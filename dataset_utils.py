@@ -101,8 +101,10 @@ def read_tfrecord(example, is_test):
     image_name = tf.cast(example['image_name'], tf.string)
     if is_test:
         class_label = tf.constant(0,dtype=tf.int32)
+        print(f'is_test {class_label}')
     else:
         class_label = tf.cast(example['target'], tf.int32)
+        print(f'is_not_test {class_label}')
     one_hot_class_label=tf.one_hot(class_label, depth=len(CLASSES))
     return image, one_hot_class_label, image_name
 
