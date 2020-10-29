@@ -18,7 +18,7 @@ DATASETS = { # available image sizes
 
 CLASSES = ['health','melanoma']
 
-BATCH_SIZE = 4*8*2 if is_debug else 4*8*2
+BATCH_SIZE = 2 if is_debug else 4*8*2
 
 # TTEST IMAGES:  10982 , STEPS PER EPOCH:  343
 # CPU
@@ -28,7 +28,7 @@ BATCH_SIZE = 4*8*2 if is_debug else 4*8*2
 #TPU
 #63it [04:13,  3.49s/it] 335/(128*63)=0,04 sec/image
 
-TRAIN_STEPS = 10 if is_debug else 10 #50000//BATCH_SIZE
+TRAIN_STEPS = 1 if is_debug else 10 #50000//BATCH_SIZE
 
 
 

@@ -4,7 +4,7 @@ import os
 import pickle
 import tensorflow as tf
 import numpy as np
-from collections import namedtuple
+import contextlib
 from matplotlib import pyplot as plt
 print("Tensorflow version " + tf.__version__)
 import tensorflow.keras.backend as K
@@ -49,17 +49,22 @@ for fold in range(CONFIG.nfolds):
     print(f'fold={fold}')
 
     if not is_debug:
-        resolver = tf.distribute.cluster_resolver.TPUClusterResolver(tpu=os.environ['TPU_NAME'])
-        tf.config.experimental_connect_to_cluster(resolver)
-        # This is the TPU initialization code that has to be at the beginning.
-        tf.tpu.experimental.initialize_tpu_system(resolver)
-        print("All devices: ", tf.config.list_logical_devices('TPU'))
-        strategy = tf.distribute.experimental.TPUStrategy(resolver)
+        tpu_key='TPU_NAME'
+        if tpu_key in os.environ:
+            resolver = tf.distribute.cluster_resolver.TPUClusterResolver(tpu=os.environ[tpu_key])
+            tf.config.experimental_connect_to_cluster(resolver)
+            # This is the TPU initialization code that has to be at the beginning.
+            tf.tpu.experimental.initialize_tpu_system(resolver)
+            print("All devices: ", tf.config.list_logical_devices('TPU'))
+            strategy = tf.distribute.experimental.TPUStrategy(resolver)
+            scope=strategy.scope()
+        else:
+            scope = contextlib.suppress()
 
     if is_debug:
         model = create_model(CONFIG)
     else:
-        with strategy.scope():
+        with scope:
             model = create_model(CONFIG)
 
     model.summary()
@@ -78,6 +83,7 @@ for fold in range(CONFIG.nfolds):
     
     validation_dataset = get_validation_dataset(val_filenames_folds[fold])
     validation_dataset_tta = get_validation_dataset_tta(val_filenames_folds[fold])
-    
+
+    submission.calc_and_save_submissions(CONFIG, model, f'test_{fold}', test_dataset, test_dataset_tta, CONFIG.ttas)
     submission.calc_and_save_submissions(CONFIG,model,f'val_{fold}',validation_dataset, validation_dataset_tta, CONFIG.ttas)
-    submission.calc_and_save_submissions(CONFIG,model,f'test_{fold}',test_dataset, test_dataset_tta,CONFIG.ttas)
+

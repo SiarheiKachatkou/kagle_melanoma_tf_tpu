@@ -7,7 +7,7 @@ def make_submission_dataframe(test_dataset, model):
     preds=[]
     names=[]
     labs=[]
-    for images, labels, image_names in test_dataset:#tqdm(test_dataset):
+    for images, labels, image_names in tqdm(test_dataset):
         labs.extend(labels.numpy())
         image_names = image_names.numpy()
 
