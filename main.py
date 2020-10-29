@@ -18,7 +18,7 @@ from create_model import create_model
 config=namedtuple('config',['lr_max','lr_start','lr_warm_up_epochs','lr_min','lr_exp_decay','nfolds','l2_penalty','model_fn_str','work_dir','ttas'])
 
 CONFIG=config(lr_max=0.0002*8, lr_start=0.0002*8, lr_warm_up_epochs=0, lr_min=0.000005,lr_exp_decay=0.8, nfolds=4,l2_penalty=1e-6, work_dir='b6_focal_loss_768',
-              model_fn_str="efficientnet.tfkeras.EfficientNetB0(weights='imagenet', include_top=False)", ttas=1)
+              model_fn_str="efficientnet.tfkeras.EfficientNetB6(weights='imagenet', include_top=False)", ttas=1)
 
 #pretrained_model = tf.keras.applications.MobileNetV2(input_shape=[*IMAGE_SIZE, 3], include_top=False)
 #pretrained_model = tf.keras.applications.Xception(input_shape=[*IMAGE_SIZE, 3], include_top=False)
@@ -28,13 +28,7 @@ CONFIG=config(lr_max=0.0002*8, lr_start=0.0002*8, lr_warm_up_epochs=0, lr_min=0.
 # EfficientNet can be loaded through efficientnet.tfkeras library (https://github.com/qubvel/efficientnet)
 
 
-if not is_debug:
-    resolver = tf.distribute.cluster_resolver.TPUClusterResolver(tpu=os.environ['TPU_NAME'])
-    tf.config.experimental_connect_to_cluster(resolver)
-    # This is the TPU initialization code that has to be at the beginning.
-    tf.tpu.experimental.initialize_tpu_system(resolver)
-    print("All devices: ", tf.config.list_logical_devices('TPU'))
-    strategy = tf.distribute.experimental.TPUStrategy(resolver)
+
 
 if not os.path.exists(CONFIG.work_dir):
     os.mkdir(CONFIG.work_dir)
@@ -64,11 +58,17 @@ test_dataset = get_test_dataset(test_filenames)
 test_dataset_tta = get_test_dataset_tta(test_filenames)
 
 for fold in range(CONFIG.nfolds):
-    
-
 
     print(f'fold={fold}')
-    
+
+    if not is_debug:
+        resolver = tf.distribute.cluster_resolver.TPUClusterResolver(tpu=os.environ['TPU_NAME'])
+        tf.config.experimental_connect_to_cluster(resolver)
+        # This is the TPU initialization code that has to be at the beginning.
+        tf.tpu.experimental.initialize_tpu_system(resolver)
+        print("All devices: ", tf.config.list_logical_devices('TPU'))
+        strategy = tf.distribute.experimental.TPUStrategy(resolver)
+
     if is_debug:
         model = create_model(CONFIG)
     else:
@@ -94,5 +94,3 @@ for fold in range(CONFIG.nfolds):
     
     submission.calc_and_save_submissions(CONFIG,model,f'val_{fold}',validation_dataset, validation_dataset_tta, CONFIG.ttas)
     submission.calc_and_save_submissions(CONFIG,model,f'test_{fold}',test_dataset, test_dataset_tta,CONFIG.ttas)
-    
-    K.clear_session()
