@@ -101,10 +101,8 @@ def read_tfrecord(example, is_test):
     image_name = tf.cast(example['image_name'], tf.string)
     if is_test:
         class_label = tf.constant(0,dtype=tf.int32)
-        print(f'is_test {class_label}')
     else:
         class_label = tf.cast(example['target'], tf.int32)
-        print(f'is_not_test {class_label}')
     one_hot_class_label=tf.one_hot(class_label, depth=len(CLASSES))
     return image, one_hot_class_label, image_name
 
@@ -210,7 +208,7 @@ def get_test_dataset_tta(test_filenames):
     return dataset
 
 def get_test_dataset(test_filenames):
-    dataset = load_dataset(test_filenames, is_test=True)
+    dataset = load_dataset(test_filenames, is_test=False)
     dataset = dataset.batch(BATCH_SIZE)
     dataset = dataset.prefetch(AUTO) # prefetch next batch while training (autotune prefetch buffer size)
     return dataset
