@@ -37,10 +37,10 @@ print("Learning rate schedule: {:.3g} to {:.3g} to {:.3g}".format(y[0], max(y), 
 train_filenames_folds, val_filenames_folds=get_train_val_filenames(DATASETS[IMAGE_HEIGHT],CONFIG.nfolds)
 test_filenames=get_test_filenames(DATASETS[IMAGE_HEIGHT])
 if is_debug:
-    test_filenames=[test_filenames[0]]
+
     train_filenames_folds=[[f[0]] for f in train_filenames_folds]
     val_filenames_folds=[[f[0]] for f in val_filenames_folds]
-
+test_filenames=[test_filenames[0]]
 print(f'test filenames {test_filenames}')
 test_dataset = get_test_dataset(test_filenames)
 test_dataset_tta = get_test_dataset_tta(test_filenames)
