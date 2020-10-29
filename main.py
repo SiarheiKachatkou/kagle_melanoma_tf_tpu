@@ -40,7 +40,8 @@ if is_debug:
     test_filenames=[test_filenames[0]]
     train_filenames_folds=[[f[0]] for f in train_filenames_folds]
     val_filenames_folds=[[f[0]] for f in val_filenames_folds]
-    
+
+print(f'test filenames {test_filenames}')
 test_dataset = get_test_dataset(test_filenames)
 test_dataset_tta = get_test_dataset_tta(test_filenames)
 
