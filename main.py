@@ -1,16 +1,12 @@
 
 
-import re
+import os
 import pickle
 import tensorflow as tf
 import numpy as np
-from tqdm import tqdm
-import pandas as pd
 from collections import namedtuple
 from matplotlib import pyplot as plt
 print("Tensorflow version " + tf.__version__)
-from kaggle_datasets import KaggleDatasets
-from tensorflow.keras import layers
 import tensorflow.keras.backend as K
 
 from consts import *
@@ -22,7 +18,7 @@ from create_model import create_model
 config=namedtuple('config',['lr_max','lr_start','lr_warm_up_epochs','lr_min','lr_exp_decay','nfolds','l2_penalty','model_fn_str','work_dir','ttas'])
 
 CONFIG=config(lr_max=0.0002*8, lr_start=0.0002*8, lr_warm_up_epochs=0, lr_min=0.000005,lr_exp_decay=0.8, nfolds=4,l2_penalty=1e-6, work_dir='b6_focal_loss_768',
-              model_fn_str="efficientnet.tfkeras.EfficientNetB6(weights='imagenet', include_top=False)", ttas=1)
+              model_fn_str="efficientnet.tfkeras.EfficientNetB0(weights='imagenet', include_top=False)", ttas=1)
 
 #pretrained_model = tf.keras.applications.MobileNetV2(input_shape=[*IMAGE_SIZE, 3], include_top=False)
 #pretrained_model = tf.keras.applications.Xception(input_shape=[*IMAGE_SIZE, 3], include_top=False)
@@ -32,7 +28,7 @@ CONFIG=config(lr_max=0.0002*8, lr_start=0.0002*8, lr_warm_up_epochs=0, lr_min=0.
 # EfficientNet can be loaded through efficientnet.tfkeras library (https://github.com/qubvel/efficientnet)
 
 
-if True: #not is_debug:
+if not is_debug:
     resolver = tf.distribute.cluster_resolver.TPUClusterResolver(tpu=os.environ['TPU_NAME'])
     tf.config.experimental_connect_to_cluster(resolver)
     # This is the TPU initialization code that has to be at the beginning.
