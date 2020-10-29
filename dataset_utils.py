@@ -208,7 +208,7 @@ def get_test_dataset_tta(test_filenames):
     return dataset
 
 def get_test_dataset(test_filenames):
-    dataset = load_dataset(test_filenames, is_test=False)
+    dataset = load_dataset(test_filenames, is_test=True)
     dataset = dataset.batch(BATCH_SIZE)
     dataset = dataset.prefetch(AUTO) # prefetch next batch while training (autotune prefetch buffer size)
     return dataset
