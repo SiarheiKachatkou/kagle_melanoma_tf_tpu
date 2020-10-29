@@ -152,11 +152,7 @@ def get_training_dataset(training_fileimages):
     dataset = dataset.prefetch(AUTO) # prefetch next batch while training (autotune prefetch buffer size)
     return dataset
 
-def get_validation_dataset(validation_fileimages):
-    dataset = load_dataset(validation_fileimages, is_test=False)
-    dataset = dataset.batch(BATCH_SIZE)
-    dataset = dataset.prefetch(AUTO) # prefetch next batch while training (autotune prefetch buffer size)
-    return dataset
+
 
 def data_tta(image, one_hot_class, image_name):
     
@@ -165,13 +161,6 @@ def data_tta(image, one_hot_class, image_name):
     image = tf.image.random_flip_up_down(image)
     image = tf.image.random_contrast(image,0.8,1.2)
     return image, one_hot_class, image_name
-
-def get_validation_dataset_tta(val_filenames):
-    dataset = load_dataset(val_filenames, is_test=False)
-    dataset = dataset.map(data_tta, num_parallel_calls=AUTO)
-    dataset = dataset.batch(BATCH_SIZE)
-    dataset = dataset.prefetch(AUTO) # prefetch next batch while training (autotune prefetch buffer size)
-    return dataset
 
 def count_data_items(filenames):
     # the number of data items is written in the name of the .tfrec files, i.e. flowers00-230.tfrec = 230 data items
@@ -197,6 +186,19 @@ def get_train_val_filenames(gs_path_to_dataset_train, nfolds):
         val_filenames_folds.append(list(filenames[test_index]))
     return train_filenames_folds, val_filenames_folds
 
+def get_validation_dataset_tta(val_filenames):
+    dataset = load_dataset(val_filenames, is_test=False)
+    dataset = dataset.map(data_tta, num_parallel_calls=AUTO)
+    dataset = dataset.batch(BATCH_SIZE)
+    dataset = dataset.prefetch(AUTO) # prefetch next batch while training (autotune prefetch buffer size)
+    return dataset
+
+
+def get_validation_dataset(validation_fileimages):
+    dataset = load_dataset(validation_fileimages, is_test=False)
+    dataset = dataset.batch(BATCH_SIZE)
+    dataset = dataset.prefetch(AUTO) # prefetch next batch while training (autotune prefetch buffer size)
+    return dataset
 
 def get_test_dataset_tta(test_filenames):
     dataset = load_dataset(test_filenames, is_test=True)
