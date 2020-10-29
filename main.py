@@ -42,7 +42,7 @@ if is_debug:
     val_filenames_folds=[[f[0]] for f in val_filenames_folds]
 
 print(f'test filenames {test_filenames}')
-test_dataset = get_validation_dataset(test_filenames)
+test_dataset = get_test_dataset(test_filenames)
 test_dataset_tta = get_test_dataset_tta(test_filenames)
 
 for fold in range(CONFIG.nfolds):

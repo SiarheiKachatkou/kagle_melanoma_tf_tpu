@@ -91,22 +91,31 @@ features = features_test.copy()
 features['target']=tf.io.FixedLenFeature([], tf.int64)
   
 
-def read_tfrecord(example, is_test):
-    
-    the_features=features_test if is_test else features
-    
-    example = tf.io.parse_single_example(example, the_features)
+def read_tfrecord(example):
+
+    example = tf.io.parse_single_example(example, features)
     image = tf.image.decode_jpeg(example['image'], channels=3)
     image = tf.cast(image, tf.float32) / 255.0 
     image_name = tf.cast(example['image_name'], tf.string)
-    if is_test:
-        class_label = tf.constant(0,dtype=tf.int32)
-    else:
-        class_label = tf.cast(example['target'], tf.int32)
+
+    class_label = tf.cast(example['target'], tf.int32)
     one_hot_class_label=tf.one_hot(class_label, depth=len(CLASSES))
     return image, one_hot_class_label, image_name
 
-    
+
+def read_tfrecord_test(example):
+
+    example = tf.io.parse_single_example(example, features_test)
+    image = tf.image.decode_jpeg(example['image'], channels=3)
+    image = tf.cast(image, tf.float32) / 255.0
+    image_name = tf.cast(example['image_name'], tf.string)
+
+    class_label = tf.constant(0, dtype=tf.int32)
+
+    one_hot_class_label = tf.one_hot(class_label, depth=len(CLASSES))
+    return image, one_hot_class_label, image_name
+
+
 def force_image_sizes(dataset, image_size):
     # explicit size needed for TPU
     reshape_images = lambda image, *args: (tf.reshape(image, [*image_size, 3]), *args)
@@ -122,7 +131,7 @@ def load_dataset(filenames, is_test):
 
     dataset = tf.data.TFRecordDataset(filenames, num_parallel_reads=AUTO) # automatically interleaves reads from multiple files
     dataset = dataset.with_options(ignore_order) # uses data as soon as it streams in, rather than in its original order
-    the_read_tfrecord=partial(read_tfrecord,is_test=is_test)
+    the_read_tfrecord=read_tfrecord_test if is_test else read_tfrecord
     dataset = dataset.map(the_read_tfrecord, num_parallel_calls=AUTO)
     dataset = force_image_sizes(dataset, IMAGE_SIZE)
     return dataset
