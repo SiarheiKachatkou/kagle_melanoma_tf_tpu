@@ -1,10 +1,7 @@
-
-pip uninstall tensorflow -y
-pip uninstall tensorflow-gpu -y
-pip install tensorflow-gpu==2.3.1
-pip install --upgrade tensorflow_datasets
-pip install -q -U albumentations
-pip install -U efficientnet
-pip install tqdm
-pip install pandas
-pip install -U scikit-learn
+#pip3 install tensorflow-gpu==2.3.1
+pip3 install --upgrade tensorflow_datasets
+pip3 install -q -U albumentations
+pip3 install -U efficientnet
+pip3 install tqdm
+pip3 install pandas
+pip3 install scikit-learn
