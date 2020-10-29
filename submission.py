@@ -8,7 +8,6 @@ def make_submission_dataframe(test_dataset, model):
     names=[]
     labs=[]
     for batch in tqdm(test_dataset):
-        print(f'batch = {batch}')
         images, labels, image_names = batch
         labs.extend(labels.numpy())
         image_names = image_names.numpy()
