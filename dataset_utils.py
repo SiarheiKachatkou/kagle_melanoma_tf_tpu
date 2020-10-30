@@ -78,20 +78,6 @@ def data_augment(image, one_hot_class, image_name):
     #image,one_hot_class = albumentaze_data(image,one_hot_class,IMAGE_SIZE)
     return image, one_hot_class, image_name
 
-def get_training_dataset(training_fileimages):
-    dataset = load_dataset(training_fileimages, is_test=False)
-    dataset = dataset.map(data_augment, num_parallel_calls=AUTO)
-    #dataset = dataset.map(partial(albumentaze_data, img_size=IMAGE_SIZE), num_parallel_calls=AUTO)
-    
-    dataset = dataset.repeat()
-    dataset = dataset.shuffle(2048)
-    
-    dataset = dataset.batch(BATCH_SIZE)
-    
-    dataset = dataset.prefetch(AUTO) # prefetch next batch while training (autotune prefetch buffer size)
-    return dataset
-
-
 
 def data_tta(image, one_hot_class, image_name):
     
@@ -124,6 +110,21 @@ def get_train_val_filenames(gs_path_to_dataset_train, nfolds):
         train_filenames_folds.append(list(filenames[train_index]))
         val_filenames_folds.append(list(filenames[test_index]))
     return train_filenames_folds, val_filenames_folds
+
+
+def get_training_dataset(training_fileimages):
+    dataset = load_dataset(training_fileimages, is_test=False)
+    dataset = dataset.map(data_augment, num_parallel_calls=AUTO)
+    # dataset = dataset.map(partial(albumentaze_data, img_size=IMAGE_SIZE), num_parallel_calls=AUTO)
+
+    dataset = dataset.repeat()
+    dataset = dataset.shuffle(2048)
+
+    dataset = dataset.batch(BATCH_SIZE)
+
+    dataset = dataset.prefetch(AUTO)  # prefetch next batch while training (autotune prefetch buffer size)
+    return dataset
+
 
 def get_validation_dataset_tta(val_filenames):
     dataset = load_dataset(val_filenames, is_test=False)

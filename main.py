@@ -59,8 +59,6 @@ if is_debug:
     train_filenames_folds=[[f[0]] for f in train_filenames_folds]
     val_filenames_folds=[[f[0]] for f in val_filenames_folds]
 
-test_dataset = get_test_dataset(test_filenames)
-test_dataset_tta = get_test_dataset_tta(test_filenames)
 
 for fold in range(CONFIG.nfolds):
 
@@ -84,7 +82,10 @@ for fold in range(CONFIG.nfolds):
     
     display_training_curves(history.history['accuracy'][1:], history.history['val_accuracy'][1:], 'accuracy', 211)
     display_training_curves(history.history['loss'][1:], history.history['val_loss'][1:], 'loss', 212)
-    
+
+    test_dataset = get_test_dataset(test_filenames)
+    test_dataset_tta = get_test_dataset_tta(test_filenames)
+
     validation_dataset = get_validation_dataset(val_filenames_folds[fold])
     validation_dataset_tta = get_validation_dataset_tta(val_filenames_folds[fold])
 
