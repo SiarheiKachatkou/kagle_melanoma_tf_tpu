@@ -1,3 +1,4 @@
+import datetime
 from collections import namedtuple
 #import os
 #os.environ['TPU_NAME']='grpc://10.63.244.98:8470'
@@ -32,11 +33,15 @@ TRAIN_STEPS = 1 if is_debug else 10 #50000//BATCH_SIZE
 
 
 
-config=namedtuple('config',['lr_max','lr_start','lr_warm_up_epochs','lr_min','lr_exp_decay','nfolds','l2_penalty','model_fn_str','work_dir','ttas'])
+config=namedtuple('config',['lr_max','lr_start','lr_warm_up_epochs','lr_min','lr_exp_decay','nfolds','l2_penalty','model_fn_str','work_dir', 'gs_work_dir','ttas'])
+
+work_dir_name='b6_focal_loss_768'
 
 CONFIG=config(lr_max=0.0002*8, lr_start=0.0002*8, lr_warm_up_epochs=0, lr_min=0.000005,lr_exp_decay=0.8, nfolds=4,
-              l2_penalty=1e-6, work_dir='b6_focal_loss_768',
-              model_fn_str="efficientnet.tfkeras.EfficientNetB6(weights='imagenet', include_top=False)", ttas=1)
+              l2_penalty=1e-6, work_dir=work_dir_name,
+              gs_work_dir=f'gs://kochetkov_kaggle_melanoma/{work_dir_name}+{str(datetime.datetime.now())}',
+              model_fn_str="efficientnet.tfkeras.EfficientNetB6(weights='imagenet', include_top=False)", ttas=1,
+              )
 
 #pretrained_model = tf.keras.applications.MobileNetV2(input_shape=[*IMAGE_SIZE, 3], include_top=False)
 #pretrained_model = tf.keras.applications.Xception(input_shape=[*IMAGE_SIZE, 3], include_top=False)
