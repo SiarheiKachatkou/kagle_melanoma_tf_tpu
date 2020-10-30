@@ -2,7 +2,8 @@ import datetime
 from collections import namedtuple
 import os
 os.environ['TPU_NAME']='grpc://10.240.1.2:8470'
-
+# To disable all logging output from TensorFlow
+os.environ["TF_CPP_MIN_LOG_LEVEL"]="3"
 
 is_debug = False
 
@@ -39,7 +40,7 @@ CONFIG=config(lr_max=0.0002*8, lr_start=0.0002*8, lr_warm_up_epochs=0, lr_min=0.
               l2_penalty=1e-6, work_dir=work_dir_name,
               gs_work_dir=f'gs://kochetkov_kaggle_melanoma/{work_dir_name}_{str(datetime.datetime.now())}',
               model_fn_str="efficientnet.tfkeras.EfficientNetB4(weights='imagenet', include_top=False)", ttas=1,
-              use_metrics=False
+              use_metrics=True
               )
 
 #pretrained_model = tf.keras.applications.MobileNetV2(input_shape=[*IMAGE_SIZE, 3], include_top=False)
