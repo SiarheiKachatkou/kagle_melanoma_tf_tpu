@@ -32,7 +32,7 @@ class BinaryFocalLoss():
                -K.sum((1 - self._alpha) * K.pow(pt_0, self._gamma) * K.log(1. - pt_0))
 
 
-auc = tf.keras.metrics.AUC()
+
 
 
 def create_model(cfg):
@@ -53,7 +53,7 @@ def create_model(cfg):
     model.compile(
         optimizer='adam',
         loss = loss_fn,#'categorical_crossentropy',#loss_fn
-        metrics=['accuracy',auc]
+        metrics=['accuracy', tf.keras.metrics.AUC(name='auc')]
     )
     
     if cfg.l2_penalty!=0:
