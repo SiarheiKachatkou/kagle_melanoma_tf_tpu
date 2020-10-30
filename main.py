@@ -9,11 +9,13 @@ from matplotlib import pyplot as plt
 print("Tensorflow version " + tf.__version__)
 import tensorflow.keras.backend as K
 
+from display_utils import display_training_curves
 from consts import *
 from dataset_utils import *
 import submission
 from create_model import BinaryFocalLoss
 from create_model import create_model
+
 
 def get_scope():
     if not is_debug:
