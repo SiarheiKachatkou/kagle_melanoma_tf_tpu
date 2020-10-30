@@ -42,9 +42,7 @@ if not os.path.exists(CONFIG.work_dir):
 shutil.copyfile('consts.py',os.path.join(CONFIG.work_dir,'consts.py'))
 
 lrfn=get_lrfn(CONFIG)
-
 lr_callback = tf.keras.callbacks.LearningRateScheduler(lrfn, verbose=True)
-
 rng = [i for i in range(EPOCHS)]
 y = [lrfn(x) for x in rng]
 plt.plot(rng, y)
@@ -77,6 +75,7 @@ for fold in range(CONFIG.nfolds):
     print("FINAL ACCURACY MEAN-5: ", np.mean(final_accuracy))
     model.save(f'{CONFIG.work_dir}/model{fold}.h5')
     print(history.history)
+
     display_training_curves(history.history['auc'][1:], history.history['val_auc'][1:], 'auc', 211)
     plt.savefig(os.path.join(CONFIG.work_dir,'auc.png'))
     display_training_curves(history.history['loss'][1:], history.history['val_loss'][1:], 'loss', 212)
