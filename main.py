@@ -76,8 +76,9 @@ for fold in range(CONFIG.nfolds):
     model.save(f'{CONFIG.work_dir}/model{fold}.h5')
     print(history.history)
 
-    display_training_curves(history.history['auc'][1:], history.history['val_auc'][1:], 'auc', 211)
-    plt.savefig(os.path.join(CONFIG.work_dir, f'auc_{fold}.png'))
+    if CONFIG.use_metrics:
+        display_training_curves(history.history['auc'][1:], history.history['val_auc'][1:], 'auc', 211)
+        plt.savefig(os.path.join(CONFIG.work_dir, f'auc_{fold}.png'))
     display_training_curves(history.history['loss'][1:], history.history['val_loss'][1:], 'loss', 212)
     plt.savefig(os.path.join(CONFIG.work_dir, f'loss{fold}.png'))
 

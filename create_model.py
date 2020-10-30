@@ -49,11 +49,12 @@ def create_model(cfg):
     ])
     
     loss_fn=BinaryFocalLoss(gamma=2.0, alpha=0.25)
-    
+
+    metrics=['accuracy', tf.keras.metrics.AUC(name='auc')] if cfg.use_metrics else None
     model.compile(
         optimizer='adam',
         loss = loss_fn,#'categorical_crossentropy',#loss_fn
-        metrics=['accuracy', tf.keras.metrics.AUC(name='auc')]
+        metrics=metrics
     )
     
     if cfg.l2_penalty!=0:
