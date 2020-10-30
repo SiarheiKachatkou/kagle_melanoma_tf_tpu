@@ -57,7 +57,6 @@ if is_debug:
     train_filenames_folds=[[f[0]] for f in train_filenames_folds]
     val_filenames_folds=[[f[0]] for f in val_filenames_folds]
 
-print(f'test filenames {test_filenames}')
 test_dataset = get_test_dataset(test_filenames)
 test_dataset_tta = get_test_dataset_tta(test_filenames)
 
@@ -87,6 +86,8 @@ for fold in range(CONFIG.nfolds):
     validation_dataset = get_validation_dataset(val_filenames_folds[fold])
     validation_dataset_tta = get_validation_dataset_tta(val_filenames_folds[fold])
 
+    submission.calc_and_save_submissions(CONFIG, model, f'val_{fold}', validation_dataset, validation_dataset_tta,
+                                         CONFIG.ttas)
     submission.calc_and_save_submissions(CONFIG, model, f'test_{fold}', test_dataset, test_dataset_tta, CONFIG.ttas)
-    submission.calc_and_save_submissions(CONFIG,model,f'val_{fold}',validation_dataset, validation_dataset_tta, CONFIG.ttas)
+
 
