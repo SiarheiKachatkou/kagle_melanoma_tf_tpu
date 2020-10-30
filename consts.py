@@ -1,7 +1,7 @@
 import datetime
 from collections import namedtuple
-#import os
-#os.environ['TPU_NAME']='grpc://10.63.244.98:8470'
+import os
+os.environ['TPU_NAME']='grpc://10.240.1.2:8470'
 
 
 is_debug = False
