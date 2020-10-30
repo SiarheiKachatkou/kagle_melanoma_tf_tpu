@@ -76,7 +76,7 @@ for fold in range(CONFIG.nfolds):
     final_accuracy = history.history["val_accuracy"][-5:]
     print("FINAL ACCURACY MEAN-5: ", np.mean(final_accuracy))
     model.save(f'{CONFIG.work_dir}/model{fold}.h5')
-    
+    print(history.history)
     display_training_curves(history.history['auc'][1:], history.history['val_auc'][1:], 'auc', 211)
     plt.savefig(os.path.join(CONFIG.work_dir,'auc.png'))
     display_training_curves(history.history['loss'][1:], history.history['val_loss'][1:], 'loss', 212)
