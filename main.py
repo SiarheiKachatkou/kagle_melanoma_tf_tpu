@@ -4,6 +4,7 @@ import os
 import pickle
 import tensorflow as tf
 import numpy as np
+import subprocess
 import contextlib
 from matplotlib import pyplot as plt
 print("Tensorflow version " + tf.__version__)
@@ -90,5 +91,7 @@ for fold in range(CONFIG.nfolds):
     submission.calc_and_save_submissions(CONFIG, model, f'val_{fold}', validation_dataset, validation_dataset_tta,
                                          CONFIG.ttas)
     submission.calc_and_save_submissions(CONFIG, model, f'test_{fold}', test_dataset, test_dataset_tta, CONFIG.ttas)
-    tf.io.gfile.copy(CONFIG.work_dir,CONFIG.gs_work_dir)
+
+    subprocess.check_call(['gsutil', 'cp', '-r', CONFIG.work_dir,CONFIG.gs_work_dir])
+
 
