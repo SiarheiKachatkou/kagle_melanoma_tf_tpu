@@ -77,9 +77,9 @@ for fold in range(CONFIG.nfolds):
     print(history.history)
 
     display_training_curves(history.history['auc'][1:], history.history['val_auc'][1:], 'auc', 211)
-    plt.savefig(os.path.join(CONFIG.work_dir,'auc.png'))
+    plt.savefig(os.path.join(CONFIG.work_dir, f'auc_{fold}.png'))
     display_training_curves(history.history['loss'][1:], history.history['val_loss'][1:], 'loss', 212)
-    plt.savefig(os.path.join(CONFIG.work_dir, 'loss.png'))
+    plt.savefig(os.path.join(CONFIG.work_dir, f'loss{fold}.png'))
 
     test_dataset = get_test_dataset(test_filenames)
     test_dataset_tta = get_test_dataset_tta(test_filenames)
@@ -91,6 +91,6 @@ for fold in range(CONFIG.nfolds):
                                          CONFIG.ttas)
     submission.calc_and_save_submissions(CONFIG, model, f'test_{fold}', test_dataset, test_dataset_tta, CONFIG.ttas)
 
-    subprocess.check_call(['gsutil', 'cp', '-r', CONFIG.work_dir,CONFIG.gs_work_dir])
+    subprocess.check_call(['gsutil', '-m', 'cp', '-r', CONFIG.work_dir,CONFIG.gs_work_dir])
 
 
