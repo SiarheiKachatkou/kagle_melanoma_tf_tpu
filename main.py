@@ -70,7 +70,8 @@ for fold in range(CONFIG.nfolds):
     validation_dataset = get_validation_dataset(val_filenames_folds[fold])
     
     history = model.fit(return_2_values(training_dataset), validation_data=return_2_values(validation_dataset),
-                        steps_per_epoch=TRAIN_STEPS, epochs=EPOCHS, callbacks=[lr_callback])
+                        steps_per_epoch=TRAIN_STEPS, epochs=EPOCHS, callbacks=[lr_callback],
+                        workers=8, use_multiprocessing=True)
 
     final_accuracy = history.history["val_accuracy"][-5:]
     print("FINAL ACCURACY MEAN-5: ", np.mean(final_accuracy))
