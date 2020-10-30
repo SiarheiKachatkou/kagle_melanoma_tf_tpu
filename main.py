@@ -15,7 +15,23 @@ import submission
 from create_model import BinaryFocalLoss
 from create_model import create_model
 
+def get_scope():
+    if not is_debug:
+        tpu_key='TPU_NAME'
+        if tpu_key in os.environ:
+            resolver = tf.distribute.cluster_resolver.TPUClusterResolver(tpu=os.environ[tpu_key])
+            tf.config.experimental_connect_to_cluster(resolver)
+            # This is the TPU initialization code that has to be at the beginning.
+            tf.tpu.experimental.initialize_tpu_system(resolver)
+            print("All devices: ", tf.config.list_logical_devices('TPU'))
+            strategy = tf.distribute.experimental.TPUStrategy(resolver)
+            scope=strategy.scope()
+        else:
+            scope = contextlib.suppress()
+    else:
+        scope = contextlib.suppress()
 
+    return scope
 
 if not os.path.exists(CONFIG.work_dir):
     os.mkdir(CONFIG.work_dir)
@@ -49,24 +65,10 @@ for fold in range(CONFIG.nfolds):
 
     print(f'fold={fold}')
 
-    if not is_debug:
-        tpu_key='TPU_NAME'
-        if tpu_key in os.environ:
-            resolver = tf.distribute.cluster_resolver.TPUClusterResolver(tpu=os.environ[tpu_key])
-            tf.config.experimental_connect_to_cluster(resolver)
-            # This is the TPU initialization code that has to be at the beginning.
-            tf.tpu.experimental.initialize_tpu_system(resolver)
-            print("All devices: ", tf.config.list_logical_devices('TPU'))
-            strategy = tf.distribute.experimental.TPUStrategy(resolver)
-            scope=strategy.scope()
-        else:
-            scope = contextlib.suppress()
+    scope = get_scope()
 
-    if is_debug:
+    with scope:
         model = create_model(CONFIG)
-    else:
-        with scope:
-            model = create_model(CONFIG)
 
     model.summary()
     training_dataset = get_training_dataset(train_filenames_folds[fold])
