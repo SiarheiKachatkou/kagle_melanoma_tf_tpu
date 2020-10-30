@@ -30,6 +30,7 @@ def get_scope():
             strategy = tf.distribute.experimental.TPUStrategy(resolver)
             scope=strategy.scope()
         else:
+            print(f'{tpu_key} not found in {os.environ}')
             scope = contextlib.suppress()
     else:
         scope = contextlib.suppress()
