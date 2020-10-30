@@ -38,7 +38,7 @@ def get_scope():
 if not os.path.exists(CONFIG.work_dir):
     os.mkdir(CONFIG.work_dir)
     
-shutil.copyfile('const.py',os.path.join(CONFIG.work_dir,'const.py'))
+shutil.copyfile('consts.py',os.path.join(CONFIG.work_dir,'consts.py'))
 
 lrfn=get_lrfn(CONFIG)
 
