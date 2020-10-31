@@ -20,7 +20,7 @@ DATASETS = { # available image sizes
 
 CLASSES = ['health','melanoma']
 
-BATCH_SIZE = 2 if is_debug else 6*8*2
+BATCH_SIZE = 2 if is_debug else 4*8*2
 
 # 4*8*2 = 64- 18 min/epoch
 # 6*8=48 - 27 min/epoch
