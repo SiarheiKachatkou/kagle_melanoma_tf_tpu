@@ -22,7 +22,7 @@ DATASETS = { # available image sizes
 
 CLASSES = ['health','melanoma']
 
-BATCH_SIZE = 2 if is_debug else 4*8
+BATCH_SIZE = 2 if is_debug else 2*8
 
 # 4*8*2 = 64- 18 min/epoch (time from TPU monitor)
 # 6*8=48 - 27 min/epoch (time from TPU monitor)
