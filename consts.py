@@ -1,8 +1,10 @@
 import datetime
 from collections import namedtuple
 import os
-os.environ['TPU_NAME']='grpc://10.240.1.2:8470'
-# To disable all logging output from TensorFlow
+os.environ['TPU_NAME']="grpc://10.240.1.10:8470"
+
+#'grpc://10.240.1.2:8470'
+
 os.environ["TF_CPP_MIN_LOG_LEVEL"]="3"
 
 is_debug = False
@@ -38,7 +40,7 @@ TRAIN_STEPS = 1 if is_debug else 50000//BATCH_SIZE
 
 config=namedtuple('config',['lr_max','lr_start','lr_warm_up_epochs','lr_min','lr_exp_decay','nfolds','l2_penalty','model_fn_str','work_dir', 'gs_work_dir','ttas','use_metrics'])
 
-work_dir_name='b4_focal_loss_768'
+work_dir_name='b4_focal_loss_768_hair'
 
 CONFIG=config(lr_max=0.0002*8, lr_start=0.0002*8, lr_warm_up_epochs=0, lr_min=0.000005,lr_exp_decay=0.8, nfolds=4,
               l2_penalty=1e-6, work_dir=work_dir_name,

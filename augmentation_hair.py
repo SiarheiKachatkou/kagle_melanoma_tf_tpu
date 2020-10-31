@@ -1,7 +1,7 @@
 import tensorflow as tf
 from consts import IMAGE_HEIGHT
 
-GCS_PATH_hair_images = "gs:///kochetkov_kaggle_melanoma/malanoma_hairs"
+GCS_PATH_hair_images = "gs://kochetkov_kaggle_melanoma/malanoma_hairs"
 hair_images = tf.io.gfile.glob(GCS_PATH_hair_images + '/*.png')
 hair_images_tf=tf.convert_to_tensor(hair_images)
 
