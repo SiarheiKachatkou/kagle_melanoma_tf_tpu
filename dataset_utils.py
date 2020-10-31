@@ -6,6 +6,7 @@ import numpy as np
 import tensorflow as tf
 AUTO = tf.data.experimental.AUTOTUNE
 from consts import *
+from augmentation_hair import hair_aug_tf
 
 features_test = {
       'image': tf.io.FixedLenFeature([], tf.string),
@@ -75,6 +76,7 @@ def data_augment(image, one_hot_class, image_name):
     image = tf.image.random_flip_left_right(image)
     image = tf.image.random_flip_up_down(image)
     image = tf.image.random_contrast(image,0.8,1.2)
+    image = hair_aug_tf(image, augment=True)
     #image,one_hot_class = albumentaze_data(image,one_hot_class,IMAGE_SIZE)
     return image, one_hot_class, image_name
 

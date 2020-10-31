@@ -22,9 +22,9 @@ CLASSES = ['health','melanoma']
 
 BATCH_SIZE = 2 if is_debug else 4*8*2
 
-# 4*8*2 = 64- 18 min/epoch
-# 6*8=48 - 27 min/epoch
-# 4*8 = 32 - 10 min/epoch
+# 4*8*2 = 64- 18 min/epoch (time from TPU monitor)
+# 6*8=48 - 27 min/epoch (time from TPU monitor)
+# 4*8 = 32 - 10 min/epoch (time from ETA)
 
 # TTEST IMAGES:  10982 , STEPS PER EPOCH:  343
 # CPU
