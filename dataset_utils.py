@@ -7,6 +7,7 @@ import tensorflow as tf
 AUTO = tf.data.experimental.AUTOTUNE
 from consts import *
 from augmentation_hair import hair_aug_tf
+from augmentations import cutout, transform
 
 features_test = {
       'image': tf.io.FixedLenFeature([], tf.string),
@@ -53,6 +54,7 @@ def force_image_sizes(dataset, image_size):
     dataset = dataset.map(reshape_images, num_parallel_calls=AUTO)
     return dataset
 
+
 def load_dataset(filenames, is_test):
     # Read from TFRecords. For optimal performance, reading from multiple files at once and
     # disregarding data order. Order does not matter since we will be shuffling the data anyway.
@@ -67,6 +69,7 @@ def load_dataset(filenames, is_test):
     dataset = force_image_sizes(dataset, IMAGE_SIZE)
     return dataset
 
+
 def data_augment(image, one_hot_class, image_name):
     # data augmentation. Thanks to the dataset.prefetch(AUTO) statement in the next function (below),
     # this happens essentially for free on TPU. Data pipeline code is executed on the "CPU" part
@@ -76,6 +79,14 @@ def data_augment(image, one_hot_class, image_name):
     image = tf.image.random_flip_left_right(image)
     image = tf.image.random_flip_up_down(image)
     image = tf.image.random_contrast(image,0.8,1.2)
+    image = cutout(image, IMAGE_HEIGHT, prob=0.5, holes_count=3, hole_size=0.2)
+    shift=0.1*IMAGE_HEIGHT
+    shear=0.01*IMAGE_HEIGHT
+    zoom=0.1
+    image = transform(image, IMAGE_HEIGHT, prob=0.5, rot_limit=180, shr_limit=shear,
+                      hshift=shift, wshift=shift,
+                      hzoom=zoom, wzoom=zoom)
+
     #image = hair_aug_tf(image, augment=True)
     #image,one_hot_class = albumentaze_data(image,one_hot_class,IMAGE_SIZE)
     return image, one_hot_class, image_name

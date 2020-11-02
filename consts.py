@@ -13,7 +13,7 @@ is_debug = False
 
 EPOCHS = 1 if is_debug else 10
 
-IMAGE_HEIGHT = 768
+IMAGE_HEIGHT = 128 #768
 
 IMAGE_SIZE=[IMAGE_HEIGHT, IMAGE_HEIGHT]
 
