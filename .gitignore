@@ -130,3 +130,6 @@ dmypy.json
 b6_focal_loss_768/
 ./idea
 ./idea
+b4_focal_loss_768
+b4_focal_loss_768_final
+b4_focal_loss_768_hair
