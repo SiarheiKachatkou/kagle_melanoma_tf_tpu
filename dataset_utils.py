@@ -76,7 +76,7 @@ def data_augment(image, one_hot_class, image_name):
     image = tf.image.random_flip_left_right(image)
     image = tf.image.random_flip_up_down(image)
     image = tf.image.random_contrast(image,0.8,1.2)
-    image = hair_aug_tf(image, augment=True)
+    #image = hair_aug_tf(image, augment=True)
     #image,one_hot_class = albumentaze_data(image,one_hot_class,IMAGE_SIZE)
     return image, one_hot_class, image_name
 
