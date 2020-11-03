@@ -28,8 +28,8 @@ class BinaryFocalLoss():
         # clip to prevent NaN's and Inf's
         pt_1 = K.clip(pt_1, epsilon, 1. - epsilon)
         pt_0 = K.clip(pt_0, epsilon, 1. - epsilon)
-        return -K.sum(self._alpha * K.pow(1. - pt_1, self._gamma) * K.log(pt_1)) \
-               -K.sum((1 - self._alpha) * K.pow(pt_0, self._gamma) * K.log(1. - pt_0))
+        return -K.mean(self._alpha * K.pow(1. - pt_1, self._gamma) * K.log(pt_1)) \
+               -K.mean((1 - self._alpha) * K.pow(pt_0, self._gamma) * K.log(1. - pt_0))
 
 
 def compile_model(model, metrics, cfg):
