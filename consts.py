@@ -23,7 +23,7 @@ DATASETS = {
 
 CLASSES = ['health','melanoma']
 
-red = 8
+red = 16
 
 BATCH_SIZE = 2 if is_debug else 4*8*2//red
 
