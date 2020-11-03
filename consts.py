@@ -1,11 +1,9 @@
 import datetime
 from collections import namedtuple
 import os
-os.environ['TPU_NAME']='grpc://10.240.1.2:8470' #tpu3
-
-    #"grpc://10.240.1.10:8470" #tpu2
-
-
+tpu3='grpc://10.240.1.2:8470'
+tpu2="grpc://10.240.1.10:8470"
+os.environ['TPU_NAME']=tpu2
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"]="3"
 
@@ -25,7 +23,7 @@ DATASETS = {
 
 CLASSES = ['health','melanoma']
 
-BATCH_SIZE = 2 if is_debug else 4*8*2 #2*8
+BATCH_SIZE = 2 if is_debug else 2*8 #4*8*2 #2*8
 
 # 4*8*2 = 64- 18 min/epoch (time from TPU monitor)
 # 6*8=48 - 27 min/epoch (time from TPU monitor)
@@ -43,13 +41,13 @@ TRAIN_STEPS = 1 if is_debug else 50000//BATCH_SIZE
 
 config=namedtuple('config',['lr_max','lr_start','lr_warm_up_epochs','lr_min','lr_exp_decay','nfolds','l2_penalty','model_fn_str','work_dir', 'gs_work_dir','ttas','use_metrics'])
 
-work_dir_name='b4_focal_loss_768_old_datasets'
+work_dir_name='b7_focal_loss_768_old_datasets'
 
 red=1
 CONFIG=config(lr_max=0.0002*8/red, lr_start=0.0002*8/red, lr_warm_up_epochs=0, lr_min=0.000005/red,lr_exp_decay=0.8, nfolds=4,
               l2_penalty=1e-6, work_dir=work_dir_name,
               gs_work_dir=f'gs://kochetkov_kaggle_melanoma/{work_dir_name}_{str(datetime.datetime.now())}',
-              model_fn_str="efficientnet.tfkeras.EfficientNetB4(weights='imagenet', include_top=False)", ttas=1,
+              model_fn_str="efficientnet.tfkeras.EfficientNetB7(weights='imagenet', include_top=False)", ttas=1,
               use_metrics=True
               )
 
