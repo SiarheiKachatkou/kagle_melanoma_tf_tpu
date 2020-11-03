@@ -65,3 +65,7 @@ def create_model(cfg):
                   setattr(layer, attr, regularizer)
     
     return model
+
+
+def set_backbone_trainable(model, flag):
+    model.layers[0].trainable = flag

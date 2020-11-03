@@ -33,13 +33,20 @@ features_old = {
 
 features = features_test.copy()
 features['target']=tf.io.FixedLenFeature([], tf.int64)
+
+
+def _normalize(image8u):
+    image = tf.cast(image8u,tf.float32)
+    image = tf.keras.applications.imagenet_utils.preprocess_input(image, mode='torch')
+    return image
+
   
 
 def read_tfrecord(example):
 
     example = tf.io.parse_single_example(example, features)
     image = tf.image.decode_jpeg(example['image'], channels=3)
-    image = tf.cast(image, tf.float32) / 255.0 
+    image = _normalize(image)
     image_name = tf.cast(example['image_name'], tf.string)
 
     class_label = tf.cast(example['target'], tf.int32)
@@ -51,7 +58,7 @@ def read_tfrecord_test(example):
 
     example = tf.io.parse_single_example(example, features_test)
     image = tf.image.decode_jpeg(example['image'], channels=3)
-    image = tf.cast(image, tf.float32) / 255.0
+    image = _normalize(image)
     image_name = tf.cast(example['image_name'], tf.string)
 
     class_label = tf.constant(0, dtype=tf.int32)
@@ -64,7 +71,7 @@ def read_tfrecord_old(example):
 
     example = tf.io.parse_single_example(example, features_old)
     image = tf.image.decode_jpeg(example['image'], channels=3)
-    image = tf.cast(image, tf.float32) / 255.0
+    image = _normalize(image)
     image_name = tf.cast(example['image_name'], tf.string)
 
     class_label = tf.cast(example['target'], tf.int32)
