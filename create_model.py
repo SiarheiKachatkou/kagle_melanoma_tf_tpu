@@ -32,10 +32,9 @@ class BinaryFocalLoss():
                -K.sum((1 - self._alpha) * K.pow(pt_0, self._gamma) * K.log(1. - pt_0))
 
 
-def compile_model(model, cfg):
+def compile_model(model, metrics, cfg):
     loss_fn = BinaryFocalLoss(gamma=2.0, alpha=0.25)
 
-    metrics = ['accuracy', tf.keras.metrics.AUC(name='auc')] if cfg.use_metrics else None
     model.compile(
         optimizer='adam',
         loss=loss_fn,  # 'categorical_crossentropy',#loss_fn
@@ -45,7 +44,7 @@ def compile_model(model, cfg):
     return model
 
 
-def create_model(cfg, backbone_trainable=True):
+def create_model(cfg,  metrics, backbone_trainable=True):
 
     pretrained_model = eval(cfg.model_fn_str) 
     
@@ -65,11 +64,11 @@ def create_model(cfg, backbone_trainable=True):
                 if hasattr(layer, attr):
                     setattr(layer, attr, regularizer)
 
-    model = compile_model(model, cfg)
+    model = compile_model(model, metrics, cfg)
 
     return model
 
 
-def set_backbone_trainable(model, flag, cfg):
+def set_backbone_trainable(model, metrics, flag, cfg):
     model.layers[0].trainable = flag
-    return compile_model(model, cfg)
+    return compile_model(model, metrics, cfg)

@@ -63,7 +63,8 @@ for fold in range(CONFIG.nfolds):
     print(f'fold={fold}')
     scope = get_scope()
     with scope:
-        model = create_model(CONFIG, backbone_trainable=False)
+        metrics = ['accuracy', tf.keras.metrics.AUC(name='auc')] if CONFIG.use_metrics else None
+        model = create_model(CONFIG, metrics, backbone_trainable=False)
 
     model.summary()
     training_dataset = get_training_dataset(train_filenames_folds[fold], DATASETS[IMAGE_HEIGHT]['old'])
@@ -73,8 +74,8 @@ for fold in range(CONFIG.nfolds):
                                   validation_data=return_2_values(validation_dataset), steps_per_epoch=TRAIN_STEPS,
                                   epochs=EPOCHS_FINE_TUNE, callbacks=[lr_callback])
 
-    with scope:
-        model = set_backbone_trainable(model, True, CONFIG)
+
+    model = set_backbone_trainable(model, metrics, True, CONFIG)
 
     history = model.fit(return_2_values(training_dataset), validation_data=return_2_values(validation_dataset),
                         steps_per_epoch=TRAIN_STEPS, initial_epoch=EPOCHS_FINE_TUNE, epochs=EPOCHS_FULL, callbacks=[lr_callback])
