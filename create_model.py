@@ -1,6 +1,7 @@
 import tensorflow as tf
 import efficientnet.tfkeras
 import tensorflow.keras.backend as K
+from consts import BATCH_SIZE
 
 class BinaryFocalLoss():
     def __init__(self, gamma=0.2, alpha=0.25):
@@ -28,8 +29,9 @@ class BinaryFocalLoss():
         # clip to prevent NaN's and Inf's
         pt_1 = K.clip(pt_1, epsilon, 1. - epsilon)
         pt_0 = K.clip(pt_0, epsilon, 1. - epsilon)
-        return -K.mean(self._alpha * K.pow(1. - pt_1, self._gamma) * K.log(pt_1)) \
-               -K.mean((1 - self._alpha) * K.pow(pt_0, self._gamma) * K.log(1. - pt_0))
+        loss = -K.sum(self._alpha * K.pow(1. - pt_1, self._gamma) * K.log(pt_1)) \
+               -K.sum((1 - self._alpha) * K.pow(pt_0, self._gamma) * K.log(1. - pt_0))
+        return loss/BATCH_SIZE
 
 
 def compile_model(model, metrics, cfg):
