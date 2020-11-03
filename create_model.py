@@ -32,14 +32,24 @@ class BinaryFocalLoss():
                -K.sum((1 - self._alpha) * K.pow(pt_0, self._gamma) * K.log(1. - pt_0))
 
 
+def compile_model(model):
+    loss_fn = BinaryFocalLoss(gamma=2.0, alpha=0.25)
+
+    metrics = ['accuracy', tf.keras.metrics.AUC(name='auc')] if cfg.use_metrics else None
+    model.compile(
+        optimizer='adam',
+        loss=loss_fn,  # 'categorical_crossentropy',#loss_fn
+        metrics=metrics
+    )
+
+    return model
 
 
-
-def create_model(cfg):
+def create_model(cfg, backbone_trainable=True):
 
     pretrained_model = eval(cfg.model_fn_str) 
     
-    pretrained_model.trainable = True
+    pretrained_model.trainable = backbone_trainable
 
     model = tf.keras.Sequential([
         pretrained_model,
@@ -47,25 +57,19 @@ def create_model(cfg):
         #tf.keras.layers.Flatten(),
         tf.keras.layers.Dense(2, activation='softmax')
     ])
-    
-    loss_fn=BinaryFocalLoss(gamma=2.0, alpha=0.25)
 
-    metrics=['accuracy', tf.keras.metrics.AUC(name='auc')] if cfg.use_metrics else None
-    model.compile(
-        optimizer='adam',
-        loss = loss_fn,#'categorical_crossentropy',#loss_fn
-        metrics=metrics
-    )
-    
-    if cfg.l2_penalty!=0:
+    if cfg.l2_penalty != 0:
         regularizer = tf.keras.regularizers.l2(cfg.l2_penalty)
         for layer in model.layers:
             for attr in ['kernel_regularizer']:
                 if hasattr(layer, attr):
-                  setattr(layer, attr, regularizer)
-    
+                    setattr(layer, attr, regularizer)
+
+    model = compile_model(model)
+
     return model
 
 
 def set_backbone_trainable(model, flag):
     model.layers[0].trainable = flag
+    return compile_model(model)

@@ -63,7 +63,7 @@ def cutout(image, IMG_HEIGHT=256, prob = 0.75, holes_count = 8, hole_size = 0.2)
         xb = tf.math.minimum(IMG_HEIGHT,x+WIDTH//2)
         # DROPOUT IMAGE
         one = image[ya:yb,0:xa,:]
-        two = tf.ones([yb-ya,xb-xa,3])*tf.random.uniform((),maxval=1.0)
+        two = tf.ones([yb-ya,xb-xa,3])*tf.random.uniform((),minval=-1, maxval=1.0)
         three = image[ya:yb,xb:IMG_HEIGHT,:]
         middle = tf.concat([one,two,three],axis=1)
         image = tf.concat([image[0:ya,:,:],middle,image[yb:IMG_HEIGHT,:,:]],axis=0)
