@@ -40,7 +40,7 @@ BATCH_SIZE = 2 if is_debug else 4*8*2//red
 #TPU
 #63it [04:13,  3.49s/it] 335/(128*63)=0,04 sec/image
 
-TRAIN_STEPS = 1 if is_debug else 10 #50000//BATCH_SIZE
+TRAIN_STEPS = 1 if is_debug else 50000//BATCH_SIZE
 
 config=namedtuple('config',['lr_max','lr_start','lr_warm_up_epochs','lr_min','lr_exp_decay','nfolds','l2_penalty','model_fn_str','work_dir', 'gs_work_dir','ttas','use_metrics'])
 
