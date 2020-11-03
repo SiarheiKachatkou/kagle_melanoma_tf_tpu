@@ -32,7 +32,7 @@ class BinaryFocalLoss():
                -K.sum((1 - self._alpha) * K.pow(pt_0, self._gamma) * K.log(1. - pt_0))
 
 
-def compile_model(model):
+def compile_model(model, cfg):
     loss_fn = BinaryFocalLoss(gamma=2.0, alpha=0.25)
 
     metrics = ['accuracy', tf.keras.metrics.AUC(name='auc')] if cfg.use_metrics else None
@@ -65,11 +65,11 @@ def create_model(cfg, backbone_trainable=True):
                 if hasattr(layer, attr):
                     setattr(layer, attr, regularizer)
 
-    model = compile_model(model)
+    model = compile_model(model, cfg)
 
     return model
 
 
-def set_backbone_trainable(model, flag):
+def set_backbone_trainable(model, flag, cfg):
     model.layers[0].trainable = flag
-    return compile_model(model)
+    return compile_model(model, cfg)
