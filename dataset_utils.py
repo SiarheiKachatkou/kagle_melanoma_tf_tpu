@@ -18,6 +18,18 @@ features_test = {
       'anatom_site_general_challenge': tf.io.FixedLenFeature([], tf.int64)
   }
 
+features_old = {
+  'image': tf.io.FixedLenFeature([], tf.string),
+  'image_name': tf.io.FixedLenFeature([], tf.string),
+  'patient_id': tf.io.FixedLenFeature([], tf.int64),
+  'sex': tf.io.FixedLenFeature([], tf.int64),
+  'age_approx': tf.io.FixedLenFeature([], tf.int64),
+  'anatom_site_general_challenge': tf.io.FixedLenFeature([], tf.int64),
+  'diagnosis': tf.io.FixedLenFeature([], tf.int64),
+  'target': tf.io.FixedLenFeature([], tf.int64),
+  'width': tf.io.FixedLenFeature([], tf.int64),
+  'height': tf.io.FixedLenFeature([], tf.int64)
+}
 
 features = features_test.copy()
 features['target']=tf.io.FixedLenFeature([], tf.int64)
@@ -48,6 +60,19 @@ def read_tfrecord_test(example):
     return image, one_hot_class_label, image_name
 
 
+def read_tfrecord_old(example):
+
+    example = tf.io.parse_single_example(example, features_old)
+    image = tf.image.decode_jpeg(example['image'], channels=3)
+    image = tf.cast(image, tf.float32) / 255.0
+    image_name = tf.cast(example['image_name'], tf.string)
+
+    class_label = tf.cast(example['target'], tf.int32)
+
+    one_hot_class_label = tf.one_hot(class_label, depth=len(CLASSES))
+    return image, one_hot_class_label, image_name
+
+
 def force_image_sizes(dataset, image_size):
     # explicit size needed for TPU
     reshape_images = lambda image, *args: (tf.reshape(image, [*image_size, 3]), *args)
@@ -69,6 +94,19 @@ def load_dataset(filenames, is_test):
     dataset = force_image_sizes(dataset, IMAGE_SIZE)
     return dataset
 
+
+def load_dataset_old(fileimages_old):
+    ignore_order = tf.data.Options()
+    ignore_order.experimental_deterministic = False
+
+    dataset = tf.data.TFRecordDataset(fileimages_old,
+                                      num_parallel_reads=AUTO)  # automatically interleaves reads from multiple files
+    dataset = dataset.with_options(
+        ignore_order)  # uses data as soon as it streams in, rather than in its original order
+
+    dataset = dataset.map(read_tfrecord_old, num_parallel_calls=AUTO)
+    dataset = force_image_sizes(dataset, IMAGE_SIZE)
+    return dataset
 
 def data_augment(image, one_hot_class, image_name):
     # data augmentation. Thanks to the dataset.prefetch(AUTO) statement in the next function (below),
@@ -125,10 +163,11 @@ def get_train_val_filenames(gs_path_to_dataset_train, nfolds):
     return train_filenames_folds, val_filenames_folds
 
 
-def get_training_dataset(training_fileimages):
+def get_training_dataset(training_fileimages, training_fileimages_old):
     dataset = load_dataset(training_fileimages, is_test=False)
+    dataset_old = load_dataset_old(training_fileimages_old)
+    dataset.concatenate(dataset_old)
     dataset = dataset.map(data_augment, num_parallel_calls=AUTO)
-    # dataset = dataset.map(partial(albumentaze_data, img_size=IMAGE_SIZE), num_parallel_calls=AUTO)
 
     dataset = dataset.repeat()
     dataset = dataset.shuffle(2048)

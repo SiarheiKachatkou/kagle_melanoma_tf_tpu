@@ -17,9 +17,10 @@ IMAGE_HEIGHT = 768
 
 IMAGE_SIZE=[IMAGE_HEIGHT, IMAGE_HEIGHT]
 
-DATASETS = { # available image sizes
-    128: 'gs://kaggle_melanoma_isic/isic2020-128-colornormed-tfrecord' +'/train*.tfrec',
-    768: 'gs://kaggle_melanoma_isic/isic2020-768-colornormed-tfrecord/archive/train*.tfrec'
+DATASETS = {
+            128: {'new': 'gs://kaggle_melanoma_isic/isic2020-128-colornormed-tfrecord' +'/train*.tfrec'},
+            768: {'new': 'gs://kaggle_melanoma_isic/isic2020-768-colornormed-tfrecord/archive/train*.tfrec',
+                  'old': 'gs://kaggle_melanoma_isic/old-768-tfrecord/train*.tfrec'}
 }
 
 CLASSES = ['health','melanoma']

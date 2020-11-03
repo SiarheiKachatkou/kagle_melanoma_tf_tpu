@@ -50,8 +50,8 @@ plt.plot(rng, y)
 plt.title("Learning rate schedule: {:.3g} to {:.3g} to {:.3g}".format(y[0], max(y), y[-1]))
 plt.savefig(os.path.join(CONFIG.work_dir,'lr_schedule.png'))
 
-train_filenames_folds, val_filenames_folds=get_train_val_filenames(DATASETS[IMAGE_HEIGHT],CONFIG.nfolds)
-test_filenames=get_test_filenames(DATASETS[IMAGE_HEIGHT])
+train_filenames_folds, val_filenames_folds=get_train_val_filenames(DATASETS[IMAGE_HEIGHT]['new'],CONFIG.nfolds)
+test_filenames=get_test_filenames(DATASETS[IMAGE_HEIGHT]['new'])
 if is_debug:
     test_filenames = [test_filenames[0]]
     train_filenames_folds=[[f[0]] for f in train_filenames_folds]
@@ -66,7 +66,7 @@ for fold in range(CONFIG.nfolds):
         model = create_model(CONFIG)
 
     model.summary()
-    training_dataset = get_training_dataset(train_filenames_folds[fold])
+    training_dataset = get_training_dataset(train_filenames_folds[fold], DATASETS[IMAGE_HEIGHT]['old'])
     validation_dataset = get_validation_dataset(val_filenames_folds[fold])
     
     history = model.fit(return_2_values(training_dataset), validation_data=return_2_values(validation_dataset),
