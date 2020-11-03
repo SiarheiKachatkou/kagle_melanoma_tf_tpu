@@ -43,6 +43,13 @@ def compile_model(model, metrics, cfg):
         metrics=metrics
     )
 
+    if cfg.l2_penalty != 0:
+        regularizer = tf.keras.regularizers.l2(cfg.l2_penalty)
+        for layer in model.layers:
+            for attr in ['kernel_regularizer']:
+                if hasattr(layer, attr):
+                    setattr(layer, attr, regularizer)
+
     return model
 
 
@@ -58,13 +65,6 @@ def create_model(cfg,  metrics, backbone_trainable=True):
         #tf.keras.layers.Flatten(),
         tf.keras.layers.Dense(2, activation='softmax')
     ])
-
-    if cfg.l2_penalty != 0:
-        regularizer = tf.keras.regularizers.l2(cfg.l2_penalty)
-        for layer in model.layers:
-            for attr in ['kernel_regularizer']:
-                if hasattr(layer, attr):
-                    setattr(layer, attr, regularizer)
 
     model = compile_model(model, metrics, cfg)
 
