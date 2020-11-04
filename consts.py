@@ -3,7 +3,7 @@ from collections import namedtuple
 import os
 tpu3='grpc://10.240.1.2:8470'
 tpu2="grpc://10.240.1.10:8470"
-os.environ['TPU_NAME']=tpu3
+os.environ['TPU_NAME']=tpu2
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"]="3"
 
@@ -24,7 +24,7 @@ DATASETS = {
 
 CLASSES = ['health','melanoma']
 
-red = 1
+red = 4
 
 BATCH_SIZE = 2 if is_debug else 4*8*2//red
 
@@ -44,7 +44,7 @@ TRAIN_STEPS = 1 if is_debug else 50000//BATCH_SIZE
 
 config=namedtuple('config',['lr_max','lr_start','lr_warm_up_epochs','lr_min','lr_exp_decay','nfolds','l2_penalty','model_fn_str','work_dir', 'gs_work_dir','ttas','use_metrics'])
 
-work_dir_name = 'b4_focal_loss_768_old_datasets_fine_tune_fix_tpu3' #'b4_focal_loss_768_old_datasets_fine_tune'
+work_dir_name = 'b4_focal_loss_768_old_datasets_fine_tune_fix_tpu2' #'b4_focal_loss_768_old_datasets_fine_tune'
 
 
 CONFIG=config(lr_max=0.0002*8/red, lr_start=0.0002*8/red, lr_warm_up_epochs=0, lr_min=0.000005/red,lr_exp_decay=0.8, nfolds=4,
