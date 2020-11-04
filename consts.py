@@ -44,7 +44,7 @@ CONFIG=config(lr_max=0.0002*8/red, lr_start=0.0002*8/red, lr_warm_up_epochs=0, l
               nfolds=2, l2_penalty=1e+3, work_dir=work_dir_name,
               gs_work_dir=f'gs://kochetkov_kaggle_melanoma/{work_dir_name}_{str(datetime.datetime.now())}',
               model_fn_str="efficientnet.tfkeras.EfficientNetB4(weights='imagenet', include_top=False)", ttas=1,
-              use_metrics=True, dropout_rate=0.5
+              use_metrics=True, dropout_rate=0.95
               )
 
 #pretrained_model = tf.keras.applications.MobileNetV2(input_shape=[*IMAGE_SIZE, 3], include_top=False)
