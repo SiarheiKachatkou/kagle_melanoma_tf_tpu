@@ -18,6 +18,13 @@ from create_model import BinaryFocalLoss
 from create_model import create_model, set_backbone_trainable
 
 
+def join_history(history1, history2):
+    for k in history1.history.keys():
+        if k in history2.history.keys():
+            history1.history[k].extend(history2.history[k])
+    return history1
+
+
 def get_scope():
     if not is_debug:
         tpu_key='TPU_NAME'
@@ -82,9 +89,13 @@ for fold in range(CONFIG.nfolds):
                         steps_per_epoch=TRAIN_STEPS, initial_epoch=EPOCHS_FINE_TUNE, epochs=EPOCHS_FULL, callbacks=[lr_callback])
 
 
+    history = join_history(history_fine_tune, history)
+
     final_accuracy = history.history["val_accuracy"][-5:]
     print("FINAL ACCURACY MEAN-5: ", np.mean(final_accuracy))
     model.save(f'{CONFIG.work_dir}/model{fold}.h5')
+
+    history=join_history(history,history_fine_tune)
     print(history_fine_tune.history)
     print(history.history)
 
