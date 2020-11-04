@@ -1,9 +1,13 @@
 import datetime
 from collections import namedtuple
 import os
+
+
+use_tpu_2=False
+
 tpu3='grpc://10.240.1.2:8470'
 tpu2="grpc://10.240.1.10:8470"
-os.environ['TPU_NAME']=tpu3
+os.environ['TPU_NAME']=tpu2 if use_tpu_2 else tpu3
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"]="3"
 
@@ -24,7 +28,7 @@ DATASETS = {
 
 CLASSES = ['health','melanoma']
 
-red = 1
+red = 4 if use_tpu_2 else 1
 
 BATCH_SIZE = 2 if is_debug else 4*8*2//red
 

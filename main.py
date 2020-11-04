@@ -64,7 +64,7 @@ for fold in range(CONFIG.nfolds):
     scope = get_scope()
     with scope:
         metrics = ['accuracy', tf.keras.metrics.AUC(name='auc')] if CONFIG.use_metrics else None
-        model = create_model(CONFIG, metrics, backbone_trainable=True)
+        model = create_model(CONFIG, metrics, backbone_trainable=False)
 
     model.summary()
     training_dataset = get_training_dataset(train_filenames_folds[fold], DATASETS[IMAGE_HEIGHT]['old'])

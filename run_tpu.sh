@@ -11,3 +11,8 @@ ctpu up --project=${PROJECT_ID} \
  --tpu-size=v${TPU}-8 \
  --name=tpu-melanoma-${TPU} \
  --preemptible
+
+git clone -b old_dataset_transfer_learning https://github.com/SiarheiKachatkou/kagle_melanoma_tf_tpu.git
+cd kagle_melanoma_tf_tpu
+./install.sh
+python3 main.py
