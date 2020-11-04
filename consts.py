@@ -36,7 +36,7 @@ TRAIN_STEPS = 1 if is_debug else 50000//BATCH_SIZE
 
 config=namedtuple('config',['lr_max','lr_start','lr_warm_up_epochs','lr_min','lr_exp_decay','nfolds','l2_penalty','model_fn_str','work_dir', 'gs_work_dir','ttas','use_metrics'])
 
-work_dir_name = 'b4_focal_loss_768_old_datasets_fine_tune_fix_tpu3'
+work_dir_name = 'b4_focal_loss_768_old_datasets_strong_penalty'
 
 
 CONFIG=config(lr_max=0.0002*8/red, lr_start=0.0002*8/red, lr_warm_up_epochs=0, lr_min=0.000005/red,lr_exp_decay=0.8,

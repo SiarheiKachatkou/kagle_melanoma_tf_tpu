@@ -37,18 +37,18 @@ class BinaryFocalLoss():
 def compile_model(model, metrics, cfg):
     loss_fn = BinaryFocalLoss(gamma=2.0, alpha=0.25)
 
-    model.compile(
-        optimizer='adam',
-        loss=loss_fn,  # 'categorical_crossentropy',#loss_fn
-        metrics=metrics
-    )
-
     if cfg.l2_penalty != 0:
         regularizer = tf.keras.regularizers.l2(cfg.l2_penalty)
         for layer in model.layers:
             for attr in ['kernel_regularizer']:
                 if hasattr(layer, attr):
                     setattr(layer, attr, regularizer)
+
+    model.compile(
+        optimizer='adam',
+        loss=loss_fn,  # 'categorical_crossentropy',#loss_fn
+        metrics=metrics
+    )
 
     return model
 
