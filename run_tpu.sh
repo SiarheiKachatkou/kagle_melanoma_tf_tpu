@@ -14,7 +14,7 @@ ctpu up --project=${PROJECT_ID} \
 
 exit 0
 
-git clone -b old_dataset_transfer_learning https://github.com/SiarheiKachatkou/kagle_melanoma_tf_tpu.git
+git clone https://github.com/SiarheiKachatkou/kagle_melanoma_tf_tpu.git
 cd kagle_melanoma_tf_tpu
 ./install.sh
 python3 main.py
