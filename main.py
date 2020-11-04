@@ -89,6 +89,9 @@ for fold in range(CONFIG.nfolds):
                         steps_per_epoch=TRAIN_STEPS, initial_epoch=EPOCHS_FINE_TUNE, epochs=EPOCHS_FULL, callbacks=[lr_callback])
 
 
+    print(history)
+    print(history_fine_tune)
+
     history = join_history(history_fine_tune, history)
 
     final_accuracy = history.history["val_accuracy"][-5:]
