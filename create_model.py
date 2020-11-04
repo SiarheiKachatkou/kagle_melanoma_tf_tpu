@@ -62,7 +62,7 @@ def create_model(cfg,  metrics, backbone_trainable=True):
     model = tf.keras.Sequential([
         pretrained_model,
         tf.keras.layers.GlobalAveragePooling2D(),
-        #tf.keras.layers.Flatten(),
+        tf.keras.layers.Dropout(rate=cfg.dropout_rate),
         tf.keras.layers.Dense(2, activation='softmax')
     ])
 

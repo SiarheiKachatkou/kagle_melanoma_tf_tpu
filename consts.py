@@ -13,15 +13,15 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"]="3"
 
 is_debug = False
 
-EPOCHS_FINE_TUNE = 0
-EPOCHS_FULL = 2 if is_debug else 10
+EPOCHS_FINE_TUNE = 3
+EPOCHS_FULL = 2 if is_debug else 20
 
 IMAGE_HEIGHT = 768
 
 IMAGE_SIZE=[IMAGE_HEIGHT, IMAGE_HEIGHT]
 
 DATASETS = {
-            128: {'new': 'gs://kaggle_melanoma_isic/isic2020-128-colornormed-tfrecord' +'/train*.tfrec'},
+            128: {'new': 'gs://kaggle_melanoma_isic/isic2020-128-colornormed-tfrecord' +'/train*.tfrec','old':''},
             768: {'new': 'gs://kaggle_melanoma_isic/isic2020-768-colornormed-tfrecord/archive/train*.tfrec',
                   'old': 'gs://kaggle_melanoma_isic/old-768-tfrecord/train*.tfrec'}
 }
@@ -34,16 +34,17 @@ BATCH_SIZE = 2 if is_debug else 4*8*2//red
 
 TRAIN_STEPS = 1 if is_debug else 50000//BATCH_SIZE
 
-config=namedtuple('config',['lr_max','lr_start','lr_warm_up_epochs','lr_min','lr_exp_decay','nfolds','l2_penalty','model_fn_str','work_dir', 'gs_work_dir','ttas','use_metrics'])
+config=namedtuple('config',['lr_max','lr_start','lr_warm_up_epochs','lr_min','lr_exp_decay','nfolds','l2_penalty',
+                            'model_fn_str','work_dir', 'gs_work_dir','ttas','use_metrics','dropout_rate'])
 
-work_dir_name = 'b4_focal_loss_768_old_datasets_strong_penalty'
+work_dir_name = 'b4_focal_loss_768_old_datasets_dropout'
 
 
 CONFIG=config(lr_max=0.0002*8/red, lr_start=0.0002*8/red, lr_warm_up_epochs=0, lr_min=0.000005/red,lr_exp_decay=0.8,
               nfolds=2, l2_penalty=1e+3, work_dir=work_dir_name,
               gs_work_dir=f'gs://kochetkov_kaggle_melanoma/{work_dir_name}_{str(datetime.datetime.now())}',
               model_fn_str="efficientnet.tfkeras.EfficientNetB4(weights='imagenet', include_top=False)", ttas=1,
-              use_metrics=True
+              use_metrics=True, dropout_rate=0.5
               )
 
 #pretrained_model = tf.keras.applications.MobileNetV2(input_shape=[*IMAGE_SIZE, 3], include_top=False)
