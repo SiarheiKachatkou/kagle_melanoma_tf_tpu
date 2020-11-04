@@ -69,19 +69,18 @@ for fold in range(CONFIG.nfolds):
     model.summary()
     training_dataset = get_training_dataset(train_filenames_folds[fold], DATASETS[IMAGE_HEIGHT]['old'])
     validation_dataset = get_validation_dataset(val_filenames_folds[fold])
-    '''    
+
     history_fine_tune = model.fit(return_2_values(training_dataset),
                                   validation_data=return_2_values(validation_dataset), steps_per_epoch=TRAIN_STEPS,
                                   epochs=EPOCHS_FINE_TUNE, callbacks=[lr_callback])
 
     
     model = set_backbone_trainable(model, metrics, True, CONFIG)
-    '''
+
 
     history = model.fit(return_2_values(training_dataset), validation_data=return_2_values(validation_dataset),
                         steps_per_epoch=TRAIN_STEPS, initial_epoch=EPOCHS_FINE_TUNE, epochs=EPOCHS_FULL, callbacks=[lr_callback])
 
-    history_fine_tune = history
 
     final_accuracy = history.history["val_accuracy"][-5:]
     print("FINAL ACCURACY MEAN-5: ", np.mean(final_accuracy))
