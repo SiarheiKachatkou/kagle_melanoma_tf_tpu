@@ -19,9 +19,16 @@ from create_model import create_model, set_backbone_trainable
 
 
 def join_history(history1, history2):
-    for k in history1.history.keys():
+
+    all_keys=list(history1.history.keys())+list(history2.history.keys())
+
+    for k in all_keys:
         if k in history2.history.keys():
-            history1.history[k].extend(history2.history[k])
+            if k in history1.history.keys():
+                history1.history[k].extend(history2.history[k])
+            else:
+                history1.history[k]=history2.history[k]
+
     return history1
 
 
@@ -81,26 +88,18 @@ for fold in range(CONFIG.nfolds):
                                   validation_data=return_2_values(validation_dataset), steps_per_epoch=TRAIN_STEPS,
                                   epochs=EPOCHS_FINE_TUNE, callbacks=[lr_callback])
 
-    
     model = set_backbone_trainable(model, metrics, True, CONFIG)
-
 
     history = model.fit(return_2_values(training_dataset), validation_data=return_2_values(validation_dataset),
                         steps_per_epoch=TRAIN_STEPS, initial_epoch=EPOCHS_FINE_TUNE, epochs=EPOCHS_FULL, callbacks=[lr_callback])
 
-
-    print(history)
-    print(history_fine_tune)
-
     history = join_history(history_fine_tune, history)
+    print(history.history)
 
     final_accuracy = history.history["val_accuracy"][-5:]
     print("FINAL ACCURACY MEAN-5: ", np.mean(final_accuracy))
     model.save(f'{CONFIG.work_dir}/model{fold}.h5')
 
-    history=join_history(history,history_fine_tune)
-    print(history_fine_tune.history)
-    print(history.history)
 
     if CONFIG.use_metrics:
         display_training_curves(history.history['auc'][1:], history.history['val_auc'][1:], 'auc', 211)
