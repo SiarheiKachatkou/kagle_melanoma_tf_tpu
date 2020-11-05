@@ -1,7 +1,34 @@
 import tensorflow as tf
 import efficientnet.tfkeras
+import os
+import tempfile
 import tensorflow.keras.backend as K
 from consts import BATCH_SIZE
+
+
+def add_regularization(model, regularizer=tf.keras.regularizers.l2(0.0001)):
+    if not isinstance(regularizer, tf.keras.regularizers.Regularizer):
+        print("Regularizer must be a subclass of tf.keras.regularizers.Regularizer")
+        return model
+
+    for layer in model.layers:
+        for attr in ['kernel_regularizer']:
+            if hasattr(layer, attr):
+                setattr(layer, attr, regularizer)
+
+    # When we change the layers attributes, the change only happens in the model config file
+    model_json = model.to_json()
+
+    # Save the weights before reloading the model.
+    tmp_weights_path = os.path.join(tempfile.gettempdir(), 'tmp_weights.h5')
+    model.save_weights(tmp_weights_path)
+
+    # load the model from the config
+    model = tf.keras.models.model_from_json(model_json)
+
+    # Reload the model weights
+    model.load_weights(tmp_weights_path, by_name=True)
+    return model
 
 class BinaryFocalLoss():
     def __init__(self, gamma=0.2, alpha=0.25):
@@ -37,13 +64,6 @@ class BinaryFocalLoss():
 def compile_model(model, metrics, cfg):
     loss_fn = BinaryFocalLoss(gamma=2.0, alpha=0.25)
 
-    if cfg.l2_penalty != 0:
-        regularizer = tf.keras.regularizers.l2(cfg.l2_penalty)
-        for layer in model.layers:
-            for attr in ['kernel_regularizer']:
-                if hasattr(layer, attr):
-                    setattr(layer, attr, regularizer)
-
     model.compile(
         optimizer='adam',
         loss=loss_fn,  # 'categorical_crossentropy',#loss_fn
@@ -56,7 +76,10 @@ def compile_model(model, metrics, cfg):
 def create_model(cfg,  metrics, backbone_trainable=True):
 
     pretrained_model = eval(cfg.model_fn_str) 
-    
+    if cfg.l2_penalty != 0:
+        regularizer = tf.keras.regularizers.l2(cfg.l2_penalty)
+        pretrained_model=add_regularization(pretrained_model, regularizer)
+
     pretrained_model.trainable = backbone_trainable
 
     model = tf.keras.Sequential([
@@ -65,6 +88,10 @@ def create_model(cfg,  metrics, backbone_trainable=True):
         tf.keras.layers.GlobalAveragePooling2D(),
         tf.keras.layers.Dense(2, activation='softmax')
     ])
+
+    if cfg.l2_penalty != 0:
+        regularizer = tf.keras.regularizers.l2(cfg.l2_penalty)
+        model=add_regularization(model, regularizer)
 
     model = compile_model(model, metrics, cfg)
 
