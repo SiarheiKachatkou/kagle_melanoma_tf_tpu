@@ -8,7 +8,7 @@ use_tpu_2 = False
 tpu3='grpc://10.240.1.2:8470'
 
 tpu2="grpc://10.240.1.10:8470"
-os.environ['TPU_NAME']=tpu2 if use_tpu_2 else tpu3
+#os.environ['TPU_NAME']=tpu2 if use_tpu_2 else tpu3
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"]="3"
 
@@ -23,8 +23,8 @@ IMAGE_SIZE=[IMAGE_HEIGHT, IMAGE_HEIGHT]
 
 DATASETS = {
             128: {'new': 'gs://kaggle_melanoma_isic/isic2020-128-colornormed-tfrecord' +'/train*.tfrec','old':''},
-            768: {'new': 'gs://kaggle_melanoma_isic/isic2020-768-colornormed-tfrecord/archive/train*.tfrec',
-                  'old': 'gs://kaggle_melanoma_isic/old-768-tfrecord/train*.tfrec'}
+            768: {'new': 'dataset_768/train*.tfrec', #'gs://kaggle_melanoma_isic/isic2020-768-colornormed-tfrecord/archive/train*.tfrec',
+                  'old': ''} #'gs://kaggle_melanoma_isic/old-768-tfrecord/train*.tfrec'}
 }
 
 CLASSES = ['health','melanoma']
@@ -42,7 +42,7 @@ work_dir_name = 'b4_focal_loss_768_old_datasets_penalty_1e-3'
 
 
 CONFIG=config(lr_max=0.0002*8/red, lr_start=0.0002*8/red, lr_warm_up_epochs=0, lr_min=0.000005/red,lr_exp_decay=0.8,
-              nfolds=2, l2_penalty=1e-3, work_dir=work_dir_name,
+              nfolds=4, l2_penalty=1e-3, work_dir=work_dir_name,
               gs_work_dir=f'gs://kochetkov_kaggle_melanoma/{work_dir_name}_{str(datetime.datetime.now())}',
               model_fn_str="efficientnet.tfkeras.EfficientNetB4(weights='imagenet', include_top=False)", ttas=1,
               use_metrics=True, dropout_rate=0.5
