@@ -141,3 +141,4 @@ b4_focal_loss_768_old_datasets_dropout/
 b4_focal_loss_768_old_datasets_fine_tune_fix_tpu3/
 b4_focal_loss_768_old_datasets_strong_penalty/
 
+artifacts

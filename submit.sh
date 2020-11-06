@@ -1,7 +1,11 @@
-CSV=b4_focal_loss_768_final/test_0_single_model_tta_submission.csv
 
-git commit -a -m "auto commit in submit.sh"
+set -x
 
-HASH=$(git rev-parse HEAD)
+gs_folders=( "b4_focal_loss_768_old_datasets_penalty_1e-6_2020-11-06 04:42:40.388071" "b4_focal_loss_768_old_datasets_penalty_1e-9_2020-11-06 04:27:19.296397" )
+dst_folder=artifacts
 
-kaggle competitions submit -c siim-isic-melanoma-classification -f $CSV -m ${CSV}
+for folder in "${gs_folders[@]}"
+do
+  gsutil -m -q cp -r  "gs://kochetkov_kaggle_melanoma/$folder" artifacts
+  python submit.py --work_dir="$dst_folder/$folder"
+done
