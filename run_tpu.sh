@@ -14,6 +14,7 @@ ctpu up --project=${PROJECT_ID} \
 
 exit 0
 
+screen
 git clone https://github.com/SiarheiKachatkou/kagle_melanoma_tf_tpu.git
 cd kagle_melanoma_tf_tpu
 ./install.sh
