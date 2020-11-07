@@ -15,6 +15,7 @@ from dataset_utils import *
 import submission
 import shutil
 from create_model import BinaryFocalLoss
+from SaveLastCallback import SaveLastCallback
 from create_model import create_model, set_backbone_trainable
 
 
@@ -75,6 +76,11 @@ if is_debug:
 for fold in range(CONFIG.nfolds):
 
     print(f'fold={fold}')
+    model_file_path=f'{CONFIG.work_dir}/model{fold}.h5'
+    save_callback=SaveLastCallback(CONFIG.work_dir,fold=fold, epochs=EPOCHS_FULL,
+                                   save_last_epochs=CONFIG.save_last_epochs)
+    callbacks=[lr_callback,save_callback]
+
     scope = get_scope()
     with scope:
         metrics = ['accuracy', tf.keras.metrics.AUC(name='auc')] if CONFIG.use_metrics else None
@@ -86,24 +92,22 @@ for fold in range(CONFIG.nfolds):
 
     history_fine_tune = model.fit(return_2_values(training_dataset),
                                   validation_data=return_2_values(validation_dataset), steps_per_epoch=TRAIN_STEPS,
-                                  epochs=EPOCHS_FINE_TUNE, callbacks=[lr_callback])
+                                  epochs=EPOCHS_FINE_TUNE, callbacks=callbacks)
 
     model = set_backbone_trainable(model, metrics, True, CONFIG)
 
     history = model.fit(return_2_values(training_dataset), validation_data=return_2_values(validation_dataset),
-                        steps_per_epoch=TRAIN_STEPS, initial_epoch=EPOCHS_FINE_TUNE, epochs=EPOCHS_FULL, callbacks=[lr_callback])
+                        steps_per_epoch=TRAIN_STEPS, initial_epoch=EPOCHS_FINE_TUNE, epochs=EPOCHS_FULL, callbacks=callbacks)
 
     history = join_history(history_fine_tune, history)
     print(history.history)
 
     final_accuracy = history.history["val_accuracy"][-5:]
     print("FINAL ACCURACY MEAN-5: ", np.mean(final_accuracy))
-    model.save(f'{CONFIG.work_dir}/model{fold}.h5')
-
+    model.save(model_file_path)
 
     if CONFIG.use_metrics:
         display_training_curves(history.history['auc'][1:], history.history['val_auc'][1:], 'auc', 211)
-        plt.savefig(os.path.join(CONFIG.work_dir, f'auc_{fold}.png'))
     display_training_curves(history.history['loss'][1:], history.history['val_loss'][1:], 'loss', 212)
     plt.savefig(os.path.join(CONFIG.work_dir, f'loss{fold}.png'))
 

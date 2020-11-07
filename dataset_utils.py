@@ -172,8 +172,10 @@ def get_train_val_filenames(gs_path_to_dataset_train, nfolds):
 
 def get_training_dataset(training_fileimages, training_fileimages_old):
     dataset = load_dataset(training_fileimages, is_test=False)
-    dataset_old = load_dataset_old(training_fileimages_old)
-    dataset.concatenate(dataset_old)
+    if len(training_fileimages_old)!=0:
+        dataset_old = load_dataset_old(training_fileimages_old)
+        dataset.concatenate(dataset_old)
+
     dataset = dataset.map(data_augment, num_parallel_calls=AUTO)
 
     dataset = dataset.repeat()
