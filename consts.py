@@ -3,7 +3,7 @@ from collections import namedtuple
 import os
 
 
-use_tpu_2 = True
+use_tpu_2 = False
 
 tpu3 = 'grpc://10.240.1.2:8470'
 tpu2 = "grpc://10.240.1.10:8470"
@@ -14,7 +14,7 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 is_debug = False
 
-EPOCHS_FINE_TUNE = 1
+EPOCHS_FINE_TUNE = 0
 EPOCHS_FULL = 5 if is_debug else 10
 
 IMAGE_HEIGHT = 512
@@ -34,7 +34,7 @@ CLASSES = ['health','melanoma']
 
 red = 4 if use_tpu_2 else 1
 
-BATCH_SIZE = 1 if is_debug else 8*4//red
+BATCH_SIZE = 1 if is_debug else 8//red
 
 TRAIN_STEPS = 1 if is_debug else 50000//BATCH_SIZE
 
