@@ -59,8 +59,12 @@ def make_submissions_all_kind(test_dataset, test_dataset_tta, models, ttas=3):
     return single_model[0],single_model_tta[0],all_model,all_model_tta
     
     
-def calc_and_save_submissions(CONFIG,model,prefix,dataset, dataset_tta, ttas=3):
-    single_model_submission,single_model_tta_submission , _,_ = make_submissions_all_kind(dataset, dataset_tta, [model], ttas)
+def calc_and_save_submissions(CONFIG,model,prefix, dataset, dataset_tta, ttas=3):
+    if isinstance(model,list):
+        models=model
+    else:
+        models=[model]
+    single_model_submission,single_model_tta_submission , _,_ = make_submissions_all_kind(dataset, dataset_tta, models, ttas)
 
     single_model_submission.to_csv(f'{CONFIG.work_dir}/{prefix}_single_model_submission.csv')
     single_model_tta_submission.to_csv(f'{CONFIG.work_dir}/{prefix}_single_model_tta_submission.csv')
