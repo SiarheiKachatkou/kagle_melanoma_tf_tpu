@@ -34,7 +34,7 @@ CLASSES = ['health','melanoma']
 
 red = 4 if use_tpu_2 else 1
 
-BATCH_SIZE = 1 if is_debug else 8*4//red
+BATCH_SIZE = 1 if is_debug else 8//red
 
 TRAIN_STEPS = 1 if is_debug else 50000//BATCH_SIZE
 
