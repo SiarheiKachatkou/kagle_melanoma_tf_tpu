@@ -44,11 +44,11 @@ config=namedtuple('config',['lr_max','lr_start','lr_warm_up_epochs','lr_min','lr
 
 model = 'B4'
 
-penalty=1e-6
+penalty = 1e-4
 work_dir_name = f'{model}_focal_loss_{IMAGE_HEIGHT}_penalty_{penalty}'
 
 
-CONFIG=config(lr_max=0.0002*8/red, lr_start=0.0002*8/red, lr_warm_up_epochs=0, lr_min=0.000005/red,lr_exp_decay=0.8,
+CONFIG=config(lr_max=0.01/red, lr_start=0.01/red, lr_warm_up_epochs=0, lr_min=0.000005/red,lr_exp_decay=0.8,
               nfolds=4, l2_penalty=penalty, work_dir=work_dir_name,
               gs_work_dir=f'gs://kochetkov_kaggle_melanoma/{str(datetime.datetime.now())[:20]}_{work_dir_name}',
               model_fn_str=f"efficientnet.tfkeras.EfficientNet{model}(weights='imagenet', include_top=False)", ttas=1,
