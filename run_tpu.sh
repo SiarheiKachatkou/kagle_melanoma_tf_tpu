@@ -22,4 +22,6 @@ cd kagle_melanoma_tf_tpu &&
 python3 main.py
 
 exit
+export PROJECT_ID=turing-audio-146210
+gcloud config set project $PROJECT_ID
 ctpu delete --project=${PROJECT_ID}   --zone=us-central1-b   --name=tpu-melanoma-3
