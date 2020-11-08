@@ -29,16 +29,22 @@ if __name__=="__main__":
 
     args=parser.parse_args()
 
-    nfolds = len(glob.glob(os.path.join(args.work_dir,'model*.*')))
+    nfolds = len(glob.glob(os.path.join(args.work_dir,'loss*.png')))
 
-    for m_type in ['', 'tta_']:
-        a = []
 
-        for fold in range(nfolds):
-            sub = pd.read_csv(os.path.join(args.work_dir, f'val_{fold}_single_model_{m_type}submission.csv'))
-            a.append(calc_auc(sub))
-        print(f'single_model_{m_type}metrics={a}')
-        print(f'single_model_{m_type}avg_metric={np.mean(a)}')
+    for le in ['', 'le']:
+        for m_type in ['', 'tta_']:
+            a = []
+
+            for fold in range(nfolds):
+                if len(le)>0:
+                    name = f'val_le_{fold}_single_model_{m_type}submission.csv'
+                else:
+                    name = f'val_{fold}_single_model_{m_type}submission.csv'
+                sub = pd.read_csv(os.path.join(args.work_dir, name))
+                a.append(calc_auc(sub))
+            print(f'{le}single_model_{m_type}metrics={a}')
+            print(f'{le}single_model_{m_type}avg_metric={np.mean(a)}')
 
     for m_type in ['', 'tta_']:
         a = []

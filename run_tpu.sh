@@ -9,7 +9,7 @@ ctpu up --project=${PROJECT_ID} \
  --zone=us-central1-b \
  --tf-version=2.3.1 \
  --tpu-size=v${TPU}-8 \
- --name=tpu-melanoma-${TPU}-2 #\
+ --name=tpu-melanoma-${TPU} #\
  #--preemptible
 
 exit 0

@@ -6,7 +6,7 @@ import os
 use_tpu_2 = True
 
 tpu3 = 'grpc://10.240.1.2:8470'
-tpu2 = "grpc://10.240.1.2:8470"#"grpc://10.240.1.10:8470"
+tpu2 = "grpc://10.240.1.10:8470"#"grpc://10.240.1.2:8470"#
 
 os.environ['TPU_NAME']=tpu2 if use_tpu_2 else tpu3
 
@@ -17,7 +17,7 @@ is_debug = False
 EPOCHS_FINE_TUNE = 0
 EPOCHS_FULL = 5 if is_debug else 10
 
-IMAGE_HEIGHT = 512
+IMAGE_HEIGHT = 128
 
 IMAGE_SIZE=[IMAGE_HEIGHT, IMAGE_HEIGHT]
 
@@ -34,7 +34,7 @@ CLASSES = ['health','melanoma']
 
 red = 2 if use_tpu_2 else 1
 
-BATCH_SIZE = 1 if is_debug else 8*2//red
+BATCH_SIZE = 1 if is_debug else 8*2*4//red
 
 TRAIN_STEPS = 1 if is_debug else 50000//BATCH_SIZE
 
@@ -42,7 +42,7 @@ config=namedtuple('config',['lr_max','lr_start','lr_warm_up_epochs','lr_min','lr
                             'model_fn_str','work_dir', 'gs_work_dir','ttas','use_metrics','dropout_rate',
                             'save_last_epochs'])
 
-model = 'B6'
+model = 'B0'
 
 work_dir_name = f'{model}_focal_loss_{IMAGE_HEIGHT}_old_datasets_penalty_1e-6'
 
