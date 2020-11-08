@@ -1,7 +1,7 @@
 
 set -x
 
-gs_folders=( "B0_focal_loss_128_old_datasets_penalty_1e-6_2020-11-08 04:05:39.472436" )
+gs_folders=( "2020-11-08 05:27:11._B4_focal_loss_128_old_datasets_penalty_1e-6")
 dst_folder=artifacts
 
 for folder in "${gs_folders[@]}"
