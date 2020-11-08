@@ -134,5 +134,5 @@ for fold in range(CONFIG.nfolds):
                                              test_dataset_tta, CONFIG.ttas)
 
     if fold!=0:
-        subprocess.check_call(['gsutil', 'rm', '-r', CONFIG.gs_work_dir+"/"+CONFIG.work_dir])
+        subprocess.check_call(['gsutil', 'rm', '-r', CONFIG.gs_work_dir])
     subprocess.check_call(['gsutil', '-m', 'cp', '-r', CONFIG.work_dir,CONFIG.gs_work_dir])

@@ -43,8 +43,8 @@ if __name__=="__main__":
                     name = f'val_{fold}_single_model_{m_type}submission.csv'
                 sub = pd.read_csv(os.path.join(args.work_dir, name))
                 a.append(calc_auc(sub))
-            print(f'{le}single_model_{m_type}metrics={a}')
-            print(f'{le}single_model_{m_type}avg_metric={np.mean(a)}')
+            print(f'{le}_single_model_{m_type}metrics={a}')
+            print(f'{le}_single_model_{m_type}avg_metric={np.mean(a)}')
 
     for m_type in ['', 'tta_']:
         a = []
