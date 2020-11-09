@@ -122,11 +122,14 @@ for fold in range(CONFIG.nfolds):
     submission.calc_and_save_submissions(CONFIG, model, f'test_{fold}', test_dataset, test_dataset_tta, CONFIG.ttas)
 
     if CONFIG.save_last_epochs!=0:
-        models=[]
-        filepaths=save_callback.get_filepaths()
-        for filepath in filepaths:
-            m=tf.keras.models.load_model(filepath, custom_objects={'BinaryFocalLoss':BinaryFocalLoss}, compile=True, options=None)
-            models.append(m)
+
+        with scope:
+            models=[]
+            filepaths=save_callback.get_filepaths()
+            for filepath in filepaths:
+                m=tf.keras.models.load_model(filepath, custom_objects={'BinaryFocalLoss':BinaryFocalLoss}, compile=True, options=None)
+                m.trainable=False
+                models.append(m)
         submission.calc_and_save_submissions(CONFIG, models, f'val_le_{fold}', validation_dataset,
                                              validation_dataset_tta,
                                              CONFIG.ttas)
