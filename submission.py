@@ -13,7 +13,7 @@ def make_submission_dataframe(test_dataset, model):
         image_names = image_names.numpy()
 
         predictions = model.predict(images, batch_size=64, workers=8, use_multiprocessing=True)
-        preds.extend(predictions[:,1])
+        preds.extend(predictions)
         names.extend(image_names)
 
     names=[n.decode('utf-8') for n in names]

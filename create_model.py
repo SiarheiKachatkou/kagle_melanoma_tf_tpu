@@ -86,7 +86,7 @@ def create_model(cfg,  metrics, backbone_trainable=True):
         pretrained_model,
         tf.keras.layers.Dropout(rate=cfg.dropout_rate),
         tf.keras.layers.GlobalAveragePooling2D(),
-        tf.keras.layers.Dense(2, activation='softmax')
+        tf.keras.layers.Dense(1, activation='sigmoid')
     ])
 
     if cfg.l2_penalty != 0:

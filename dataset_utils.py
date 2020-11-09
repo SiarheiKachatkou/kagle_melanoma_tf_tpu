@@ -50,7 +50,8 @@ def read_tfrecord(example):
     image_name = tf.cast(example['image_name'], tf.string)
 
     class_label = tf.cast(example['target'], tf.int32)
-    one_hot_class_label=tf.one_hot(class_label, depth=len(CLASSES))
+    #one_hot_class_label=tf.one_hot(class_label, depth=len(CLASSES))
+    one_hot_class_label = class_label
     return image, one_hot_class_label, image_name
 
 
@@ -63,7 +64,7 @@ def read_tfrecord_test(example):
 
     class_label = tf.constant(0, dtype=tf.int32)
 
-    one_hot_class_label = tf.one_hot(class_label, depth=len(CLASSES))
+    one_hot_class_label = class_label# tf.one_hot(class_label, depth=len(CLASSES))
     return image, one_hot_class_label, image_name
 
 
@@ -76,7 +77,7 @@ def read_tfrecord_old(example):
 
     class_label = tf.cast(example['target'], tf.int32)
 
-    one_hot_class_label = tf.one_hot(class_label, depth=len(CLASSES))
+    one_hot_class_label = class_label#tf.one_hot(class_label, depth=len(CLASSES))
     return image, one_hot_class_label, image_name
 
 
