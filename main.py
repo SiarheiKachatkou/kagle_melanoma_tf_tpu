@@ -88,6 +88,9 @@ for fold in range(CONFIG.nfolds):
 
     model.summary()
     training_dataset = get_training_dataset(train_filenames_folds[fold], DATASETS[IMAGE_HEIGHT]['old'])
+    if TRAIN_STEPS is None:
+        TRAIN_STEPS=count_data_items(train_filenames_folds[fold])//BATCH_SIZE
+    print(f'TRAIN_STEPS={TRAIN_STEPS}')
     validation_dataset = get_validation_dataset(val_filenames_folds[fold])
 
     history_fine_tune = model.fit(return_2_values(training_dataset),

@@ -35,9 +35,9 @@ CLASSES = ['health','melanoma']
 
 red = 4 if use_tpu_2 else 1
 
-BATCH_SIZE = 1 if is_debug else 8*4//red
+BATCH_SIZE = 1 if is_debug else 16*8*4//red
 
-TRAIN_STEPS = 1 if is_debug else 50000//BATCH_SIZE
+TRAIN_STEPS = 1 if is_debug else None
 
 config=namedtuple('config',['lr_max','lr_start','lr_warm_up_epochs','lr_min','lr_exp_decay','nfolds','l2_penalty',
                             'model_fn_str','work_dir', 'gs_work_dir','ttas','use_metrics','dropout_rate',
