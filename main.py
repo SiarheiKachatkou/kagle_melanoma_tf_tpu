@@ -86,47 +86,45 @@ for fold in range(CONFIG.nfolds):
         metrics = ['accuracy', tf.keras.metrics.AUC(name='auc')] if CONFIG.use_metrics else None
         model = create_model(CONFIG, metrics, backbone_trainable=False)
 
-    model.summary()
-    training_dataset = get_training_dataset(train_filenames_folds[fold], DATASETS[IMAGE_HEIGHT]['old'])
-    if TRAIN_STEPS is None:
-        TRAIN_STEPS=count_data_items(train_filenames_folds[fold])//BATCH_SIZE
-    print(f'TRAIN_STEPS={TRAIN_STEPS}')
-    validation_dataset = get_validation_dataset(val_filenames_folds[fold])
+        model.summary()
+        training_dataset = get_training_dataset(train_filenames_folds[fold], DATASETS[IMAGE_HEIGHT]['old'])
+        if TRAIN_STEPS is None:
+            TRAIN_STEPS=count_data_items(train_filenames_folds[fold])//BATCH_SIZE
+        print(f'TRAIN_STEPS={TRAIN_STEPS}')
+        validation_dataset = get_validation_dataset(val_filenames_folds[fold])
 
-    history_fine_tune = model.fit(return_2_values(training_dataset),
-                                  validation_data=return_2_values(validation_dataset), steps_per_epoch=TRAIN_STEPS,
-                                  epochs=EPOCHS_FINE_TUNE, callbacks=callbacks)
+        history_fine_tune = model.fit(return_2_values(training_dataset),
+                                      validation_data=return_2_values(validation_dataset), steps_per_epoch=TRAIN_STEPS,
+                                      epochs=EPOCHS_FINE_TUNE, callbacks=callbacks)
 
-    model = set_backbone_trainable(model, metrics, True, CONFIG)
+        model = set_backbone_trainable(model, metrics, True, CONFIG)
 
-    history = model.fit(return_2_values(training_dataset), validation_data=return_2_values(validation_dataset),
-                        steps_per_epoch=TRAIN_STEPS, initial_epoch=EPOCHS_FINE_TUNE, epochs=EPOCHS_FULL, callbacks=callbacks)
+        history = model.fit(return_2_values(training_dataset), validation_data=return_2_values(validation_dataset),
+                            steps_per_epoch=TRAIN_STEPS, initial_epoch=EPOCHS_FINE_TUNE, epochs=EPOCHS_FULL, callbacks=callbacks)
 
-    history = join_history(history_fine_tune, history)
-    print(history.history)
+        history = join_history(history_fine_tune, history)
+        print(history.history)
 
-    final_accuracy = history.history["val_accuracy"][-5:]
-    print("FINAL ACCURACY MEAN-5: ", np.mean(final_accuracy))
-    model.save(model_file_path)
+        final_accuracy = history.history["val_accuracy"][-5:]
+        print("FINAL ACCURACY MEAN-5: ", np.mean(final_accuracy))
+        model.save(model_file_path)
 
-    if CONFIG.use_metrics:
-        display_training_curves(history.history['auc'][1:], history.history['val_auc'][1:], 'auc', 211)
-    display_training_curves(history.history['loss'][1:], history.history['val_loss'][1:], 'loss', 212)
-    plt.savefig(os.path.join(CONFIG.work_dir, f'loss{fold}.png'))
+        if CONFIG.use_metrics:
+            display_training_curves(history.history['auc'][1:], history.history['val_auc'][1:], 'auc', 211)
+        display_training_curves(history.history['loss'][1:], history.history['val_loss'][1:], 'loss', 212)
+        plt.savefig(os.path.join(CONFIG.work_dir, f'loss{fold}.png'))
 
-    test_dataset = get_test_dataset(test_filenames)
-    test_dataset_tta = get_test_dataset_tta(test_filenames)
+        test_dataset = get_test_dataset(test_filenames)
+        test_dataset_tta = get_test_dataset_tta(test_filenames)
 
-    validation_dataset = get_validation_dataset(val_filenames_folds[fold])
-    validation_dataset_tta = get_validation_dataset_tta(val_filenames_folds[fold])
+        validation_dataset = get_validation_dataset(val_filenames_folds[fold])
+        validation_dataset_tta = get_validation_dataset_tta(val_filenames_folds[fold])
 
-    submission.calc_and_save_submissions(CONFIG, model, f'val_{fold}', validation_dataset, validation_dataset_tta,
-                                         CONFIG.ttas)
-    submission.calc_and_save_submissions(CONFIG, model, f'test_{fold}', test_dataset, test_dataset_tta, CONFIG.ttas)
+        submission.calc_and_save_submissions(CONFIG, model, f'val_{fold}', validation_dataset, validation_dataset_tta,
+                                             CONFIG.ttas)
+        submission.calc_and_save_submissions(CONFIG, model, f'test_{fold}', test_dataset, test_dataset_tta, CONFIG.ttas)
 
-    if CONFIG.save_last_epochs!=0:
-
-        with scope:
+        if CONFIG.save_last_epochs!=0:
             models=[]
             filepaths=save_callback.get_filepaths()
             for filepath in filepaths:
