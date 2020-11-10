@@ -15,7 +15,7 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 is_debug = False
 
 EPOCHS_FINE_TUNE = 0
-EPOCHS_FULL = 1 if is_debug else 1
+EPOCHS_FULL = 1 if is_debug else 20
 
 IMAGE_HEIGHT = 128
 
@@ -35,7 +35,7 @@ CLASSES = ['health','melanoma']
 
 red = 4 if use_tpu_2 else 1
 
-BATCH_SIZE = 1 if is_debug else 32*4//red
+BATCH_SIZE = 1 if is_debug else 4*32*4//red
 
 TRAIN_STEPS = 1 if is_debug else None
 
