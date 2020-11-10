@@ -46,7 +46,7 @@ config=namedtuple('config',['lr_max','lr_start','lr_warm_up_epochs','lr_min','lr
 model = 'B6' if not is_debug else 'B0'
 
 penalty = 1e-16
-work_dir_name = f'{model}_focal_loss_{IMAGE_HEIGHT}_penalty_{penalty}'
+work_dir_name = f'{model}_bce_loss_{IMAGE_HEIGHT}_penalty_{penalty}'
 
 
 CONFIG=config(lr_max=0.001/red, lr_start=0.001/red, lr_warm_up_epochs=0, lr_min=0.000005/red,lr_exp_decay=0.8,
