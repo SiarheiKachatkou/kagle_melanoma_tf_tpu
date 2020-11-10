@@ -21,7 +21,9 @@ def make_submission_dataframe(test_dataset, model):
     preds=np.array(preds)
     labs=np.array(labs)
     #labs=np.argmax(labs,axis=1)
-    data=np.stack([names,preds,labs],axis=1)
+    names = np.reshape(names, (-1, 1))
+    labs = np.reshape(labs, (-1, 1))
+    data=np.concatenate([names,preds,labs],axis=1)
     df_submission = pd.DataFrame(data,columns=['image_name','target','labels'])
     df_submission = df_submission.sort_values(by='image_name')
     
