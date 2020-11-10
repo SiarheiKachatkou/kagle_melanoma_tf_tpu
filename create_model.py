@@ -62,7 +62,7 @@ class BinaryFocalLoss():
 
 
 def compile_model(model, metrics, cfg):
-    loss = tf.keras.losses.CategoricalCrossentropy(label_smoothing=0.05)
+    loss = tf.keras.losses.BinaryCrossentropy(label_smoothing=0.05)
 
     model.compile(
         optimizer='adam',
