@@ -46,15 +46,19 @@ if __name__=="__main__":
             print(f'{le}_single_model_{m_type}metrics={a}')
             print(f'{le}_single_model_{m_type}avg_metric={np.mean(a)}')
 
-    for m_type in ['', 'tta_']:
-        a = []
-        subs = []
-        for fold in range(nfolds):
-            name = f'test_{fold}_single_model_{m_type}submission.csv'
-            sub = pd.read_csv(os.path.join(args.work_dir, name))
-            save_submission(sub, os.path.join(args.work_dir, 'kaggle_' + name))
-            subs.append(sub)
-        avg_sub = submission.avg_submissions(subs)
-        save_submission(avg_sub, os.path.join(args.work_dir, 'kaggle_' + f'test_{m_type}.csv'))
+    for le in ['', 'le']:
+        for m_type in ['', 'tta_']:
+            a = []
+            subs = []
+            for fold in range(nfolds):
+                if le=='':
+                    name = f'test_{fold}_single_model_{m_type}submission.csv'
+                else:
+                    name = f'test_{le}_{fold}_single_model_{m_type}submission.csv'
+                sub = pd.read_csv(os.path.join(args.work_dir, name))
+                save_submission(sub, os.path.join(args.work_dir, 'kaggle_' + name))
+                subs.append(sub)
+            avg_sub = submission.avg_submissions(subs)
+            save_submission(avg_sub, os.path.join(args.work_dir, 'kaggle_' + f'test_{le}_{m_type}.csv'))
 
 

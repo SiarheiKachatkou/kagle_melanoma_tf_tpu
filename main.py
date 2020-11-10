@@ -79,6 +79,7 @@ for fold in range(CONFIG.nfolds):
     model_file_path=f'{CONFIG.work_dir}/model{fold}.h5'
     save_callback=SaveLastCallback(CONFIG.work_dir,fold=fold, epochs=EPOCHS_FULL,
                                    save_last_epochs=CONFIG.save_last_epochs)
+
     callbacks=[lr_callback,save_callback]
 
     scope = get_scope()
