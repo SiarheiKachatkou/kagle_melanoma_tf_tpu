@@ -22,6 +22,7 @@ cd kagle_melanoma_tf_tpu &&
 python3 main.py
 
 
+
 exit
 export PROJECT_ID=turing-audio-146210
 gcloud config set project $PROJECT_ID

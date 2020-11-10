@@ -3,10 +3,10 @@ from collections import namedtuple
 import os
 
 
-use_tpu_2 = False
+use_tpu_2 = True
 
-tpu3 = "grpc://10.240.1.2:8470"#
-tpu2 = 'grpc://10.240.1.10:8470'#"grpc://10.240.1.10:8470"#
+tpu3 = "grpc://10.240.1.2:8470"
+tpu2 = 'grpc://10.240.1.10:8470'
 
 os.environ['TPU_NAME']=tpu2 if use_tpu_2 else tpu3
 
