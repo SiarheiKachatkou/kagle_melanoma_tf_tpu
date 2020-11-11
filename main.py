@@ -132,11 +132,11 @@ for fold in range(CONFIG.nfolds):
                 m=tf.keras.models.load_model(filepath, custom_objects={'BinaryFocalLoss':BinaryFocalLoss}, compile=True, options=None)
                 m.trainable=False
                 models.append(m)
-        submission.calc_and_save_submissions(CONFIG, models, f'val_le_{fold}', validation_dataset,
-                                             validation_dataset_tta,
-                                             CONFIG.ttas)
-        submission.calc_and_save_submissions(CONFIG, models, f'test_le_{fold}', test_dataset,
-                                             test_dataset_tta, CONFIG.ttas)
+            submission.calc_and_save_submissions(CONFIG, models, f'val_le_{fold}', validation_dataset,
+                                                 validation_dataset_tta,
+                                                 CONFIG.ttas)
+            submission.calc_and_save_submissions(CONFIG, models, f'test_le_{fold}', test_dataset,
+                                                 test_dataset_tta, CONFIG.ttas)
 
     if fold!=0:
         subprocess.check_call(['gsutil', 'rm', '-r', CONFIG.gs_work_dir])

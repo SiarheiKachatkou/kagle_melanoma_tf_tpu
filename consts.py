@@ -4,6 +4,7 @@ import os
 
 
 use_tpu_2 = False
+is_local=True
 
 tpu3 = "grpc://10.240.1.2:8470"
 tpu2 = 'grpc://10.240.1.10:8470'
@@ -23,7 +24,9 @@ IMAGE_SIZE=[IMAGE_HEIGHT, IMAGE_HEIGHT]
 
 DATASETS = {
             128: {'new': 'gs://kaggle_melanoma_isic/isic2020-128-colornormed-tfrecord' +'/train*.tfrec', 'old':''},
+            #128: {'new': 'data/128/train*.tfrec', 'old':''},
             384: {'new': 'gs://kaggle_melanoma_isic/isic2020-384-colornormed-tfrecord/train*.tfrec', 'old':''},
+            #384: {'new': 'data/isic2020-384-colornormed-tfrecord/train*.tfrec','old':''},
             512: {'new': 'gs://kaggle_melanoma_isic/isic2020-512-colornormed-tfrecord/train*.tfrec', 'old':''},
             768: {'new': 'gs://kaggle_melanoma_isic/isic2020-768-colornormed-tfrecord/archive/train*.tfrec',
                   'old': 'gs://kaggle_melanoma_isic/old-768-tfrecord/train*.tfrec'}

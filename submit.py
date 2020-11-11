@@ -41,8 +41,10 @@ if __name__=="__main__":
                     name = f'val_le_{fold}_single_model_{m_type}submission.csv'
                 else:
                     name = f'val_{fold}_single_model_{m_type}submission.csv'
-                sub = pd.read_csv(os.path.join(args.work_dir, name))
-                a.append(calc_auc(sub))
+                filename=os.path.join(args.work_dir, name)
+                if os.path.exists(filename):
+                    sub = pd.read_csv(filename)
+                    a.append(calc_auc(sub))
             print(f'{le}_single_model_{m_type}metrics={a}')
             print(f'{le}_single_model_{m_type}avg_metric={np.mean(a)}')
 
@@ -55,10 +57,13 @@ if __name__=="__main__":
                     name = f'test_{fold}_single_model_{m_type}submission.csv'
                 else:
                     name = f'test_{le}_{fold}_single_model_{m_type}submission.csv'
-                sub = pd.read_csv(os.path.join(args.work_dir, name))
-                save_submission(sub, os.path.join(args.work_dir, 'kaggle_' + name))
-                subs.append(sub)
-            avg_sub = submission.avg_submissions(subs)
-            save_submission(avg_sub, os.path.join(args.work_dir, 'kaggle_' + f'test_{le}_{m_type}.csv'))
+                filename=os.path.join(args.work_dir, name)
+                if os.path.exists(filename):
+                    sub = pd.read_csv(filename)
+                    save_submission(sub, os.path.join(args.work_dir, 'kaggle_' + name))
+                    subs.append(sub)
+            if subs:
+                avg_sub = submission.avg_submissions(subs)
+                save_submission(avg_sub, os.path.join(args.work_dir, 'kaggle_' + f'test_{le}_{m_type}.csv'))
 
 
