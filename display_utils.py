@@ -2,6 +2,7 @@ from functools import partial
 import matplotlib.pyplot as plt
 import numpy as np
 from consts import CLASSES
+import cv2
 
 def dataset_to_numpy_util(dataset, N):
     dataset = dataset.unbatch().batch(N)
@@ -33,13 +34,14 @@ def display_9_images_from_dataset(dataset):
     # labels=[0,0]
     # while sum(labels)==0:
     images, labels = dataset_to_numpy_util(dataset, 9)
-    labels = np.argmax(labels, axis=-1)
+    #labels = np.argmax(labels, axis=-1)
     print(labels)
     for i, image in enumerate(images):
+        image = cv2.normalize(image,None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
         title = CLASSES[labels[i]]
         subplot = display_one_flower(image, title, subplot)
         if i >= 8:
-            break;
+            break
 
     # plt.tight_layout()
     plt.subplots_adjust(wspace=0.1, hspace=0.1)

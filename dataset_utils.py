@@ -120,8 +120,8 @@ def data_augment(image, one_hot_class, image_name):
     # data augmentation. Thanks to the dataset.prefetch(AUTO) statement in the next function (below),
     # this happens essentially for free on TPU. Data pipeline code is executed on the "CPU" part
     # of the TPU while the TPU itself is computing gradients.
-   
-    image = tf.image.random_saturation(image, 0, 2)
+
+    #image = tf.image.random_saturation(image, 0.05, 1)
     image = tf.image.random_flip_left_right(image)
     image = tf.image.random_flip_up_down(image)
     image = tf.image.random_contrast(image,0.8,1.2)
@@ -129,9 +129,8 @@ def data_augment(image, one_hot_class, image_name):
     shift=0.1*IMAGE_HEIGHT
     shear=0.01*IMAGE_HEIGHT
     zoom=0.1
-    image = transform(image, IMAGE_HEIGHT, prob=0.5, rot_limit=180, shr_limit=shear,
-                      hshift=shift, wshift=shift,
-                      hzoom=zoom, wzoom=zoom)
+
+    image = transform(image, IMAGE_HEIGHT)
 
     #image = hair_aug_tf(image, augment=True)
     #image,one_hot_class = albumentaze_data(image,one_hot_class,IMAGE_SIZE)
@@ -139,8 +138,7 @@ def data_augment(image, one_hot_class, image_name):
 
 
 def data_tta(image, one_hot_class, image_name):
-    
-    image = tf.image.random_saturation(image, 0, 2)
+
     image = tf.image.random_flip_left_right(image)
     image = tf.image.random_flip_up_down(image)
     image = tf.image.random_contrast(image,0.8,1.2)
