@@ -8,7 +8,7 @@ import subprocess
 import contextlib
 from matplotlib import pyplot as plt
 print("Tensorflow version " + tf.__version__)
-from lr import get_lrfn
+from lr import get_lrfn, get_cycling_lrfn
 from display_utils import display_training_curves
 from consts import *
 from dataset_utils import *
@@ -57,7 +57,7 @@ if not os.path.exists(CONFIG.work_dir):
     
 shutil.copyfile('consts.py',os.path.join(CONFIG.work_dir,'consts.py'))
 
-lrfn=get_lrfn(CONFIG)
+lrfn = get_cycling_lrfn(CONFIG) #get_lrfn(CONFIG)#
 lr_callback = tf.keras.callbacks.LearningRateScheduler(lrfn, verbose=True)
 rng = [i for i in range(EPOCHS_FULL)]
 y = [lrfn(x) for x in rng]

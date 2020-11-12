@@ -61,11 +61,15 @@ class BinaryFocalLoss():
         return loss/BATCH_SIZE
 
 
-def compile_model(model, metrics, cfg):
+def compile_model(model, metrics, cfg, lr=None):
     loss = tf.keras.losses.BinaryCrossentropy(label_smoothing=0.05)
 
+    learning_rate = cfg.lr_start if lr is None else lr
+
+    opt = tf.keras.optimizers.Adam(learning_rate=learning_rate)
+
     model.compile(
-        optimizer='adam',
+        optimizer=opt,
         loss=loss,
         metrics=metrics
     )
@@ -73,7 +77,7 @@ def compile_model(model, metrics, cfg):
     return model
 
 
-def create_model(cfg,  metrics, backbone_trainable=True):
+def create_model(cfg,  metrics, backbone_trainable=True, lr=None):
 
     pretrained_model = eval(cfg.model_fn_str) 
     if cfg.l2_penalty != 0:
@@ -93,7 +97,7 @@ def create_model(cfg,  metrics, backbone_trainable=True):
         regularizer = tf.keras.regularizers.l2(cfg.l2_penalty)
         model=add_regularization(model, regularizer)
 
-    model = compile_model(model, metrics, cfg)
+    model = compile_model(model, metrics, cfg, lr)
 
     return model
 
