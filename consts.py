@@ -4,9 +4,10 @@ import os
 
 
 use_tpu_2 = False
-is_local=True
+is_local = False
+is_kaggle = True
 
-if not is_local:
+if (not is_local) and (not is_kaggle):
     tpu3 = "grpc://10.240.1.2:8470"
     tpu2 = 'grpc://10.240.1.10:8470'
 
