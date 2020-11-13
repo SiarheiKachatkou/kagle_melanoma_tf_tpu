@@ -15,7 +15,7 @@ if (not is_local) and (not is_kaggle):
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
-is_debug = False
+is_debug = True
 
 EPOCHS_FINE_TUNE = 0
 EPOCHS_FULL = 1 if is_debug else 19
