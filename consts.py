@@ -15,12 +15,12 @@ if (not is_local) and (not is_kaggle):
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
-is_debug = True
+is_debug = False
 
 EPOCHS_FINE_TUNE = 0
-EPOCHS_FULL = 1 if is_debug else 19
+EPOCHS_FULL = 1 if is_debug else 12
 
-IMAGE_HEIGHT = 128
+IMAGE_HEIGHT = 384
 
 IMAGE_SIZE=[IMAGE_HEIGHT, IMAGE_HEIGHT]
 
@@ -54,7 +54,7 @@ config=namedtuple('config',['lr_max','lr_start','stepsize', 'lr_warm_up_epochs',
                             'model_fn_str','work_dir', 'gs_work_dir','ttas','use_metrics','dropout_rate',
                             'save_last_epochs'])
 
-model = 'B0' if not is_debug else 'B0'
+model = 'B6' if not is_debug else 'B0'
 
 penalty = 1e-16
 work_dir_name = f'{model}_bce_loss_{IMAGE_HEIGHT}_penalty_{penalty}_cycle_lr_e3'
