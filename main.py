@@ -138,7 +138,7 @@ for fold in range(CONFIG.nfolds):
             submission.calc_and_save_submissions(CONFIG, models, f'test_le_{fold}', test_dataset,
                                                  test_dataset_tta, CONFIG.ttas)
 
-    if not is_local:
+    if (not is_local) and (not is_kaggle):
         if fold!=0:
             subprocess.check_call(['gsutil', 'rm', '-r', CONFIG.gs_work_dir])
         subprocess.check_call(['gsutil', '-m', 'cp', '-r', CONFIG.work_dir,CONFIG.gs_work_dir])
