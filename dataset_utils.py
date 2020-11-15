@@ -140,10 +140,12 @@ def data_augment(image, one_hot_class, image_name):
 
 def data_tta(image, one_hot_class, image_name):
 
+    image = transform(image,DIM=IMAGE_HEIGHT)
     image = tf.image.random_flip_left_right(image)
-    image = tf.image.random_flip_up_down(image)
-    image = tf.image.random_contrast(image,0.8,1.2)
-    image = transform(image, IMAGE_HEIGHT)
+    #img = tf.image.random_hue(img, 0.01)
+    image = tf.image.random_saturation(image, 0.7, 1.3)
+    image = tf.image.random_contrast(image, 0.8, 1.2)
+    image = tf.image.random_brightness(image, 0.1)
 	
     return image, one_hot_class, image_name
 
