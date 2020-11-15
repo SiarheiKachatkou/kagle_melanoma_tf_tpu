@@ -97,9 +97,14 @@ def load_dataset(filenames, is_test):
 
     dataset = tf.data.TFRecordDataset(filenames, num_parallel_reads=AUTO) # automatically interleaves reads from multiple files
     dataset = dataset.with_options(ignore_order) # uses data as soon as it streams in, rather than in its original order
+	dataset = dataset.cache()
     the_read_tfrecord=read_tfrecord_test if is_test else read_tfrecord
     dataset = dataset.map(the_read_tfrecord, num_parallel_calls=AUTO)
     dataset = force_image_sizes(dataset, IMAGE_SIZE)
+	
+    if not is_test: 
+        dataset = dataset.shuffle(1024*8)
+        
     return dataset
 
 
@@ -111,7 +116,8 @@ def load_dataset_old(fileimages_old):
                                       num_parallel_reads=AUTO)  # automatically interleaves reads from multiple files
     dataset = dataset.with_options(
         ignore_order)  # uses data as soon as it streams in, rather than in its original order
-
+	dataset = dataset.cache()
+	dataset = dataset.shuffle(1024*8)
     dataset = dataset.map(read_tfrecord_old, num_parallel_calls=AUTO)
     dataset = force_image_sizes(dataset, IMAGE_SIZE)
     return dataset
@@ -120,19 +126,15 @@ def data_augment(image, one_hot_class, image_name):
     # data augmentation. Thanks to the dataset.prefetch(AUTO) statement in the next function (below),
     # this happens essentially for free on TPU. Data pipeline code is executed on the "CPU" part
     # of the TPU while the TPU itself is computing gradients.
+	
+	image = transform(image,DIM=dim)
+	image = tf.image.random_flip_left_right(image)
+	#img = tf.image.random_hue(img, 0.01)
+	image = tf.image.random_saturation(image, 0.7, 1.3)
+	image = tf.image.random_contrast(image, 0.8, 1.2)
+	image = tf.image.random_brightness(image, 0.1)
+	
 
-    #image = tf.image.random_saturation(image, 0.05, 1)
-    image = tf.image.random_flip_left_right(image)
-    image = tf.image.random_flip_up_down(image)
-    image = tf.image.random_contrast(image,0.8,1.2)
-    image = cutout(image, IMAGE_HEIGHT, prob=0.5, holes_count=3, hole_size=0.2)
-    shift=0.1*IMAGE_HEIGHT
-    shear=0.01*IMAGE_HEIGHT
-    zoom=0.1
-
-    image = transform(image, IMAGE_HEIGHT)
-    #image = hair_aug_tf(image, augment=True)
-    #image,one_hot_class = albumentaze_data(image,one_hot_class,IMAGE_SIZE)
     return image, one_hot_class, image_name
 
 
