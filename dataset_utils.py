@@ -97,7 +97,7 @@ def load_dataset(filenames, is_test):
 
     dataset = tf.data.TFRecordDataset(filenames, num_parallel_reads=AUTO) # automatically interleaves reads from multiple files
     dataset = dataset.with_options(ignore_order) # uses data as soon as it streams in, rather than in its original order
-	dataset = dataset.cache()
+    dataset = dataset.cache()
     the_read_tfrecord=read_tfrecord_test if is_test else read_tfrecord
     dataset = dataset.map(the_read_tfrecord, num_parallel_calls=AUTO)
     dataset = force_image_sizes(dataset, IMAGE_SIZE)
@@ -116,8 +116,8 @@ def load_dataset_old(fileimages_old):
                                       num_parallel_reads=AUTO)  # automatically interleaves reads from multiple files
     dataset = dataset.with_options(
         ignore_order)  # uses data as soon as it streams in, rather than in its original order
-	dataset = dataset.cache()
-	dataset = dataset.shuffle(1024*8)
+    dataset = dataset.cache()
+    dataset = dataset.shuffle(1024*8)
     dataset = dataset.map(read_tfrecord_old, num_parallel_calls=AUTO)
     dataset = force_image_sizes(dataset, IMAGE_SIZE)
     return dataset
