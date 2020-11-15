@@ -127,13 +127,13 @@ def data_augment(image, one_hot_class, image_name):
     # this happens essentially for free on TPU. Data pipeline code is executed on the "CPU" part
     # of the TPU while the TPU itself is computing gradients.
 	
-	image = transform(image,DIM=dim)
-	image = tf.image.random_flip_left_right(image)
-	#img = tf.image.random_hue(img, 0.01)
-	image = tf.image.random_saturation(image, 0.7, 1.3)
-	image = tf.image.random_contrast(image, 0.8, 1.2)
-	image = tf.image.random_brightness(image, 0.1)
-	
+    image = transform(image,DIM=dim)
+    image = tf.image.random_flip_left_right(image)
+    #img = tf.image.random_hue(img, 0.01)
+    image = tf.image.random_saturation(image, 0.7, 1.3)
+    image = tf.image.random_contrast(image, 0.8, 1.2)
+    image = tf.image.random_brightness(image, 0.1)
+
 
     return image, one_hot_class, image_name
 
