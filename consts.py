@@ -59,8 +59,8 @@ model = 'B6' if not is_debug else 'B0'
 penalty = 1e-16
 work_dir_name = f'{model}_bce_loss_{IMAGE_HEIGHT}_penalty_{penalty}_cycle_lr_e3'
 
-
-CONFIG=config(lr_max=2e-3, lr_start=3e-6, stepsize=3, lr_warm_up_epochs=0, lr_min=0.000001/red,lr_exp_decay=0.8,
+0.00000125*32*8
+CONFIG=config(lr_max=3e-4, lr_start=5e-6, stepsize=3, lr_warm_up_epochs=5, lr_min=0.000001/red,lr_exp_decay=0.8,
               nfolds=4, l2_penalty=penalty, work_dir=work_dir_name,
               gs_work_dir=f'gs://kochetkov_kaggle_melanoma/{str(datetime.datetime.now())[:20]}_{work_dir_name}',
               model_fn_str=f"efficientnet.tfkeras.EfficientNet{model}(weights='imagenet', include_top=False)", ttas=11,
