@@ -6,6 +6,7 @@ import os
 use_tpu_2 = False
 is_local = False
 is_kaggle = True
+is_debug = False
 
 if (not is_local) and (not is_kaggle):
     tpu3 = "grpc://10.240.1.2:8470"
@@ -15,7 +16,6 @@ if (not is_local) and (not is_kaggle):
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
-is_debug = False
 
 EPOCHS_FINE_TUNE = 0
 EPOCHS_FULL = 1 if is_debug else 12
@@ -27,7 +27,8 @@ IMAGE_SIZE=[IMAGE_HEIGHT, IMAGE_HEIGHT]
 if is_local:
     DATASETS = {
                 128: {'new': 'data/128/train*.tfrec', 'old': ''},
-                384: {'new': 'data/isic2020-384-colornormed-tfrecord/train*.tfrec', 'old': ''},
+                #384: {'new': 'data/isic2020-384-colornormed-tfrecord/train*.tfrec', 'old': ''},
+                384: {'new': 'data/384_triple/train*.tfrec', 'old': ''},
                 768: {'new': 'data/dataset_768/train*.tfrec', 'old': ''}
     }
 
@@ -37,7 +38,7 @@ else:
                 #128: {'new': 'data/128/train*.tfrec', 'old':''},
                 #384: {'new': 'gs://kaggle_melanoma_isic/isic2020-384-colornormed-tfrecord/train*.tfrec', 'old':''},
                 #384: {'new': 'data/isic2020-384-colornormed-tfrecord/train*.tfrec','old':''},
-                384: {'new':'gs://kds-785d838553ec94dcf7ccf4f71183219115abdaa11bc1b1f41593c5c0/train*.tfrec','old':''},
+                384: {'new':'gs://kds-76800f320871e548ef017f0a5a63cef5c72d1d47d6e020c81edfa286/train*.tfrec','old':''},
                 512: {'new': 'gs://kaggle_melanoma_isic/isic2020-512-colornormed-tfrecord/train*.tfrec', 'old':''},
                 768: {'new': 'gs://kaggle_melanoma_isic/isic2020-768-colornormed-tfrecord/archive/train*.tfrec',
                       'old': 'gs://kaggle_melanoma_isic/old-768-tfrecord/train*.tfrec'}
