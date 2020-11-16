@@ -35,8 +35,9 @@ else:
     DATASETS = {
                 128: {'new': 'gs://kaggle_melanoma_isic/isic2020-128-colornormed-tfrecord' +'/train*.tfrec', 'old':''},
                 #128: {'new': 'data/128/train*.tfrec', 'old':''},
-                384: {'new': 'gs://kaggle_melanoma_isic/isic2020-384-colornormed-tfrecord/train*.tfrec', 'old':''},
+                #384: {'new': 'gs://kaggle_melanoma_isic/isic2020-384-colornormed-tfrecord/train*.tfrec', 'old':''},
                 #384: {'new': 'data/isic2020-384-colornormed-tfrecord/train*.tfrec','old':''},
+                384: {'new':'gs://kds-785d838553ec94dcf7ccf4f71183219115abdaa11bc1b1f41593c5c0/train*.tfrec','old':''},
                 512: {'new': 'gs://kaggle_melanoma_isic/isic2020-512-colornormed-tfrecord/train*.tfrec', 'old':''},
                 768: {'new': 'gs://kaggle_melanoma_isic/isic2020-768-colornormed-tfrecord/archive/train*.tfrec',
                       'old': 'gs://kaggle_melanoma_isic/old-768-tfrecord/train*.tfrec'}
@@ -59,7 +60,6 @@ model = 'B6' if not is_debug else 'B0'
 penalty = 1e-16
 work_dir_name = f'{model}_bce_loss_{IMAGE_HEIGHT}_penalty_{penalty}_cycle_lr_e3'
 
-0.00000125*32*8
 CONFIG=config(lr_max=3e-4, lr_start=5e-6, stepsize=3, lr_warm_up_epochs=5, lr_min=0.000001/red,lr_exp_decay=0.8,
               nfolds=4, l2_penalty=penalty, work_dir=work_dir_name,
               gs_work_dir=f'gs://kochetkov_kaggle_melanoma/{str(datetime.datetime.now())[:20]}_{work_dir_name}',

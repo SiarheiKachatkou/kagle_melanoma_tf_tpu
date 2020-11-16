@@ -6,7 +6,7 @@ import numpy as np
 import tensorflow as tf
 AUTO = tf.data.experimental.AUTOTUNE
 from consts import *
-from augmentation_hair import hair_aug_tf
+#from augmentation_hair import hair_aug_tf
 from augmentations import cutout, transform
 
 features_test = {

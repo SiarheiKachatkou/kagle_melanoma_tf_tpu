@@ -1,6 +1,7 @@
 import tensorflow as tf
 from consts import IMAGE_HEIGHT
 
+'''
 GCS_PATH_hair_images = "gs://kochetkov_kaggle_melanoma/malanoma_hairs"
 hair_images = tf.io.gfile.glob(GCS_PATH_hair_images + '/*.png')
 hair_images_tf=tf.convert_to_tensor(hair_images)
@@ -100,3 +101,5 @@ def hair_aug_tf(input_img, augment=True):
         return img
     else:
         return input_img
+
+'''
