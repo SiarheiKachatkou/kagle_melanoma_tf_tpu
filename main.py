@@ -11,7 +11,8 @@ print("Tensorflow version " + tf.__version__)
 from lr import get_lrfn, get_cycling_lrfn
 from display_utils import display_training_curves
 from consts import *
-from dataset_utils import *
+from dataset_utils import get_test_filenames, get_train_val_filenames, count_data_items
+from dataset import  get_dataset
 import submission
 import shutil
 from create_model import BinaryFocalLoss
@@ -93,19 +94,22 @@ for fold in range(CONFIG.nfolds):
         model = create_model(CONFIG, metrics, backbone_trainable=False)
 
         model.summary()
-        training_dataset = get_training_dataset(train_filenames_folds[fold], DATASETS[IMAGE_HEIGHT]['old'])
+        training_dataset = get_dataset(train_filenames_folds[fold], augment=True, shuffle=True, repeat=False,
+                labeled=True, return_image_names=False, batch_size=BATCH_SIZE, dim=IMAGE_HEIGHT)
+
         if TRAIN_STEPS is None:
             TRAIN_STEPS=count_data_items(train_filenames_folds[fold])//BATCH_SIZE
         print(f'TRAIN_STEPS={TRAIN_STEPS}')
-        validation_dataset = get_validation_dataset(val_filenames_folds[fold])
+        validation_dataset = get_dataset(val_filenames_folds[fold], augment=False, shuffle=False, repeat=False,
+                labeled=True, return_image_names=False, batch_size=BATCH_SIZE, dim=IMAGE_HEIGHT)
 
-        history_fine_tune = model.fit(return_2_values(training_dataset),
-                                      validation_data=return_2_values(validation_dataset), steps_per_epoch=TRAIN_STEPS,
+        history_fine_tune = model.fit(training_dataset,
+                                      validation_data=validation_dataset, steps_per_epoch=TRAIN_STEPS,
                                       epochs=EPOCHS_FINE_TUNE, callbacks=callbacks)
 
         model = set_backbone_trainable(model, metrics, True, CONFIG)
 
-        history = model.fit(return_2_values(training_dataset), validation_data=return_2_values(validation_dataset),
+        history = model.fit(training_dataset, validation_data=validation_dataset,
                             steps_per_epoch=TRAIN_STEPS, initial_epoch=EPOCHS_FINE_TUNE, epochs=EPOCHS_FULL, callbacks=callbacks)
 
         history = join_history(history_fine_tune, history)
@@ -120,11 +124,17 @@ for fold in range(CONFIG.nfolds):
         display_training_curves(history.history['loss'][1:], history.history['val_loss'][1:], 'loss', 212)
         plt.savefig(os.path.join(CONFIG.work_dir, f'loss{fold}.png'))
 
-        test_dataset = get_test_dataset(test_filenames)
-        test_dataset_tta = get_test_dataset_tta(test_filenames)
+        test_dataset = get_dataset(test_filenames, augment=False, shuffle=False, repeat=False,
+                labeled=False, return_image_names=True, batch_size=BATCH_SIZE, dim=IMAGE_HEIGHT)
 
-        validation_dataset = get_validation_dataset(val_filenames_folds[fold])
-        validation_dataset_tta = get_validation_dataset_tta(val_filenames_folds[fold])
+        test_dataset_tta = get_dataset(test_filenames, augment=True, shuffle=False, repeat=False,
+                labeled=False, return_image_names=True, batch_size=BATCH_SIZE, dim=IMAGE_HEIGHT)
+
+        validation_dataset = get_dataset(val_filenames_folds[fold], augment=False, shuffle=False, repeat=False,
+                labeled=True, return_image_names=True, batch_size=BATCH_SIZE, dim=IMAGE_HEIGHT)
+
+        validation_dataset_tta = get_dataset(val_filenames_folds[fold], augment=True, shuffle=False, repeat=False,
+                labeled=True, return_image_names=True, batch_size=BATCH_SIZE, dim=IMAGE_HEIGHT)
 
         submission.calc_and_save_submissions(CONFIG, model, f'val_{fold}', validation_dataset, validation_dataset_tta,
                                              CONFIG.ttas)

@@ -28,7 +28,7 @@ if is_local:
     DATASETS = {
                 128: {'new': 'data/128/train*.tfrec', 'old': ''},
                 #384: {'new': 'data/isic2020-384-colornormed-tfrecord/train*.tfrec', 'old': ''},
-                384: {'new': 'data/384_triple/train*.tfrec', 'old': ''},
+                384: {'new': 'data/384_triple_2020/train*.tfrec', 'old': ''},
                 768: {'new': 'data/dataset_768/train*.tfrec', 'old': ''}
     }
 
