@@ -57,7 +57,7 @@ if not os.path.exists(CONFIG.work_dir):
     
 shutil.copyfile('consts.py',os.path.join(CONFIG.work_dir,'consts.py'))
 
-lrfn = get_cycling_lrfn(CONFIG) #get_lrfn(CONFIG)#
+lrfn = get_lrfn(CONFIG)#get_cycling_lrfn(CONFIG) #
 lr_callback = tf.keras.callbacks.LearningRateScheduler(lrfn, verbose=True)
 rng = [i for i in range(EPOCHS_FULL)]
 y = [lrfn(x) for x in rng]
@@ -77,10 +77,15 @@ for fold in range(CONFIG.nfolds):
 
     print(f'fold={fold}')
     model_file_path=f'{CONFIG.work_dir}/model{fold}.h5'
+    # SAVE BEST MODEL EACH FOLD
+    save_callback_best = tf.keras.callbacks.ModelCheckpoint(
+        model_file_path, monitor='val_loss', verbose=0, save_best_only=True,
+        mode='min', save_freq='epoch')
+
     save_callback=SaveLastCallback(CONFIG.work_dir,fold=fold, epochs=EPOCHS_FULL,
                                    save_last_epochs=CONFIG.save_last_epochs)
 
-    callbacks=[lr_callback,save_callback]
+    callbacks=[lr_callback,save_callback_best]
 
     scope = get_scope()
     with scope:
