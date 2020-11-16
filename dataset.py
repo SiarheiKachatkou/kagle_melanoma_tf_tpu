@@ -16,7 +16,6 @@ HZOOM_ = 8.0
 WZOOM_ = 8.0
 HSHIFT_ = 8.0
 WSHIFT_ = 8.0
-REPLICAS = 8
 
 def get_mat(rotation, shear, height_zoom, width_zoom, height_shift, width_shift):
     # returns 3x3 transformmatrix which transforms indicies
@@ -179,6 +178,6 @@ def get_dataset(files, augment=False, shuffle=False, repeat=False,
                                                *args),
                 num_parallel_calls=AUTO)
 
-    ds = ds.batch(batch_size * REPLICAS)
+    ds = ds.batch(batch_size)
     ds = ds.prefetch(AUTO)
     return ds
