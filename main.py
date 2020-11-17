@@ -100,14 +100,11 @@ for fold in range(CONFIG.nfolds):
                                          labeled=True, return_image_names=False, batch_size=BATCH_SIZE,
                                          dim=IMAGE_HEIGHT)
 
-        '''
+
         metrics = ['accuracy', tf.keras.metrics.AUC(name='auc')] if CONFIG.use_metrics else None
         model = create_model(CONFIG, metrics, backbone_trainable=False)
 
         model.summary()
-        
-
-        
 
         history_fine_tune = model.fit(training_dataset,
                                       validation_data=validation_dataset, steps_per_epoch=TRAIN_STEPS,
@@ -117,14 +114,15 @@ for fold in range(CONFIG.nfolds):
         '''
         model=build_model(IMAGE_HEIGHT,6)
         model.summary()
+        '''
 
         history = model.fit(training_dataset, validation_data=validation_dataset,
                             steps_per_epoch=TRAIN_STEPS, initial_epoch=EPOCHS_FINE_TUNE, epochs=EPOCHS_FULL, callbacks=callbacks)
 
-        #history = join_history(history_fine_tune, history)
+        history = join_history(history_fine_tune, history)
         print(history.history)
 
-        '''
+
 
         final_accuracy = history.history["val_accuracy"][-5:]
         print("FINAL ACCURACY MEAN-5: ", np.mean(final_accuracy))
@@ -134,7 +132,7 @@ for fold in range(CONFIG.nfolds):
             display_training_curves(history.history['auc'][1:], history.history['val_auc'][1:], 'auc', 211)
         display_training_curves(history.history['loss'][1:], history.history['val_loss'][1:], 'loss', 212)
         plt.savefig(os.path.join(CONFIG.work_dir, f'loss{fold}.png'))
-        '''
+
 
         test_dataset = get_dataset(test_filenames, augment=False, shuffle=False, repeat=False,
                 labeled=False, return_image_names=True, batch_size=BATCH_SIZE, dim=IMAGE_HEIGHT)

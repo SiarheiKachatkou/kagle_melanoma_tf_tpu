@@ -58,14 +58,14 @@ config=namedtuple('config',['lr_max','lr_start','stepsize', 'lr_warm_up_epochs',
 
 model = 'B6' if not is_debug else 'B0'
 
-penalty = 1e-16
+penalty = 0
 work_dir_name = f'{model}_bce_loss_{IMAGE_HEIGHT}_penalty_{penalty}_cycle_lr_e3' if not is_debug else 'debug'
 
-CONFIG=config(lr_max=3e-4, lr_start=5e-6, stepsize=3, lr_warm_up_epochs=5, lr_min=0.000001/red,lr_exp_decay=0.8,
+CONFIG=config(lr_max=3e-4, lr_start=5e-6, stepsize=3, lr_warm_up_epochs=5, lr_min=1e-6,lr_exp_decay=0.8,
               nfolds=4, l2_penalty=penalty, work_dir=work_dir_name,
               gs_work_dir=f'gs://kochetkov_kaggle_melanoma/{str(datetime.datetime.now())[:20]}_{work_dir_name}',
               model_fn_str=f"efficientnet.tfkeras.EfficientNet{model}(weights='imagenet', include_top=False)", ttas=11,
-              use_metrics=True, dropout_rate=0.5,
+              use_metrics=True, dropout_rate=0.0,
               save_last_epochs=0
               )
 
