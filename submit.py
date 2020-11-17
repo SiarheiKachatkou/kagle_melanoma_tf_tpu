@@ -23,14 +23,18 @@ def save_submission(df, name):
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--work_dir',type=str)
+parser.add_argument('--folds',type=int, default=0)
 
 
 if __name__=="__main__":
 
     args=parser.parse_args()
 
-    nfolds = len(glob.glob(os.path.join(args.work_dir,'loss*.png')))
-
+    if args.folds==0:
+        nfolds = len(glob.glob(os.path.join(args.work_dir,'loss*.png')))
+        print(f' --folds not specified, will use {nfolds}')
+    else:
+        nfolds=args.folds
 
     for le in ['', 'le']:
         for m_type in ['', 'tta_']:

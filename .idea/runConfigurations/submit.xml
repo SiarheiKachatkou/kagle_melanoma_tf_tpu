@@ -13,7 +13,7 @@
     <option name="ADD_SOURCE_ROOTS" value="true" />
     <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
     <option name="SCRIPT_NAME" value="$PROJECT_DIR$/submit.py" />
-    <option name="PARAMETERS" value="--work_dir=&quot;artifacts/B4_focal_loss_512_old_datasets_penalty_1e-6_2020-11-07 06:32:45.283702&quot;" />
+    <option name="PARAMETERS" value="--work_dir=1 --folds=1" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="false" />
