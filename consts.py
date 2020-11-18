@@ -18,7 +18,7 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 
 EPOCHS_FINE_TUNE = 0
-EPOCHS_FULL = 1 if is_debug else 12
+EPOCHS_FULL = 3 if is_debug else 12
 
 IMAGE_HEIGHT = 384
 
@@ -66,7 +66,7 @@ CONFIG=config(lr_max=3e-4, lr_start=5e-6, stepsize=3, lr_warm_up_epochs=5, lr_mi
               gs_work_dir=f'gs://kochetkov_kaggle_melanoma/{str(datetime.datetime.now())[:20]}_{work_dir_name}',
               model_fn_str=f"efficientnet.tfkeras.EfficientNet{model}(weights='imagenet', include_top=False)", ttas=11,
               use_metrics=True, dropout_rate=0.0,
-              save_last_epochs=0
+              save_last_epochs=3
               )
 
 #pretrained_model = tf.keras.applications.MobileNetV2(input_shape=[*IMAGE_SIZE, 3], include_top=False)
