@@ -81,9 +81,12 @@ def get_mat(rotation, shear, height_zoom, width_zoom, height_shift, width_shift)
                  K.dot(zoom_matrix, shift_matrix))
 
 
-def transform(image, DIM=256):
+def transform_geometricaly(image, DIM=256):
     # input image - is one image of size [dim,dim,3] not a batch of [b,dim,dim,3]
     # output - image randomly rotated, sheared, zoomed, and shifted
+
+    image = tf.image.random_flip_left_right(image)
+
     XDIM = DIM % 2  # fix for size 331
     rot = ROT_ * tf.random.normal([1], seed=op_seed, dtype='float32')
     shr = SHR_ * tf.random.normal([1], seed=op_seed, dtype='float32')
@@ -111,3 +114,43 @@ def transform(image, DIM=256):
     d = tf.gather_nd(image, tf.transpose(idx3))
 
     return tf.reshape(d, [DIM, DIM, 3])
+
+
+def _augment_color(image):
+    image = tf.image.random_saturation(image, 0.7, 1.3)
+    image = tf.image.random_hue(image, 0.1)
+
+    image = tf.image.random_contrast(image, 0.8, 1.2)
+    image = tf.image.random_brightness(image, 0.1)
+
+    return image
+
+
+def _normalize(image8u):
+    image = tf.cast(image8u,tf.float32)
+    image = tf.keras.applications.imagenet_utils.preprocess_input(image, mode='torch')
+    return image
+
+
+def augment_train(image, label, image_name):
+    image=_augment_color(image)
+    image = transform_geometricaly(image, DIM=IMAGE_HEIGHT)
+    image = _normalize(image)
+    return image, label, image_name
+
+
+def augment_tta(image, label, image_name):
+    image=_augment_color(image)
+    image = transform_geometricaly(image, DIM=IMAGE_HEIGHT)
+    image = _normalize(image)
+    return image, label, image_name
+
+
+def augment_val(image, label, image_name):
+    image = _normalize(image)
+    return image, label, image_name
+
+
+def augment_test(image, label, image_name):
+    image = _normalize(image)
+    return image, label, image_name

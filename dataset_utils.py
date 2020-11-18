@@ -1,13 +1,9 @@
-import re
-from sklearn.model_selection import KFold
-import numpy as np
-
-
 import tensorflow as tf
 AUTO = tf.data.experimental.AUTOTUNE
 from consts import *
 #from augmentation_hair import hair_aug_tf
-from augmentations import cutout, transform
+from augmentations import augment_train,augment_tta,augment_val,augment_test
+from files_utils import get_train_val_filenames,get_test_filenames,count_data_items
 
 features_test = {
       'image': tf.io.FixedLenFeature([], tf.string),
@@ -35,64 +31,43 @@ features = features_test.copy()
 features['target']=tf.io.FixedLenFeature([], tf.int64)
 
 
-def _normalize(image8u):
-
-    image = tf.cast(image8u,tf.float32)
-    image = tf.image.random_saturation(image, 0.7, 1.3)
-    image = tf.image.random_hue(image, 0.1)
-
-    image = tf.keras.applications.imagenet_utils.preprocess_input(image, mode='torch')
-    return image
-
-  
-
 def read_tfrecord(example):
 
     example = tf.io.parse_single_example(example, features)
     image = tf.image.decode_jpeg(example['image'], channels=3)
-    image = _normalize(image)
     image_name = tf.cast(example['image_name'], tf.string)
-
     class_label = tf.cast(example['target'], tf.int32)
-    #one_hot_class_label=tf.one_hot(class_label, depth=len(CLASSES))
-    one_hot_class_label = class_label
-    return image, one_hot_class_label, image_name
+    return image, class_label, image_name
 
 
 def read_tfrecord_test(example):
 
     example = tf.io.parse_single_example(example, features_test)
     image = tf.image.decode_jpeg(example['image'], channels=3)
-    image = _normalize(image)
     image_name = tf.cast(example['image_name'], tf.string)
 
     class_label = tf.constant(0, dtype=tf.int32)
-
-    one_hot_class_label = class_label# tf.one_hot(class_label, depth=len(CLASSES))
-    return image, one_hot_class_label, image_name
+    return image, class_label, image_name
 
 
 def read_tfrecord_old(example):
-
     example = tf.io.parse_single_example(example, features_old)
     image = tf.image.decode_jpeg(example['image'], channels=3)
-    image = _normalize(image)
     image_name = tf.cast(example['image_name'], tf.string)
-
     class_label = tf.cast(example['target'], tf.int32)
+    return image, class_label, image_name
 
-    one_hot_class_label = class_label#tf.one_hot(class_label, depth=len(CLASSES))
-    return image, one_hot_class_label, image_name
 
 def _num_parallel_calls():
     return 1 if is_debug else AUTO
 
+
 def force_image_sizes(dataset, image_size):
     # explicit size needed for TPU
     reshape_images = lambda image, *args: (tf.reshape(image, [*image_size, 3]), *args)
-
     dataset = dataset.map(reshape_images, _num_parallel_calls())
     return dataset
+
 
 def _ignore_order(dataset):
     ignore_order = tf.data.Options()
@@ -104,18 +79,16 @@ def _ignore_order(dataset):
         ignore_order)  # uses data as soon as it streams in, rather than in its original order
     return dataset
 
+
 def load_dataset(filenames, is_test):
     # Read from TFRecords. For optimal performance, reading from multiple files at once and
     # disregarding data order. Order does not matter since we will be shuffling the data anyway.
-
-
     dataset = tf.data.TFRecordDataset(filenames, num_parallel_reads=_num_parallel_calls()) # automatically interleaves reads from multiple files
     dataset = _ignore_order(dataset)
     dataset = dataset.cache()
     the_read_tfrecord=read_tfrecord_test if is_test else read_tfrecord
     dataset = dataset.map(the_read_tfrecord, num_parallel_calls=_num_parallel_calls())
     dataset = force_image_sizes(dataset, IMAGE_SIZE)
-	
     if not is_test: 
         dataset = dataset.shuffle(1024*8)
         
@@ -133,55 +106,16 @@ def load_dataset_old(fileimages_old):
     dataset = force_image_sizes(dataset, IMAGE_SIZE)
     return dataset
 
-def data_augment(image, one_hot_class, image_name):
-    # data augmentation. Thanks to the dataset.prefetch(AUTO) statement in the next function (below),
-    # this happens essentially for free on TPU. Data pipeline code is executed on the "CPU" part
-    # of the TPU while the TPU itself is computing gradients.
-	
-    image = transform(image,DIM=IMAGE_HEIGHT)
-    image = tf.image.random_flip_left_right(image)
-
-    image = tf.image.random_contrast(image, 0.8, 1.2)
-    image = tf.image.random_brightness(image, 0.1)
+def _augm_dataset(dataset, augm_fn):
+    dataset = dataset.map(augm_fn, num_parallel_calls=_num_parallel_calls())
+    dataset = dataset.batch(BATCH_SIZE)
+    dataset = dataset.prefetch(AUTO)
+    return dataset
 
 
-    return image, one_hot_class, image_name
-
-
-def data_tta(image, one_hot_class, image_name):
-
-    image = transform(image,DIM=IMAGE_HEIGHT)
-    image = tf.image.random_flip_left_right(image)
-    #img = tf.image.random_hue(img, 0.01)
-    image = tf.image.random_saturation(image, 0.7, 1.3)
-    image = tf.image.random_contrast(image, 0.8, 1.2)
-    image = tf.image.random_brightness(image, 0.1)
-	
-    return image, one_hot_class, image_name
-
-def count_data_items(filenames):
-    # the number of data items is written in the name of the .tfrec files, i.e. flowers00-230.tfrec = 230 data items
-    n = [int(re.compile(r"-([0-9]*)\.").search(filename).group(1)) for filename in filenames]
-    return np.sum(n)
-
-def get_test_filenames(gs_path_to_dataset_train):
-    gcs_pattern = gs_path_to_dataset_train.replace('train','test')
-    test_filenames = tf.io.gfile.glob(gcs_pattern)
-    test_steps = count_data_items(test_filenames) // BATCH_SIZE
-    print("TTEST IMAGES: ", count_data_items(test_filenames), ", STEPS PER EPOCH: ", test_steps)
-    return test_filenames
-
-def get_train_val_filenames(gs_path_to_dataset_train, nfolds):
-    
-    filenames = tf.io.gfile.glob(gs_path_to_dataset_train)
-    filenames=np.array(filenames)
-    kf = KFold(n_splits=nfolds, random_state=0, shuffle=True)
-    train_filenames_folds=[]
-    val_filenames_folds=[]
-    for train_index, test_index in kf.split(filenames):
-        train_filenames_folds.append(list(filenames[train_index]))
-        val_filenames_folds.append(list(filenames[test_index]))
-    return train_filenames_folds, val_filenames_folds
+def _get_dataset(filenames,is_test,augm_fn):
+    dataset = load_dataset(filenames, is_test=is_test)
+    return _augm_dataset(dataset,augm_fn)
 
 
 def get_training_dataset(training_fileimages, training_fileimages_old):
@@ -190,43 +124,25 @@ def get_training_dataset(training_fileimages, training_fileimages_old):
         dataset_old = load_dataset_old(training_fileimages_old)
         dataset.concatenate(dataset_old)
 
-    dataset = dataset.map(data_augment, num_parallel_calls=_num_parallel_calls())
-
-    dataset = dataset.repeat()
-    dataset = dataset.shuffle(2048)
-
-    dataset = dataset.batch(BATCH_SIZE)
-
-    dataset = dataset.prefetch(AUTO)  # prefetch next batch while training (autotune prefetch buffer size)
+    dataset=dataset.shuffle(2048)
+    dataset = _augm_dataset(dataset,augment_train)
     return dataset
-
 
 def get_validation_dataset_tta(val_filenames):
-    dataset = load_dataset(val_filenames, is_test=False)
-    dataset = dataset.map(data_tta, num_parallel_calls=_num_parallel_calls())
-    dataset = dataset.batch(BATCH_SIZE)
-    dataset = dataset.prefetch(AUTO) # prefetch next batch while training (autotune prefetch buffer size)
-    return dataset
+    return _get_dataset(val_filenames,is_test=False,augm_fn=augment_tta)
 
 
-def get_validation_dataset(validation_fileimages):
-    dataset = load_dataset(validation_fileimages, is_test=False)
-    dataset = dataset.batch(BATCH_SIZE)
-    dataset = dataset.prefetch(AUTO) # prefetch next batch while training (autotune prefetch buffer size)
-    return dataset
+def get_validation_dataset(val_filenames):
+    return _get_dataset(val_filenames, is_test=False, augm_fn=augment_val)
+
 
 def get_test_dataset_tta(test_filenames):
-    dataset = load_dataset(test_filenames, is_test=True)
-    dataset = dataset.map(data_tta, num_parallel_calls=_num_parallel_calls())
-    dataset = dataset.batch(BATCH_SIZE)
-    dataset = dataset.prefetch(AUTO) # prefetch next batch while training (autotune prefetch buffer size)
-    return dataset
+    return _get_dataset(test_filenames, is_test=True, augm_fn=augment_tta)
+
 
 def get_test_dataset(test_filenames):
-    dataset = load_dataset(test_filenames, is_test=True)
-    dataset = dataset.batch(BATCH_SIZE)
-    dataset = dataset.prefetch(AUTO) # prefetch next batch while training (autotune prefetch buffer size)
-    return dataset
+    return _get_dataset(test_filenames, is_test=True, augm_fn=augment_test)
+
 
 def return_2_values(dataset):
     def two(a1,a2,*args):
