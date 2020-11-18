@@ -1,12 +1,16 @@
 import datetime
 from collections import namedtuple
 import os
+import tensorflow as tf
+import numpy as np
+import random
+import sklearn
 
 
 use_tpu_2 = False
-is_local = False
+is_local = True
 is_kaggle = True
-is_debug = False
+is_debug = True
 
 if (not is_local) and (not is_kaggle):
     tpu3 = "grpc://10.240.1.2:8470"
@@ -76,3 +80,9 @@ CONFIG=config(lr_max=3e-4, lr_start=5e-6, stepsize=3, lr_warm_up_epochs=5, lr_mi
 #pretrained_model = tf.keras.applications.MobileNet(weights='imagenet', include_top=False, input_shape=[*IMAGE_SIZE, 3])
 # EfficientNet can be loaded through efficientnet.tfkeras library (https://github.com/qubvel/efficientnet)
 
+seed=10000
+op_seed=10
+tf.random.set_seed(seed)
+tf.compat.v1.random.set_random_seed(seed)
+np.random.seed(seed)
+random.seed(seed)

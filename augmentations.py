@@ -1,6 +1,7 @@
 import tensorflow as tf
 import tensorflow.keras.backend as K
 import math
+from consts import *
 
 # COARSE DROPOUT
 
@@ -9,14 +10,14 @@ def cutout(image, IMG_HEIGHT=256, prob = 0.75, holes_count = 8, hole_size = 0.2)
     # output - image with CT squares of side size SZ*IMG_HEIGHT removed
     
     # DO DROPOUT WITH PROBABILITY DEFINED ABOVE
-    P = tf.cast(tf.random.uniform([],0,1) > prob, tf.int32)
+    P = tf.cast(tf.random.uniform([],0,1, seed=op_seed) > prob, tf.int32)
     if (P==0)|(holes_count == 0)|(hole_size == 0):
         return image
     
     for k in range(holes_count):
         # CHOOSE RANDOM LOCATION
-        x = tf.cast( tf.random.uniform([],0,IMG_HEIGHT),tf.int32)
-        y = tf.cast( tf.random.uniform([],0,IMG_HEIGHT),tf.int32)
+        x = tf.cast( tf.random.uniform([],0,IMG_HEIGHT, seed=op_seed),tf.int32)
+        y = tf.cast( tf.random.uniform([],0,IMG_HEIGHT, seed=op_seed),tf.int32)
         # COMPUTE SQUARE
         WIDTH = tf.cast(hole_size * IMG_HEIGHT, tf.int32)
         ya = tf.math.maximum(0,y-WIDTH//2)
@@ -84,13 +85,12 @@ def transform(image, DIM=256):
     # input image - is one image of size [dim,dim,3] not a batch of [b,dim,dim,3]
     # output - image randomly rotated, sheared, zoomed, and shifted
     XDIM = DIM % 2  # fix for size 331
-
-    rot = ROT_ * tf.random.normal([1], dtype='float32')
-    shr = SHR_ * tf.random.normal([1], dtype='float32')
-    h_zoom = 1.0 + tf.random.normal([1], dtype='float32') / HZOOM_
-    w_zoom = 1.0 + tf.random.normal([1], dtype='float32') / WZOOM_
-    h_shift = HSHIFT_ * tf.random.normal([1], dtype='float32')
-    w_shift = WSHIFT_ * tf.random.normal([1], dtype='float32')
+    rot = ROT_ * tf.random.normal([1], seed=op_seed, dtype='float32')
+    shr = SHR_ * tf.random.normal([1], seed=op_seed, dtype='float32')
+    h_zoom = 1.0 + tf.random.normal([1], seed=op_seed, dtype='float32') / HZOOM_
+    w_zoom = 1.0 + tf.random.normal([1], seed=op_seed, dtype='float32') / WZOOM_
+    h_shift = HSHIFT_ * tf.random.normal([1], seed=op_seed, dtype='float32')
+    w_shift = WSHIFT_ * tf.random.normal([1], seed=op_seed, dtype='float32')
 
     # GET TRANSFORMATION MATRIX
     m = get_mat(rot, shr, h_zoom, w_zoom, h_shift, w_shift)

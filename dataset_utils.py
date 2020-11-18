@@ -36,7 +36,11 @@ features['target']=tf.io.FixedLenFeature([], tf.int64)
 
 
 def _normalize(image8u):
+
     image = tf.cast(image8u,tf.float32)
+    image = tf.image.random_saturation(image, 0.7, 1.3)
+    image = tf.image.random_hue(image, 0.1)
+
     image = tf.keras.applications.imagenet_utils.preprocess_input(image, mode='torch')
     return image
 
@@ -80,26 +84,36 @@ def read_tfrecord_old(example):
     one_hot_class_label = class_label#tf.one_hot(class_label, depth=len(CLASSES))
     return image, one_hot_class_label, image_name
 
+def _num_parallel_calls():
+    return 1 if is_debug else AUTO
 
 def force_image_sizes(dataset, image_size):
     # explicit size needed for TPU
     reshape_images = lambda image, *args: (tf.reshape(image, [*image_size, 3]), *args)
-    dataset = dataset.map(reshape_images, num_parallel_calls=AUTO)
+
+    dataset = dataset.map(reshape_images, _num_parallel_calls())
     return dataset
 
+def _ignore_order(dataset):
+    ignore_order = tf.data.Options()
+    if is_debug:
+        ignore_order.experimental_deterministic = True
+    else:
+        ignore_order.experimental_deterministic = False
+    dataset = dataset.with_options(
+        ignore_order)  # uses data as soon as it streams in, rather than in its original order
+    return dataset
 
 def load_dataset(filenames, is_test):
     # Read from TFRecords. For optimal performance, reading from multiple files at once and
     # disregarding data order. Order does not matter since we will be shuffling the data anyway.
 
-    ignore_order = tf.data.Options()
-    ignore_order.experimental_deterministic = False
 
-    dataset = tf.data.TFRecordDataset(filenames, num_parallel_reads=AUTO) # automatically interleaves reads from multiple files
-    dataset = dataset.with_options(ignore_order) # uses data as soon as it streams in, rather than in its original order
+    dataset = tf.data.TFRecordDataset(filenames, num_parallel_reads=_num_parallel_calls()) # automatically interleaves reads from multiple files
+    dataset = _ignore_order(dataset)
     dataset = dataset.cache()
     the_read_tfrecord=read_tfrecord_test if is_test else read_tfrecord
-    dataset = dataset.map(the_read_tfrecord, num_parallel_calls=AUTO)
+    dataset = dataset.map(the_read_tfrecord, num_parallel_calls=_num_parallel_calls())
     dataset = force_image_sizes(dataset, IMAGE_SIZE)
 	
     if not is_test: 
@@ -109,16 +123,13 @@ def load_dataset(filenames, is_test):
 
 
 def load_dataset_old(fileimages_old):
-    ignore_order = tf.data.Options()
-    ignore_order.experimental_deterministic = False
 
     dataset = tf.data.TFRecordDataset(fileimages_old,
-                                      num_parallel_reads=AUTO)  # automatically interleaves reads from multiple files
-    dataset = dataset.with_options(
-        ignore_order)  # uses data as soon as it streams in, rather than in its original order
+                                      num_parallel_reads=_num_parallel_calls())  # automatically interleaves reads from multiple files
+    dataset=_ignore_order(dataset)
     dataset = dataset.cache()
     dataset = dataset.shuffle(1024*8)
-    dataset = dataset.map(read_tfrecord_old, num_parallel_calls=AUTO)
+    dataset = dataset.map(read_tfrecord_old, num_parallel_calls=_num_parallel_calls())
     dataset = force_image_sizes(dataset, IMAGE_SIZE)
     return dataset
 
@@ -129,8 +140,7 @@ def data_augment(image, one_hot_class, image_name):
 	
     image = transform(image,DIM=IMAGE_HEIGHT)
     image = tf.image.random_flip_left_right(image)
-    #img = tf.image.random_hue(img, 0.01)
-    image = tf.image.random_saturation(image, 0.7, 1.3)
+
     image = tf.image.random_contrast(image, 0.8, 1.2)
     image = tf.image.random_brightness(image, 0.1)
 
@@ -180,7 +190,7 @@ def get_training_dataset(training_fileimages, training_fileimages_old):
         dataset_old = load_dataset_old(training_fileimages_old)
         dataset.concatenate(dataset_old)
 
-    dataset = dataset.map(data_augment, num_parallel_calls=AUTO)
+    dataset = dataset.map(data_augment, num_parallel_calls=_num_parallel_calls())
 
     dataset = dataset.repeat()
     dataset = dataset.shuffle(2048)
@@ -193,7 +203,7 @@ def get_training_dataset(training_fileimages, training_fileimages_old):
 
 def get_validation_dataset_tta(val_filenames):
     dataset = load_dataset(val_filenames, is_test=False)
-    dataset = dataset.map(data_tta, num_parallel_calls=AUTO)
+    dataset = dataset.map(data_tta, num_parallel_calls=_num_parallel_calls())
     dataset = dataset.batch(BATCH_SIZE)
     dataset = dataset.prefetch(AUTO) # prefetch next batch while training (autotune prefetch buffer size)
     return dataset
@@ -207,7 +217,7 @@ def get_validation_dataset(validation_fileimages):
 
 def get_test_dataset_tta(test_filenames):
     dataset = load_dataset(test_filenames, is_test=True)
-    dataset = dataset.map(data_tta, num_parallel_calls=AUTO)
+    dataset = dataset.map(data_tta, num_parallel_calls=_num_parallel_calls())
     dataset = dataset.batch(BATCH_SIZE)
     dataset = dataset.prefetch(AUTO) # prefetch next batch while training (autotune prefetch buffer size)
     return dataset
@@ -221,5 +231,5 @@ def get_test_dataset(test_filenames):
 def return_2_values(dataset):
     def two(a1,a2,*args):
         return a1,a2
-    ds=dataset.map(two,num_parallel_calls=AUTO)
+    ds=dataset.map(two,num_parallel_calls=_num_parallel_calls())
     return ds
