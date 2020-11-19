@@ -21,7 +21,10 @@ from create_model import create_model, set_backbone_trainable
 
 if use_amp:
     from tensorflow.keras.mixed_precision import experimental as mixed_precision
-    policy = mixed_precision.Policy('mixed_float16')
+    if not is_local:
+        policy = mixed_precision.Policy('mixed_bfloat16')
+    else:
+        policy = mixed_precision.Policy('mixed_float16')
     mixed_precision.set_policy(policy)
 
 def join_history(history1, history2):
