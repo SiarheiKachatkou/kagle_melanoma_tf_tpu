@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
+import gc
 
 def make_submission_dataframe(test_dataset, model):
 
@@ -12,9 +13,11 @@ def make_submission_dataframe(test_dataset, model):
         labs.extend(labels.numpy())
         image_names = image_names.numpy()
 
-        predictions = model.predict(images, batch_size=64, workers=8, use_multiprocessing=True)
+        predictions = model.predict(images, workers=8, use_multiprocessing=True)
         preds.extend(predictions)
         names.extend(image_names)
+
+    gc.collect()
 
     names=[n.decode('utf-8') for n in names]
     names=np.array(names)

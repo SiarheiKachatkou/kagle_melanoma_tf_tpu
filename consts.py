@@ -8,9 +8,9 @@ import sklearn
 
 
 use_tpu_2 = False
-is_local = True
+is_local = False
 is_kaggle = True
-is_debug = True
+is_debug = False
 
 if (not is_local) and (not is_kaggle):
     tpu3 = "grpc://10.240.1.2:8470"
@@ -52,6 +52,9 @@ CLASSES = ['health','melanoma']
 
 red = 4 if use_tpu_2 else 1
 
+if is_local:
+    red=4
+
 BATCH_SIZE = 1 if is_debug else 8*32//red
 
 TRAIN_STEPS = 1 if is_debug else None
@@ -70,7 +73,7 @@ CONFIG=config(lr_max=3e-4, lr_start=5e-6, stepsize=3, lr_warm_up_epochs=5, lr_mi
               gs_work_dir=f'gs://kochetkov_kaggle_melanoma/{str(datetime.datetime.now())[:20]}_{work_dir_name}',
               model_fn_str=f"efficientnet.tfkeras.EfficientNet{model}(weights='imagenet', include_top=False)", ttas=11,
               use_metrics=True, dropout_rate=0.0,
-              save_last_epochs=3
+              save_last_epochs=0
               )
 
 #pretrained_model = tf.keras.applications.MobileNetV2(input_shape=[*IMAGE_SIZE, 3], include_top=False)

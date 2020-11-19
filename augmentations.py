@@ -118,7 +118,7 @@ def transform_geometricaly(image, DIM=256):
 
 def _augment_color(image):
     image = tf.image.random_saturation(image, 0.7, 1.3)
-    image = tf.image.random_hue(image, 0.1)
+    image = tf.image.random_hue(image, 0.05)
 
     image = tf.image.random_contrast(image, 0.8, 1.2)
     image = tf.image.random_brightness(image, 0.1)
@@ -134,15 +134,15 @@ def _normalize(image8u):
 
 def augment_train(image, label, image_name):
     image=_augment_color(image)
-    image = transform_geometricaly(image, DIM=IMAGE_HEIGHT)
     image = _normalize(image)
+    image = transform_geometricaly(image, DIM=IMAGE_HEIGHT)
     return image, label, image_name
 
 
 def augment_tta(image, label, image_name):
     image=_augment_color(image)
-    image = transform_geometricaly(image, DIM=IMAGE_HEIGHT)
     image = _normalize(image)
+    image = transform_geometricaly(image, DIM=IMAGE_HEIGHT)
     return image, label, image_name
 
 

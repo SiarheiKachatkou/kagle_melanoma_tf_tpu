@@ -90,7 +90,7 @@ def load_dataset(filenames, is_test):
     dataset = dataset.map(the_read_tfrecord, num_parallel_calls=_num_parallel_calls())
     dataset = force_image_sizes(dataset, IMAGE_SIZE)
     if not is_test: 
-        dataset = dataset.shuffle(1024*8)
+        dataset = dataset.shuffle(256)
         
     return dataset
 
@@ -101,7 +101,7 @@ def load_dataset_old(fileimages_old):
                                       num_parallel_reads=_num_parallel_calls())  # automatically interleaves reads from multiple files
     dataset=_ignore_order(dataset)
     dataset = dataset.cache()
-    dataset = dataset.shuffle(1024*8)
+    dataset = dataset.shuffle(512)
     dataset = dataset.map(read_tfrecord_old, num_parallel_calls=_num_parallel_calls())
     dataset = force_image_sizes(dataset, IMAGE_SIZE)
     return dataset
@@ -124,7 +124,8 @@ def get_training_dataset(training_fileimages, training_fileimages_old):
         dataset_old = load_dataset_old(training_fileimages_old)
         dataset.concatenate(dataset_old)
 
-    dataset=dataset.shuffle(2048)
+    dataset = dataset.repeat()
+    dataset=dataset.shuffle(512)
     dataset = _augm_dataset(dataset,augment_train)
     return dataset
 
