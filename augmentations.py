@@ -141,7 +141,6 @@ def cut_mix(images,labels,*args, prob=0.5):
         dy=tf.cast((IMAGE_HEIGHT - cut_size),tf.float32)
         y = tf.cast(tf.random.uniform((), 0, 1) * dy, tf.int32)
         donor_idx = tf.cast( tf.random.uniform([],0,BATCH_SIZE),tf.int32)
-        print(images.shape)
         donor=images[donor_idx]
 
         one = img[y:y+cut_size, 0:x, :]

@@ -8,10 +8,10 @@ import sklearn
 
 
 use_tpu_2 = False
-is_local = True
+is_local = False
 is_kaggle = True
-is_debug = True
-use_amp = False
+is_debug = False
+use_amp = True
 
 if (not is_local) and (not is_kaggle):
     tpu3 = "grpc://10.240.1.2:8470"
@@ -64,7 +64,7 @@ config=namedtuple('config',['lr_max','lr_start','stepsize', 'lr_warm_up_epochs',
                             'model_fn_str','work_dir', 'gs_work_dir','ttas','use_metrics','dropout_rate',
                             'save_last_epochs'])
 
-model = 'B6' if not is_debug else 'B0'
+model = 'B0' if not is_debug else 'B0'
 
 penalty = 0
 work_dir_name = f'{model}_bce_loss_{IMAGE_HEIGHT}_penalty_{penalty}_cycle_lr_e3' if not is_debug else 'debug'

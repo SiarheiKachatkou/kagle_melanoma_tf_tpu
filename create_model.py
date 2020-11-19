@@ -63,7 +63,7 @@ class BinaryFocalLoss():
 
 
 def compile_model(model, metrics, cfg, lr=None):
-    loss = tf.keras.losses.BinaryCrossentropy(label_smoothing=0.05)
+    loss = tf.keras.losses.BinaryCrossentropy()#label_smoothing=0.05)
 
     learning_rate = cfg.lr_start if lr is None else lr
 
