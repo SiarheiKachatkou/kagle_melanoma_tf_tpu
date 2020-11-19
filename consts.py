@@ -10,7 +10,7 @@ import sklearn
 use_tpu_2 = False
 is_local = False
 is_kaggle = True
-is_debug = True
+is_debug = False
 use_amp = True
 
 if (not is_local) and (not is_kaggle):
@@ -23,7 +23,7 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 
 EPOCHS_FINE_TUNE = 0
-EPOCHS_FULL = 1 if is_debug else 12
+EPOCHS_FULL = 1 if is_debug else 1
 
 IMAGE_HEIGHT = 384
 
@@ -56,7 +56,7 @@ red = 4 if use_tpu_2 else 1
 if is_local:
     red=4
 
-BATCH_SIZE = 2*8*32 if is_debug else 2*8*32//red
+BATCH_SIZE = 1 if is_debug else 2*8*32//red
 
 TRAIN_STEPS = 1 if is_debug else None
 
