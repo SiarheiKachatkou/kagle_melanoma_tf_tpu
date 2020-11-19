@@ -19,9 +19,10 @@ from create_model import BinaryFocalLoss
 from SaveLastCallback import SaveLastCallback
 from create_model import create_model, set_backbone_trainable
 
-from tensorflow.keras.mixed_precision import experimental as mixed_precision
-policy = mixed_precision.Policy('mixed_float16')
-mixed_precision.set_policy(policy)
+if use_amp:
+    from tensorflow.keras.mixed_precision import experimental as mixed_precision
+    policy = mixed_precision.Policy('mixed_float16')
+    mixed_precision.set_policy(policy)
 
 def join_history(history1, history2):
 

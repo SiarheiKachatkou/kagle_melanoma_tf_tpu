@@ -11,6 +11,7 @@ use_tpu_2 = False
 is_local = False
 is_kaggle = True
 is_debug = False
+use_amp = False
 
 if (not is_local) and (not is_kaggle):
     tpu3 = "grpc://10.240.1.2:8470"
