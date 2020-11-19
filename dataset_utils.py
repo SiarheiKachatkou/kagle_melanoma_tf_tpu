@@ -2,7 +2,7 @@ import tensorflow as tf
 AUTO = tf.data.experimental.AUTOTUNE
 from consts import *
 #from augmentation_hair import hair_aug_tf
-from augmentations import augment_train,augment_tta,augment_val,augment_test
+from augmentations import augment_train,augment_tta,augment_val,augment_test, cut_mix
 from files_utils import get_train_val_filenames,get_test_filenames,count_data_items
 
 features_test = {
@@ -30,13 +30,14 @@ features_old = {
 features = features_test.copy()
 features['target']=tf.io.FixedLenFeature([], tf.int64)
 
+label_type=tf.float32
 
 def read_tfrecord(example):
 
     example = tf.io.parse_single_example(example, features)
     image = tf.image.decode_jpeg(example['image'], channels=3)
     image_name = tf.cast(example['image_name'], tf.string)
-    class_label = tf.cast(example['target'], tf.int32)
+    class_label = tf.cast(example['target'], label_type)
     return image, class_label, image_name
 
 
@@ -46,7 +47,7 @@ def read_tfrecord_test(example):
     image = tf.image.decode_jpeg(example['image'], channels=3)
     image_name = tf.cast(example['image_name'], tf.string)
 
-    class_label = tf.constant(0, dtype=tf.int32)
+    class_label = tf.constant(0, dtype=label_type)
     return image, class_label, image_name
 
 
@@ -54,7 +55,7 @@ def read_tfrecord_old(example):
     example = tf.io.parse_single_example(example, features_old)
     image = tf.image.decode_jpeg(example['image'], channels=3)
     image_name = tf.cast(example['image_name'], tf.string)
-    class_label = tf.cast(example['target'], tf.int32)
+    class_label = tf.cast(example['target'], label_type)
     return image, class_label, image_name
 
 
@@ -112,6 +113,10 @@ def _augm_dataset(dataset, augm_fn):
     dataset = dataset.prefetch(AUTO)
     return dataset
 
+def _augm_batched_dataset(dataset,batch_augm_fn):
+    dataset = dataset.map(batch_augm_fn, num_parallel_calls=_num_parallel_calls())
+    return dataset
+
 
 def _get_dataset(filenames,is_test,augm_fn):
     dataset = load_dataset(filenames, is_test=is_test)
@@ -127,6 +132,8 @@ def get_training_dataset(training_fileimages, training_fileimages_old):
     dataset = dataset.repeat()
     dataset=dataset.shuffle(512)
     dataset = _augm_dataset(dataset,augment_train)
+    dataset = _augm_batched_dataset(dataset, cut_mix)
+
     return dataset
 
 def get_validation_dataset_tta(val_filenames):

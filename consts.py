@@ -8,9 +8,9 @@ import sklearn
 
 
 use_tpu_2 = False
-is_local = False
+is_local = True
 is_kaggle = True
-is_debug = False
+is_debug = True
 use_amp = False
 
 if (not is_local) and (not is_kaggle):

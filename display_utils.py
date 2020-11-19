@@ -3,10 +3,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 from consts import CLASSES
 import cv2
+from augmentations import cut_mix
 
 def dataset_to_numpy_util(dataset, N):
     dataset = dataset.unbatch().batch(N)
     for images, labels in dataset:
+        #images, labels = cut_mix(images,labels)
         numpy_images = images.numpy()
         numpy_labels = labels.numpy()
         break
@@ -38,7 +40,7 @@ def display_9_images_from_dataset(dataset):
     print(labels)
     for i, image in enumerate(images):
         image = cv2.normalize(image,None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
-        title = CLASSES[labels[i]]
+        title = str(labels[i])
         subplot = display_one_flower(image, title, subplot)
         if i >= 8:
             break
