@@ -23,7 +23,7 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 
 EPOCHS_FINE_TUNE = 0
-EPOCHS_FULL = 1 if is_debug else 1
+EPOCHS_FULL = 1 if is_debug else 12
 
 IMAGE_HEIGHT = 384
 
