@@ -21,15 +21,11 @@ def make_submission_dataframe(test_dataset, model):
 
     names=[n.decode('utf-8') for n in names]
     names=np.array(names)
-    preds=np.array(preds)
+    preds=np.array(preds).astype(np.float32)
     labs=np.array(labs)
     #labs=np.argmax(labs,axis=1)
     names = np.reshape(names, (-1, 1))
     labs = np.reshape(labs, (-1, 1)).astype(np.int32)
-
-    print(f'labs {labs}')
-    print(f'preds {preds}')
-    print(f'names {names}')
 
     data=np.concatenate([names,preds,labs],axis=1)
     df_submission = pd.DataFrame(data,columns=['image_name','target','labels'])
