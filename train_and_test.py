@@ -82,8 +82,8 @@ for fold in range(CONFIG.nfolds):
         display_training_curves(history.history['loss'][1:], history.history['val_loss'][1:], 'loss', 212)
         plt.savefig(os.path.join(CONFIG.work_dir, f'loss{fold}.png'))
 
-
-        validation_with_augm_dataset = get_training_dataset(val_filenames_folds[fold], [], CONFIG)
+        validation_with_augm_dataset = get_validation_dataset(val_filenames_folds[fold], is_augment=True)
+        validation_with_augm_dataset = validation_with_augm_dataset.repeat()
         validation_with_augm_dataset_tta = None
         steps = TRAIN_STEPS * 3
         submission.calc_and_save_submissions(CONFIG, model, f'with_augm_val_{fold}',

@@ -68,11 +68,11 @@ config=namedtuple('config',['lr_max','lr_start','stepsize', 'lr_warm_up_epochs',
                             'save_last_epochs',
                             'cut_mix_prob'])
 
-model = 'B0' if not is_debug else 'B0'
+model = 'B3' if not is_debug else 'B0'
 
 penalty = 0
-cut_mix_prob=0.9
-work_dir_name = f'val_quality_{model}_bce_loss_{IMAGE_HEIGHT}_epochs_{EPOCHS_FULL}_cut_mix_{cut_mix_prob}' if not is_debug else 'debug'
+cut_mix_prob=0.5
+work_dir_name = f'val_quality_2_{model}_bce_loss_{IMAGE_HEIGHT}_epochs_{EPOCHS_FULL}_cut_mix_{cut_mix_prob}' if not is_debug else 'debug'
 
 
 CONFIG=config(lr_max=3e-4, lr_start=5e-6, stepsize=3, lr_warm_up_epochs=5, lr_min=1e-6,lr_exp_decay=0.8,lr_fn='get_lrfn(CONFIG)',#get_cycling_lrfn(CONFIG) #

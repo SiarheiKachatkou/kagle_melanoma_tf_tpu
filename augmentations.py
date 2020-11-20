@@ -195,6 +195,10 @@ def augment_val(image, label, image_name):
     image = _normalize(image)
     return image, label, image_name
 
+def augment_val_aug(image, label, image_name):
+    image = _normalize(image)
+    image = tf.image.random_flip_left_right(image)
+    return image, label, image_name
 
 def augment_test(image, label, image_name):
     image = _normalize(image)

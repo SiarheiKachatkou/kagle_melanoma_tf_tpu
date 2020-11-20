@@ -3,7 +3,7 @@ AUTO = tf.data.experimental.AUTOTUNE
 from consts import *
 from functools import partial
 #from augmentation_hair import hair_aug_tf
-from augmentations import augment_train,augment_tta,augment_val,augment_test, cut_mix
+from augmentations import augment_train,augment_tta,augment_val,augment_test, cut_mix, augment_val_aug
 from files_utils import get_train_val_filenames,get_test_filenames,count_data_items
 
 features_test = {
@@ -142,8 +142,9 @@ def get_validation_dataset_tta(val_filenames):
     return _get_dataset(val_filenames,is_test=False,augm_fn=augment_tta)
 
 
-def get_validation_dataset(val_filenames):
-    return _get_dataset(val_filenames, is_test=False, augm_fn=augment_val)
+def get_validation_dataset(val_filenames, is_augment=False):
+    augm_fn=augment_val_aug if is_augment else  augment_val
+    return _get_dataset(val_filenames, is_test=False, augm_fn=augm_fn)
 
 
 def get_test_dataset_tta(test_filenames):
