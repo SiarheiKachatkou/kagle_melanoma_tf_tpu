@@ -5,7 +5,7 @@ import tensorflow as tf
 import subprocess
 from matplotlib import pyplot as plt
 from lr import get_lrfn, get_cycling_lrfn
-from display_utils import display_training_curves
+from display_utils import display_training_curves, plot_lr
 from consts import *
 from dataset_utils import *
 import submission
@@ -20,13 +20,9 @@ if not os.path.exists(CONFIG.work_dir):
     
 shutil.copyfile('consts.py',os.path.join(CONFIG.work_dir,'consts.py'))
 
-lrfn = get_lrfn(CONFIG)#get_cycling_lrfn(CONFIG) #
+lrfn = eval(CONFIG.lr_fn)
+plot_lr(lrfn,EPOCHS_FULL,CONFIG.work_dir)
 lr_callback = tf.keras.callbacks.LearningRateScheduler(lrfn, verbose=True)
-rng = [i for i in range(EPOCHS_FULL)]
-y = [lrfn(x) for x in rng]
-plt.plot(rng, y)
-plt.title("Learning rate schedule: {:.3g} to {:.3g} to {:.3g}".format(y[0], max(y), y[-1]))
-plt.savefig(os.path.join(CONFIG.work_dir,'lr_schedule.png'))
 
 train_filenames_folds, val_filenames_folds=get_train_val_filenames(DATASETS[IMAGE_HEIGHT]['new'],CONFIG.nfolds)
 test_filenames=get_test_filenames(DATASETS[IMAGE_HEIGHT]['new'])

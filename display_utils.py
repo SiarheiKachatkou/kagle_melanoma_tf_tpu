@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from consts import CLASSES
 import cv2
+import os
 from augmentations import cut_mix
 
 def dataset_to_numpy_util(dataset, N):
@@ -79,3 +80,9 @@ def display_training_curves(training, validation, title, subplot):
     ax.legend(['train', 'valid.'])
 
 
+def plot_lr(lrfn,epochs_full,work_dir):
+    rng = [i for i in range(epochs_full)]
+    y = [lrfn(x) for x in rng]
+    plt.plot(rng, y)
+    plt.title("Learning rate schedule: {:.3g} to {:.3g} to {:.3g}".format(y[0], max(y), y[-1]))
+    plt.savefig(os.path.join(work_dir, 'lr_schedule.png'))

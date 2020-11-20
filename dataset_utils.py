@@ -151,6 +151,12 @@ def get_test_dataset_tta(test_filenames):
 def get_test_dataset(test_filenames):
     return _get_dataset(test_filenames, is_test=True, augm_fn=augment_test)
 
+def get_test_dataset_with_labels(test_filenames):
+    return _get_dataset(test_filenames, is_test=False, augm_fn=augment_test)
+
+def get_test_dataset_with_labels_tta(test_filenames):
+    return _get_dataset(test_filenames, is_test=False, augm_fn=augment_tta)
+
 
 def return_2_values(dataset):
     def two(a1,a2,*args):

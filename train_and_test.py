@@ -1,37 +1,33 @@
 
 
 import os
-import pickle
+import glob
 import gc
 import tensorflow as tf
 import subprocess
 from matplotlib import pyplot as plt
 from lr import get_lrfn, get_cycling_lrfn
-from display_utils import display_training_curves
+from display_utils import display_training_curves, plot_lr
 from consts import *
 from dataset_utils import *
 import submission
 import shutil
+import pandas as pd
 from create_model import BinaryFocalLoss
 from SaveLastCallback import SaveLastCallback
 from create_model import create_model, set_backbone_trainable
 from runtime import get_scope
 from history import join_history
-
-
+from submit import calc_auc
 
 if not os.path.exists(CONFIG.work_dir):
     os.mkdir(CONFIG.work_dir)
     
 shutil.copyfile('consts.py',os.path.join(CONFIG.work_dir,'consts.py'))
 
-lrfn = get_lrfn(CONFIG)#get_cycling_lrfn(CONFIG) #
+lrfn = eval(CONFIG.lr_fn)
+plot_lr(lrfn,EPOCHS_FULL,CONFIG.work_dir)
 lr_callback = tf.keras.callbacks.LearningRateScheduler(lrfn, verbose=True)
-rng = [i for i in range(EPOCHS_FULL)]
-y = [lrfn(x) for x in rng]
-plt.plot(rng, y)
-plt.title("Learning rate schedule: {:.3g} to {:.3g} to {:.3g}".format(y[0], max(y), y[-1]))
-plt.savefig(os.path.join(CONFIG.work_dir,'lr_schedule.png'))
 
 train_filenames_folds, val_filenames_folds=get_train_val_filenames(DATASETS[IMAGE_HEIGHT]['new'],CONFIG.nfolds)
 test_filenames=get_test_filenames(DATASETS[IMAGE_HEIGHT]['new'])
@@ -42,7 +38,6 @@ if is_debug:
 
 
 for fold in range(CONFIG.nfolds):
-
     print(f'fold={fold}')
     model_file_path=f'{CONFIG.work_dir}/model{fold}.h5'
     # SAVE BEST MODEL EACH FOLD
@@ -89,8 +84,6 @@ for fold in range(CONFIG.nfolds):
         display_training_curves(history.history['loss'][1:], history.history['val_loss'][1:], 'loss', 212)
         plt.savefig(os.path.join(CONFIG.work_dir, f'loss{fold}.png'))
 
-
-
         validation_dataset = get_validation_dataset(val_filenames_folds[fold])
         validation_dataset_tta = get_validation_dataset_tta(val_filenames_folds[fold])
         submission.calc_and_save_submissions(CONFIG, model, f'val_{fold}', validation_dataset, validation_dataset_tta,
@@ -98,9 +91,10 @@ for fold in range(CONFIG.nfolds):
         del validation_dataset
         del validation_dataset_tta
 
-        test_dataset = get_test_dataset(test_filenames)
-        test_dataset_tta = get_test_dataset_tta(test_filenames)
+        test_dataset = get_test_dataset_with_labels(test_filenames)
+        test_dataset_tta = get_test_dataset_with_labels_tta(test_filenames)
         submission.calc_and_save_submissions(CONFIG, model, f'test_{fold}', test_dataset, test_dataset_tta, CONFIG.ttas)
+
         del test_dataset
         del test_dataset_tta
 
@@ -123,3 +117,17 @@ for fold in range(CONFIG.nfolds):
         subprocess.check_call(['gsutil', '-m', 'cp', '-r', CONFIG.work_dir,CONFIG.gs_work_dir])
 
     gc.collect()
+
+val_subms=glob.glob(os.path.join(CONFIG.work_dir,'val_*_tta_*.csv'))
+val_subms=[pd.read_csv(s) for s in val_subms]
+test_subms=glob.glob(os.path.join(CONFIG.work_dir,'test_*_tta_*.csv'))
+test_subms=[pd.read_csv(s) for s in test_subms]
+val_auc=np.mean([calc_auc(s) for s in val_subms])
+test_auc=np.mean([calc_auc(s) for s in test_subms])
+avg_test_sub=submission.avg_submissions(test_subms)
+test_avg_auc=calc_auc(avg_test_sub)
+
+with open(os.path.join(CONFIG.work_dir,'metric.txt'),'wt') as file:
+    text=f'val_auc,test_auc,avg_test_auc\n{val_auc},{test_auc},{test_avg_auc}'
+    print(text)
+    file.write(text)

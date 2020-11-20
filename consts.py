@@ -23,15 +23,17 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 
 EPOCHS_FINE_TUNE = 0
-EPOCHS_FULL = 1 if is_debug else 36
+EPOCHS_FULL = 1 if is_debug else 12
 
-IMAGE_HEIGHT = 384
+IMAGE_HEIGHT = 128
 
 IMAGE_SIZE=[IMAGE_HEIGHT, IMAGE_HEIGHT]
 
 if is_local:
     DATASETS = {
-                128: {'new': 'data/128/train*.tfrec', 'old': ''},
+                128: {'new': 'data/128_with_labels/train*.tfrec', 'old': ''},
+                256: {'new': 'data/256_with_labels/train*.tfrec', 'old': ''},
+                #128: {'new': 'data/128/train*.tfrec', 'old': ''},
                 #384: {'new': 'data/isic2020-384-colornormed-tfrecord/train*.tfrec', 'old': ''},
                 384: {'new': 'data/384_triple_2020/train*.tfrec', 'old': ''},
                 768: {'new': 'data/dataset_768/train*.tfrec', 'old': ''}
@@ -56,23 +58,25 @@ red = 4 if use_tpu_2 else 1
 if is_local:
     red=4
 
-BATCH_SIZE = 1 if is_debug else 8*32//red
+BATCH_SIZE = 128 if is_debug else 512
 
 TRAIN_STEPS = 1 if is_debug else None
 
-config=namedtuple('config',['lr_max','lr_start','stepsize', 'lr_warm_up_epochs','lr_min','lr_exp_decay','nfolds','l2_penalty',
+config=namedtuple('config',['lr_max','lr_start','stepsize', 'lr_warm_up_epochs','lr_min','lr_exp_decay','lr_fn',
+                            'nfolds','l2_penalty',
                             'model_fn_str','work_dir', 'gs_work_dir','ttas','use_metrics','dropout_rate',
                             'save_last_epochs'])
 
 model = 'B0' if not is_debug else 'B0'
 
 penalty = 0
-work_dir_name = f'{model}_bce_loss_{IMAGE_HEIGHT}_epochs_{EPOCHS_FULL}' if not is_debug else 'debug'
+work_dir_name = f'val_quality_{model}_bce_loss_{IMAGE_HEIGHT}_epochs_{EPOCHS_FULL}' if not is_debug else 'debug'
 
-CONFIG=config(lr_max=3e-4, lr_start=5e-6, stepsize=3, lr_warm_up_epochs=5, lr_min=1e-6,lr_exp_decay=0.8,
+
+CONFIG=config(lr_max=3e-4, lr_start=5e-6, stepsize=3, lr_warm_up_epochs=5, lr_min=1e-6,lr_exp_decay=0.8,lr_fn='get_lrfn(CONFIG)',#get_cycling_lrfn(CONFIG) #
               nfolds=4, l2_penalty=penalty, work_dir=work_dir_name,
               gs_work_dir=f'gs://kochetkov_kaggle_melanoma/{str(datetime.datetime.now())[:20]}_{work_dir_name}',
-              model_fn_str=f"efficientnet.tfkeras.EfficientNet{model}(weights='imagenet', include_top=False)", ttas=11,
+              model_fn_str=f"efficientnet.tfkeras.EfficientNet{model}(weights='imagenet', include_top=False)", ttas=6,
               use_metrics=True, dropout_rate=0.0,
               save_last_epochs=0
               )

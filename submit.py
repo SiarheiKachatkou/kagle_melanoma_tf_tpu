@@ -49,8 +49,8 @@ if __name__=="__main__":
                 if os.path.exists(filename):
                     sub = pd.read_csv(filename)
                     a.append(calc_auc(sub))
-            print(f'{le}_single_model_{m_type}metrics={a}')
-            print(f'{le}_single_model_{m_type}avg_metric={np.mean(a)}')
+            print(f'{le}_val_single_model_{m_type}metrics={a}')
+            print(f'{le}_val_single_model_{m_type}avg_metric={np.mean(a)}')
 
     for le in ['', 'le']:
         for m_type in ['', 'tta_']:
@@ -64,10 +64,19 @@ if __name__=="__main__":
                 filename=os.path.join(args.work_dir, name)
                 if os.path.exists(filename):
                     sub = pd.read_csv(filename)
+                    a.append(calc_auc(sub))
                     save_submission(sub, os.path.join(args.work_dir, 'kaggle_' + name))
                     subs.append(sub)
             if subs:
                 avg_sub = submission.avg_submissions(subs)
+                auc_avg_sub=calc_auc(avg_sub)
                 save_submission(avg_sub, os.path.join(args.work_dir, 'kaggle_' + f'test_{le}_{m_type}.csv'))
+            else:
+                auc_avg_sub=None
+
+            print(f'{le}_test_single_model_{m_type}metrics={a}')
+            print(f'{le}_test_single_model_{m_type}avg_metric={np.mean(a)}')
+            print(f'{le}_test_avg_model_{m_type}_metric={auc_avg_sub}')
+
 
 
