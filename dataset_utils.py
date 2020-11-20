@@ -132,7 +132,7 @@ def get_training_dataset(training_fileimages, training_fileimages_old):
     dataset = dataset.repeat()
     dataset=dataset.shuffle(512)
     dataset = _augm_dataset(dataset,augment_train)
-    dataset = _augm_batched_dataset(dataset, cut_mix)
+    #dataset = _augm_batched_dataset(dataset, cut_mix)
 
     return dataset
 
