@@ -8,8 +8,8 @@ import sklearn
 
 
 use_tpu_2 = False
-is_local = False
-is_kaggle = True
+is_local = True
+is_kaggle = False
 is_debug = False
 use_amp = True
 
@@ -23,7 +23,7 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 
 EPOCHS_FINE_TUNE = 0
-EPOCHS_FULL = 1 if is_debug else 12
+EPOCHS_FULL = 1 if is_debug else 36
 
 IMAGE_HEIGHT = 384
 
@@ -56,7 +56,7 @@ red = 4 if use_tpu_2 else 1
 if is_local:
     red=4
 
-BATCH_SIZE = 1 if is_debug else 2*8*32//red
+BATCH_SIZE = 1 if is_debug else 8*32//red
 
 TRAIN_STEPS = 1 if is_debug else None
 
@@ -64,10 +64,10 @@ config=namedtuple('config',['lr_max','lr_start','stepsize', 'lr_warm_up_epochs',
                             'model_fn_str','work_dir', 'gs_work_dir','ttas','use_metrics','dropout_rate',
                             'save_last_epochs'])
 
-model = 'B6' if not is_debug else 'B0'
+model = 'B0' if not is_debug else 'B0'
 
 penalty = 0
-work_dir_name = f'{model}_bce_loss_{IMAGE_HEIGHT}_penalty_{penalty}_cycle_lr_e3' if not is_debug else 'debug'
+work_dir_name = f'{model}_bce_loss_{IMAGE_HEIGHT}_epochs_{EPOCHS_FULL}' if not is_debug else 'debug'
 
 CONFIG=config(lr_max=3e-4, lr_start=5e-6, stepsize=3, lr_warm_up_epochs=5, lr_min=1e-6,lr_exp_decay=0.8,
               nfolds=4, l2_penalty=penalty, work_dir=work_dir_name,
