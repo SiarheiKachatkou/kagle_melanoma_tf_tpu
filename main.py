@@ -53,7 +53,7 @@ for fold in range(CONFIG.nfolds):
         model = create_model(CONFIG, metrics, backbone_trainable=False)
 
         model.summary()
-        training_dataset = get_training_dataset(train_filenames_folds[fold], DATASETS[IMAGE_HEIGHT]['old'])
+        training_dataset = get_training_dataset(train_filenames_folds[fold], DATASETS[IMAGE_HEIGHT]['old'], CONFIG)
         if TRAIN_STEPS is None:
             TRAIN_STEPS=count_data_items(train_filenames_folds[fold])//BATCH_SIZE
         print(f'TRAIN_STEPS={TRAIN_STEPS}')

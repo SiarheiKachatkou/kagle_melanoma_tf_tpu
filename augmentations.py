@@ -127,9 +127,15 @@ def _augment_color(image):
 
 
 def cut_mix(images,labels,*args, prob=0.5):
-    images_augm=[]
-    labels_augm=[]
+
+    if prob==0:
+        return (images,labels,*args)
+
+    images_augm = []
+    labels_augm = []
+
     for i in range(BATCH_SIZE):
+
         img, lab = images[i],labels[i]
 
         cut_area_percent=tf.random.uniform((),0,prob)
@@ -138,16 +144,18 @@ def cut_mix(images,labels,*args, prob=0.5):
 
         dx=tf.cast((IMAGE_HEIGHT-cut_size),tf.float32)
         x = tf.cast(tf.random.uniform((),0,1)*dx,tf.int32)
+        xmax=tf.minimum(IMAGE_HEIGHT,x+cut_size)
         dy=tf.cast((IMAGE_HEIGHT - cut_size),tf.float32)
         y = tf.cast(tf.random.uniform((), 0, 1) * dy, tf.int32)
+        ymax = tf.minimum(IMAGE_HEIGHT, y + cut_size)
         donor_idx = tf.cast( tf.random.uniform([],0,BATCH_SIZE),tf.int32)
         donor=images[donor_idx]
 
-        one = img[y:y+cut_size, 0:x, :]
-        two = donor[y:y+cut_size,x:x+cut_size]
-        three = img[y:y+cut_size, x+cut_size:]
+        one = img[y:ymax, 0:x, :]
+        two = donor[y:ymax,x:xmax]
+        three = img[y:ymax, xmax:]
         middle = tf.concat([one, two, three], axis=1)
-        mixed = tf.concat([img[0:y, :, :], middle, img[y+cut_size:]], axis=0)
+        mixed = tf.concat([img[0:y, :, :], middle, img[ymax:]], axis=0)
         mixed = tf.reshape(mixed, (IMAGE_HEIGHT, IMAGE_HEIGHT, 3))
 
         label_mixed=lab*(1-cut_area_percent)+labels[donor_idx]*cut_area_percent

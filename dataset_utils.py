@@ -1,6 +1,7 @@
 import tensorflow as tf
 AUTO = tf.data.experimental.AUTOTUNE
 from consts import *
+from functools import partial
 #from augmentation_hair import hair_aug_tf
 from augmentations import augment_train,augment_tta,augment_val,augment_test, cut_mix
 from files_utils import get_train_val_filenames,get_test_filenames,count_data_items
@@ -123,16 +124,17 @@ def _get_dataset(filenames,is_test,augm_fn):
     return _augm_dataset(dataset,augm_fn)
 
 
-def get_training_dataset(training_fileimages, training_fileimages_old):
+def get_training_dataset(training_fileimages, training_fileimages_old, config, repeats=None):
     dataset = load_dataset(training_fileimages, is_test=False)
     if len(training_fileimages_old)!=0:
         dataset_old = load_dataset_old(training_fileimages_old)
         dataset.concatenate(dataset_old)
 
-    dataset = dataset.repeat()
+    dataset = dataset.repeat(repeats)
     dataset=dataset.shuffle(512)
     dataset = _augm_dataset(dataset,augment_train)
-    #dataset = _augm_batched_dataset(dataset, cut_mix)
+    cut_mix_fn=partial(cut_mix,prob=config.cut_mix_prob)
+    dataset = _augm_batched_dataset(dataset, cut_mix_fn)
 
     return dataset
 

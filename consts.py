@@ -23,7 +23,7 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 
 EPOCHS_FINE_TUNE = 0
-EPOCHS_FULL = 1 if is_debug else 12
+EPOCHS_FULL = 1 if is_debug else 8
 
 IMAGE_HEIGHT = 128
 
@@ -65,12 +65,14 @@ TRAIN_STEPS = 1 if is_debug else None
 config=namedtuple('config',['lr_max','lr_start','stepsize', 'lr_warm_up_epochs','lr_min','lr_exp_decay','lr_fn',
                             'nfolds','l2_penalty',
                             'model_fn_str','work_dir', 'gs_work_dir','ttas','use_metrics','dropout_rate',
-                            'save_last_epochs'])
+                            'save_last_epochs',
+                            'cut_mix_prob'])
 
 model = 'B0' if not is_debug else 'B0'
 
 penalty = 0
-work_dir_name = f'val_quality_{model}_bce_loss_{IMAGE_HEIGHT}_epochs_{EPOCHS_FULL}' if not is_debug else 'debug'
+cut_mix_prob=0.9
+work_dir_name = f'val_quality_{model}_bce_loss_{IMAGE_HEIGHT}_epochs_{EPOCHS_FULL}_cut_mix_{cut_mix_prob}' if not is_debug else 'debug'
 
 
 CONFIG=config(lr_max=3e-4, lr_start=5e-6, stepsize=3, lr_warm_up_epochs=5, lr_min=1e-6,lr_exp_decay=0.8,lr_fn='get_lrfn(CONFIG)',#get_cycling_lrfn(CONFIG) #
@@ -78,7 +80,8 @@ CONFIG=config(lr_max=3e-4, lr_start=5e-6, stepsize=3, lr_warm_up_epochs=5, lr_mi
               gs_work_dir=f'gs://kochetkov_kaggle_melanoma/{str(datetime.datetime.now())[:20]}_{work_dir_name}',
               model_fn_str=f"efficientnet.tfkeras.EfficientNet{model}(weights='imagenet', include_top=False)", ttas=6,
               use_metrics=True, dropout_rate=0.0,
-              save_last_epochs=0
+              save_last_epochs=0,
+              cut_mix_prob=cut_mix_prob
               )
 
 #pretrained_model = tf.keras.applications.MobileNetV2(input_shape=[*IMAGE_SIZE, 3], include_top=False)

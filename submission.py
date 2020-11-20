@@ -8,7 +8,7 @@ def make_submission_dataframe(test_dataset, model):
     preds=[]
     names=[]
     labs=[]
-    for batch in tqdm(test_dataset):
+    def _process_batch(batch):
         images, labels, image_names = batch
         labs.extend(labels.numpy())
         image_names = image_names.numpy()
@@ -16,6 +16,17 @@ def make_submission_dataframe(test_dataset, model):
         predictions = model.predict(images, workers=8, use_multiprocessing=True)
         preds.extend(predictions)
         names.extend(image_names)
+
+    if isinstance(test_dataset,tuple):
+        dataset,steps=test_dataset
+        iterator=iter(dataset)
+        for _ in tqdm(range(steps)):
+            batch = iterator.get_next()
+            _process_batch(batch)
+    else:
+        for batch in tqdm(test_dataset):
+            _process_batch(batch)
+
 
     gc.collect()
 

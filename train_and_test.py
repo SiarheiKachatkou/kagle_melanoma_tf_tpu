@@ -57,7 +57,7 @@ for fold in range(CONFIG.nfolds):
         model = create_model(CONFIG, metrics, backbone_trainable=False)
 
         model.summary()
-        training_dataset = get_training_dataset(train_filenames_folds[fold], DATASETS[IMAGE_HEIGHT]['old'])
+        training_dataset = get_training_dataset(train_filenames_folds[fold], DATASETS[IMAGE_HEIGHT]['old'], CONFIG)
         if TRAIN_STEPS is None:
             TRAIN_STEPS=count_data_items(train_filenames_folds[fold])//BATCH_SIZE
         print(f'TRAIN_STEPS={TRAIN_STEPS}')
@@ -75,8 +75,6 @@ for fold in range(CONFIG.nfolds):
         history = join_history(history_fine_tune, history)
         print(history.history)
 
-        final_accuracy = history.history["val_accuracy"][-5:]
-        print("FINAL ACCURACY MEAN-5: ", np.mean(final_accuracy))
         model.save(model_file_path)
 
         if CONFIG.use_metrics:
@@ -84,12 +82,23 @@ for fold in range(CONFIG.nfolds):
         display_training_curves(history.history['loss'][1:], history.history['val_loss'][1:], 'loss', 212)
         plt.savefig(os.path.join(CONFIG.work_dir, f'loss{fold}.png'))
 
+
+        validation_with_augm_dataset = get_training_dataset(val_filenames_folds[fold], [], CONFIG)
+        validation_with_augm_dataset_tta = None
+        steps = TRAIN_STEPS * 3
+        submission.calc_and_save_submissions(CONFIG, model, f'with_augm_val_{fold}',
+                                             (validation_with_augm_dataset, steps), validation_with_augm_dataset_tta,
+                                             ttas=0)
+        del validation_with_augm_dataset
+        del validation_with_augm_dataset_tta
+
         validation_dataset = get_validation_dataset(val_filenames_folds[fold])
         validation_dataset_tta = get_validation_dataset_tta(val_filenames_folds[fold])
         submission.calc_and_save_submissions(CONFIG, model, f'val_{fold}', validation_dataset, validation_dataset_tta,
                                              CONFIG.ttas)
         del validation_dataset
         del validation_dataset_tta
+
 
         test_dataset = get_test_dataset_with_labels(test_filenames)
         test_dataset_tta = get_test_dataset_with_labels_tta(test_filenames)
@@ -118,16 +127,25 @@ for fold in range(CONFIG.nfolds):
 
     gc.collect()
 
-val_subms=glob.glob(os.path.join(CONFIG.work_dir,'val_*_tta_*.csv'))
-val_subms=[pd.read_csv(s) for s in val_subms]
+def calc_mean_auc(subm_pattern):
+    subms = glob.glob(os.path.join(CONFIG.work_dir, subm_pattern))
+    subms = [pd.read_csv(s) for s in subms]
+    auc = np.mean([calc_auc(s) for s in subms])
+    return auc
+
+
+val_auc=calc_mean_auc('val_*_tta_*.csv')
+
+with_augm_auc=calc_mean_auc('with_augm_val_*.csv')
+
+test_auc=calc_mean_auc('test_*_tta_*.csv')
+
 test_subms=glob.glob(os.path.join(CONFIG.work_dir,'test_*_tta_*.csv'))
 test_subms=[pd.read_csv(s) for s in test_subms]
-val_auc=np.mean([calc_auc(s) for s in val_subms])
-test_auc=np.mean([calc_auc(s) for s in test_subms])
 avg_test_sub=submission.avg_submissions(test_subms)
 test_avg_auc=calc_auc(avg_test_sub)
 
 with open(os.path.join(CONFIG.work_dir,'metric.txt'),'wt') as file:
-    text=f'val_auc,test_auc,avg_test_auc\n{val_auc},{test_auc},{test_avg_auc}'
+    text=f'val_auc,with_augm_auc,test_auc,avg_test_auc\n{val_auc},{with_augm_auc},{test_auc},{test_avg_auc}'
     print(text)
     file.write(text)
