@@ -5,6 +5,14 @@ import tensorflow as tf
 import numpy as np
 import random
 import sklearn
+import argparse
+
+
+parser=argparse.ArgumentParser()
+parser.add_argument('--backbone',type=str)
+parser.add_argument('--cut-mix-prob',type=float)
+parser.add_argument('--dropout-rate',type=float)
+args=parser.parse_args()
 
 
 use_tpu_2 = False
@@ -68,18 +76,20 @@ config=namedtuple('config',['lr_max','lr_start','stepsize', 'lr_warm_up_epochs',
                             'save_last_epochs',
                             'cut_mix_prob'])
 
-model = 'B3' if not is_debug else 'B0'
+model = args.backbone if not is_debug else 'B0'
 
 penalty = 0
-cut_mix_prob=0.5
-work_dir_name = f'val_quality_2_{model}_bce_loss_{IMAGE_HEIGHT}_epochs_{EPOCHS_FULL}_cut_mix_{cut_mix_prob}' if not is_debug else 'debug'
+cut_mix_prob=args.cut_mix_prob
+dropout_rate=args.dropout_rate
+
+work_dir_name = f'val_quality_2_{model}_bce_loss_{IMAGE_HEIGHT}_epochs_{EPOCHS_FULL}_cut_mix_{cut_mix_prob}_drop_{dropout_rate}' if not is_debug else 'debug'
 
 
 CONFIG=config(lr_max=3e-4, lr_start=5e-6, stepsize=3, lr_warm_up_epochs=5, lr_min=1e-6,lr_exp_decay=0.8,lr_fn='get_lrfn(CONFIG)',#get_cycling_lrfn(CONFIG) #
               nfolds=4, l2_penalty=penalty, work_dir=work_dir_name,
               gs_work_dir=f'gs://kochetkov_kaggle_melanoma/{str(datetime.datetime.now())[:20]}_{work_dir_name}',
               model_fn_str=f"efficientnet.tfkeras.EfficientNet{model}(weights='imagenet', include_top=False)", ttas=6,
-              use_metrics=True, dropout_rate=0.0,
+              use_metrics=True, dropout_rate=dropout_rate,
               save_last_epochs=0,
               cut_mix_prob=cut_mix_prob
               )
