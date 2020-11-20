@@ -1,3 +1,5 @@
+
+
 import os
 import pickle
 import gc
@@ -15,6 +17,9 @@ from SaveLastCallback import SaveLastCallback
 from create_model import create_model, set_backbone_trainable
 from runtime import get_scope
 from history import join_history
+
+
+
 if not os.path.exists(CONFIG.work_dir):
     os.mkdir(CONFIG.work_dir)
     
