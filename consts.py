@@ -30,7 +30,7 @@ if (not is_local) and (not is_kaggle):
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 
-EPOCHS_FINE_TUNE = 0
+EPOCHS_FINE_TUNE = 2
 EPOCHS_FULL = 1 if is_debug else 16
 
 IMAGE_HEIGHT = 128
@@ -82,7 +82,7 @@ penalty = 0
 cut_mix_prob=args.cut_mix_prob
 dropout_rate=args.dropout_rate
 
-work_dir_name = f'val_quality_3_{model}_bce_loss_{IMAGE_HEIGHT}_epochs_{EPOCHS_FULL}_cut_mix_{cut_mix_prob}_drop_{dropout_rate}' if not is_debug else 'debug'
+work_dir_name = f'val_quality_4_{model}_bce_loss_{IMAGE_HEIGHT}_epochs_{EPOCHS_FULL}_cut_mix_{cut_mix_prob}_drop_{dropout_rate}' if not is_debug else 'debug'
 
 
 CONFIG=config(lr_max=3e-4, lr_start=5e-6, stepsize=3, lr_warm_up_epochs=5, lr_min=1e-6,lr_exp_decay=0.8,lr_fn='get_lrfn(CONFIG)',#get_cycling_lrfn(CONFIG) #

@@ -2,13 +2,11 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import re
 
-val=pd.read_csv('val_quality_2_table.csv')
-
-arch='B0'
-drop='0'
+prefix='val_quality_2_'
+val=pd.read_csv(prefix+'table.csv')
 
 def parse_name(name):
-    ret=re.findall('val_quality_2_([A-Z0-9]*)_(.*)_cut_mix_([0-9\.]*)_drop_([0-9\.]*)',name)
+    ret=re.findall(prefix+'([A-Z0-9]*)_(.*)_cut_mix_([0-9\.]*)_drop_([0-9\.]*)',name)
     arch=ret[0][0]
     cut_mix=float(ret[0][2])
     drop=float(ret[0][3])
