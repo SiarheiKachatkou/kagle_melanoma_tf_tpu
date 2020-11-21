@@ -1,7 +1,8 @@
 import os
 import pandas as pd
 import glob
-metrics_files=glob.glob('val_quality_*/metric.txt')
+prefix='val_quality_2_'
+metrics_files=glob.glob(prefix+'*/metric.txt')
 
 ms=[]
 for file in metrics_files:
@@ -10,6 +11,6 @@ for file in metrics_files:
     ms.append(df)
 
 m=pd.concat(ms)
-m.to_csv('table.csv')
+m.to_csv(prefix+'table.csv')
 print(m.corr())
 

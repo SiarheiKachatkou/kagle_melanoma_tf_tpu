@@ -138,7 +138,10 @@ def cut_mix(images,labels,*args, prob=0.5):
 
         img, lab = images[i],labels[i]
 
-        cut_area_percent=tf.random.uniform((),0,prob)
+        cut_area_percent=tf.random.uniform((),0,1.0)
+        if tf.random.uniform((), 0, 1.0)>prob:
+            cut_area_percent=0.0
+
         cut_area=cut_area_percent*IMAGE_HEIGHT*IMAGE_HEIGHT
         cut_size=tf.cast(tf.sqrt(cut_area),tf.int32)
 
@@ -197,7 +200,7 @@ def augment_val(image, label, image_name):
 
 def augment_val_aug(image, label, image_name):
     image = _normalize(image)
-    image = tf.image.random_flip_left_right(image)
+    #image = tf.image.random_flip_left_right(image)
     return image, label, image_name
 
 def augment_test(image, label, image_name):
