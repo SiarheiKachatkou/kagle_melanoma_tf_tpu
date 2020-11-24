@@ -82,16 +82,16 @@ for fold in range(CONFIG.nfolds):
         display_training_curves(history.history['loss'][1:], history.history['val_loss'][1:], 'loss', 212)
         plt.savefig(os.path.join(CONFIG.work_dir, f'loss{fold}.png'))
 
-        validation_with_augm_dataset = get_validation_dataset(val_filenames_folds[fold], is_augment=False)
-        #validation_with_augm_dataset = validation_with_augm_dataset.repeat()
-        validation_with_augm_dataset_tta = None
-        steps = TRAIN_STEPS * 3
-        submission.calc_and_save_submissions(CONFIG, model, f'with_augm_val_{fold}',
-                                             #(validation_with_augm_dataset, steps), validation_with_augm_dataset_tta,
-                                             validation_with_augm_dataset, validation_with_augm_dataset_tta,
-                                             ttas=0)
-        del validation_with_augm_dataset
-        del validation_with_augm_dataset_tta
+
+        for flip_left_right,flip_up_bottom in [(False,False)]*4:#,(True,False),(False,True),(True,True)]:
+            validation_with_augm_dataset = get_validation_dataset(val_filenames_folds[fold])
+            validation_with_augm_dataset_tta = get_validation_dataset_tta(val_filenames_folds[fold], flip_left_right=flip_left_right,
+                                                                          flip_up_bottom=flip_up_bottom)
+            submission.calc_and_save_submissions(CONFIG, model, f'with_augm_val_{fold}{flip_left_right}{flip_up_bottom}',
+                                                 validation_with_augm_dataset, validation_with_augm_dataset_tta,
+                                                 CONFIG.ttas)
+            del validation_with_augm_dataset
+            del validation_with_augm_dataset_tta
 
         validation_dataset = get_validation_dataset(val_filenames_folds[fold])
         validation_dataset_tta = get_validation_dataset_tta(val_filenames_folds[fold])
@@ -135,9 +135,9 @@ def calc_mean_auc(subm_pattern):
     return auc
 
 
-val_auc=calc_mean_auc('val_*_tta_*.csv')
+val_auc=calc_mean_auc('val_*[!_tta_]*.csv')
 
-with_augm_auc=calc_mean_auc('with_augm_val_*.csv')
+with_augm_auc=calc_mean_auc('with_augm_val_*[!_tta_]*.csv')
 
 test_auc=calc_mean_auc('test_*_tta_*.csv')
 
