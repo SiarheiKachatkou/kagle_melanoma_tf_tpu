@@ -135,9 +135,9 @@ def calc_mean_auc(subm_pattern):
     return auc
 
 
-val_auc=calc_mean_auc('val_*[!_tta_]*.csv')
+val_auc=calc_mean_auc('val_*_tta_*.csv')
 
-with_augm_auc=calc_mean_auc('with_augm_val_*[!_tta_]*.csv')
+with_augm_auc=calc_mean_auc('with_augm_val_*_tta_*.csv')
 
 test_auc=calc_mean_auc('test_*_tta_*.csv')
 
