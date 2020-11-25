@@ -83,7 +83,7 @@ for fold in range(CONFIG.nfolds):
         plt.savefig(os.path.join(CONFIG.work_dir, f'loss{fold}.png'))
 
 
-        for flip_left_right,flip_up_bottom in [(False,False)]*4:#,(True,False),(False,True),(True,True)]:
+        for flip_left_right,flip_up_bottom in [(False,False),(True,False),(False,True),(True,True)]:
             validation_with_augm_dataset = get_validation_dataset(val_filenames_folds[fold])
             validation_with_augm_dataset_tta = get_validation_dataset_tta(val_filenames_folds[fold], flip_left_right=flip_left_right,
                                                                           flip_up_bottom=flip_up_bottom)

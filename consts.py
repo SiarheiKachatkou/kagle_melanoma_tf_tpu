@@ -12,6 +12,9 @@ parser=argparse.ArgumentParser()
 parser.add_argument('--backbone',type=str)
 parser.add_argument('--cut-mix-prob',type=float)
 parser.add_argument('--dropout-rate',type=float)
+parser.add_argument('--lr_max',type=float)
+parser.add_argument('--lr_exp_decay',type=float)
+
 args=parser.parse_args()
 
 
@@ -29,10 +32,10 @@ if (not is_local) and (not is_kaggle):
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"]="1,2"
+os.environ["CUDA_VISIBLE_DEVICES"]="1,2"#"0" #
 
 EPOCHS_FINE_TUNE = 0
-EPOCHS_FULL = 1 if is_debug else 8
+EPOCHS_FULL = 1 if is_debug else 16
 
 IMAGE_HEIGHT = 128
 
@@ -83,10 +86,10 @@ penalty = 0
 cut_mix_prob=args.cut_mix_prob
 dropout_rate=args.dropout_rate
 
-work_dir_name = f'artifacts/val_quality_6_dbg_{model}_bce_loss_{IMAGE_HEIGHT}_epochs_{EPOCHS_FULL}_cut_mix_{cut_mix_prob}_drop_{dropout_rate}' if not is_debug else 'debug'
+work_dir_name = f'artifacts/val_quality_7_{model}_bce_loss_{IMAGE_HEIGHT}_epochs_{EPOCHS_FULL}_cut_mix_{cut_mix_prob}_drop_{dropout_rate}_lr_max{args.lr_max}_lr_dacay_{args.lr_exp_decay}_0' if not is_debug else 'debug'
 
 
-CONFIG=config(lr_max=3e-4, lr_start=5e-6, stepsize=3, lr_warm_up_epochs=5, lr_min=1e-6,lr_exp_decay=0.8,lr_fn='get_lrfn(CONFIG)',#get_cycling_lrfn(CONFIG) #
+CONFIG=config(lr_max=args.lr_max*1e-4, lr_start=5e-6, stepsize=3, lr_warm_up_epochs=5, lr_min=1e-6,lr_exp_decay=args.lr_exp_decay,lr_fn='get_lrfn(CONFIG)',#get_cycling_lrfn(CONFIG) #
               nfolds=4, l2_penalty=penalty, work_dir=work_dir_name,
               gs_work_dir=f'gs://kochetkov_kaggle_melanoma/{str(datetime.datetime.now())[:20]}_{work_dir_name}',
               model_fn_str=f"efficientnet.tfkeras.EfficientNet{model}(weights='imagenet', include_top=False)", ttas=6,
