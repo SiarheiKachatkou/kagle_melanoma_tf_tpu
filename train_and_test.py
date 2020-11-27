@@ -88,7 +88,7 @@ for fold in range(CONFIG.nfolds):
         plt.savefig(os.path.join(CONFIG.work_dir, f'loss{fold}.png'))
 
 
-        for cut_mix_prob in [0.05,0.1,0.2]:
+        for cut_mix_prob in [0, 0.05]:
             validation_with_augm_dataset = get_validation_dataset(val_filenames_folds[fold])
             validation_with_augm_dataset_tta = get_validation_dataset_tta(val_filenames_folds[fold], cut_mix_prob=cut_mix_prob)
             submission.calc_and_save_submissions(CONFIG, model, f'with_augm_val_{fold}_{cut_mix_prob}',
