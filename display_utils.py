@@ -6,14 +6,29 @@ import cv2
 import os
 from augmentations import cut_mix
 
-def dataset_to_numpy_util(dataset, N):
+def dataset_to_numpy_util(dataset, N, show_zero_labels):
     dataset = dataset.unbatch().batch(N)
+    chosen_images = []
+    chosen_labels = []
     for images, labels in dataset:
         #images, labels = cut_mix(images,labels)
         numpy_images = images.numpy()
         numpy_labels = labels.numpy()
-        break
-    return numpy_images, numpy_labels
+        for l, img in zip(numpy_labels,numpy_images):
+            use_this_sample = False
+            if show_zero_labels:
+                if l==0:
+                    use_this_sample = True
+            else:
+                if l!=0:
+                    use_this_sample = True
+            if use_this_sample:
+                chosen_images.append(img)
+                chosen_labels.append(l)
+
+        if len(chosen_images)>=N:
+            break
+    return chosen_images,chosen_labels
 
 def title_from_label_and_target(label, correct_label):
     label = np.argmax(label, axis=-1)  # one-hot to class number
@@ -31,12 +46,12 @@ def display_one_flower(image, title, subplot, red=False):
     return subplot + 1
 
 
-def display_9_images_from_dataset(dataset):
+def display_9_images_from_dataset(dataset, show_zero_labels):
     subplot = 331
     plt.figure(figsize=(13, 13))
     # labels=[0,0]
     # while sum(labels)==0:
-    images, labels = dataset_to_numpy_util(dataset, 9)
+    images, labels = dataset_to_numpy_util(dataset, 9, show_zero_labels)
     #labels = np.argmax(labels, axis=-1)
     print(labels)
     for i, image in enumerate(images):

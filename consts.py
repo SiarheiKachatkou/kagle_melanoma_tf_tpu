@@ -32,7 +32,7 @@ if (not is_local) and (not is_kaggle):
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"]="1,2"#"0" #
+os.environ["CUDA_VISIBLE_DEVICES"]="0" #"1,2"#
 
 EPOCHS_FINE_TUNE = 0
 EPOCHS_FULL = 1 if is_debug else 8
