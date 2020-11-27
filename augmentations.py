@@ -128,11 +128,14 @@ def _augment_color(image):
 
 def cut_mix(images,labels,*args, prob=0.5):
 
-    if prob==0:
+    symbolic_shape = K.shape(images)
+    batch_size = symbolic_shape[0]
+    if (prob==0) or (batch_size!=BATCH_SIZE):
         return (images,labels,*args)
 
     images_augm = []
     labels_augm = []
+
 
     for i in range(BATCH_SIZE):
 

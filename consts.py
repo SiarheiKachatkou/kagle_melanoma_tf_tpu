@@ -35,7 +35,7 @@ os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"]="1,2"#"0" #
 
 EPOCHS_FINE_TUNE = 0
-EPOCHS_FULL = 1 if is_debug else 16
+EPOCHS_FULL = 1 if is_debug else 8
 
 IMAGE_HEIGHT = 128
 
@@ -86,7 +86,7 @@ penalty = 0
 cut_mix_prob=args.cut_mix_prob
 dropout_rate=args.dropout_rate
 
-work_dir_name = f'artifacts/val_quality_7_{model}_bce_loss_{IMAGE_HEIGHT}_epochs_{EPOCHS_FULL}_cut_mix_{cut_mix_prob}_drop_{dropout_rate}_lr_max{args.lr_max}_lr_dacay_{args.lr_exp_decay}_0' if not is_debug else 'debug'
+work_dir_name = f'artifacts/val_quality_8_{model}_bce_loss_{IMAGE_HEIGHT}_epochs_{EPOCHS_FULL}_cut_mix_{cut_mix_prob}_drop_{dropout_rate}_lr_max{args.lr_max}_lr_dacay_{args.lr_exp_decay}_0' if not is_debug else 'debug'
 
 
 CONFIG=config(lr_max=args.lr_max*1e-4, lr_start=5e-6, stepsize=3, lr_warm_up_epochs=5, lr_min=1e-6,lr_exp_decay=args.lr_exp_decay,lr_fn='get_lrfn(CONFIG)',#get_cycling_lrfn(CONFIG) #

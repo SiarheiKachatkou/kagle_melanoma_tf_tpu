@@ -2,6 +2,7 @@
 
 import os
 import glob
+import yaml
 import gc
 import tensorflow as tf
 import subprocess
@@ -24,6 +25,10 @@ if not os.path.exists(CONFIG.work_dir):
     os.mkdir(CONFIG.work_dir)
     
 shutil.copyfile('consts.py',os.path.join(CONFIG.work_dir,'consts.py'))
+
+with open(os.path.join(CONFIG.work_dir,'config.yaml'),'wt') as file:
+    config_dict=dict(CONFIG._asdict())
+    file.write(yaml.dump(config_dict))
 
 lrfn = eval(CONFIG.lr_fn)
 plot_lr(lrfn,EPOCHS_FULL,CONFIG.work_dir)
@@ -83,11 +88,10 @@ for fold in range(CONFIG.nfolds):
         plt.savefig(os.path.join(CONFIG.work_dir, f'loss{fold}.png'))
 
 
-        for flip_left_right,flip_up_bottom in [(False,False),(True,False),(False,True),(True,True)]:
+        for cut_mix_prob in [0.05,0.1,0.2]:
             validation_with_augm_dataset = get_validation_dataset(val_filenames_folds[fold])
-            validation_with_augm_dataset_tta = get_validation_dataset_tta(val_filenames_folds[fold], flip_left_right=flip_left_right,
-                                                                          flip_up_bottom=flip_up_bottom)
-            submission.calc_and_save_submissions(CONFIG, model, f'with_augm_val_{fold}{flip_left_right}{flip_up_bottom}',
+            validation_with_augm_dataset_tta = get_validation_dataset_tta(val_filenames_folds[fold], cut_mix_prob=cut_mix_prob)
+            submission.calc_and_save_submissions(CONFIG, model, f'with_augm_val_{fold}_{cut_mix_prob}',
                                                  validation_with_augm_dataset, validation_with_augm_dataset_tta,
                                                  CONFIG.ttas)
             del validation_with_augm_dataset

@@ -138,17 +138,12 @@ def get_training_dataset(training_fileimages, training_fileimages_old, config, r
 
     return dataset
 
-def get_validation_dataset_tta(val_filenames, flip_left_right=False,flip_up_bottom=False):
+def get_validation_dataset_tta(val_filenames, cut_mix_prob=0):
 
-    def _augment_fn(image, label, image_name):
-        if flip_left_right:
-            image=tf.image.flip_left_right(image)
-        if flip_up_bottom:
-            image=tf.image.flip_up_down(image)
-        return augment_tta(image, label, image_name)
-
-
-    dataset = _get_dataset(val_filenames,is_test=False,augm_fn=_augment_fn)
+    dataset = _get_dataset(val_filenames,is_test=False,augm_fn=augment_tta)
+    if cut_mix_prob!=0:
+        cut_mix_fn = partial(cut_mix, prob=cut_mix_prob)
+        dataset = _augm_batched_dataset(dataset, cut_mix_fn)
     return dataset
 
 
