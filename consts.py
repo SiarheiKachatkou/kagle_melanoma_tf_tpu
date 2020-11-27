@@ -18,21 +18,21 @@ parser.add_argument('--lr_exp_decay',type=float)
 args=parser.parse_args()
 
 
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
+os.environ["CUDA_VISIBLE_DEVICES"]="0" #"1,2"#
+
 use_tpu_2 = False
 is_local = True
 is_kaggle = False
 is_debug = False
-use_amp = True
+use_amp = True if os.environ["CUDA_VISIBLE_DEVICES"]!="0" else False
 
 if (not is_local) and (not is_kaggle):
     tpu3 = "grpc://10.240.1.2:8470"
     tpu2 = 'grpc://10.240.1.10:8470'
 
     os.environ['TPU_NAME']=tpu2 if use_tpu_2 else tpu3
-
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
-os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"]="0" #"1,2"#
 
 EPOCHS_FINE_TUNE = 0
 EPOCHS_FULL = 1 if is_debug else 8

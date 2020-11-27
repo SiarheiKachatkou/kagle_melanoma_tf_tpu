@@ -4,6 +4,7 @@ import numpy as np
 from consts import CLASSES
 import cv2
 import os
+from tqdm import tqdm
 from augmentations import cut_mix
 
 def dataset_to_numpy_util(dataset, N, show_zero_labels):
@@ -11,7 +12,7 @@ def dataset_to_numpy_util(dataset, N, show_zero_labels):
     chosen_images = []
     chosen_labels = []
     for images, labels in dataset:
-        #images, labels = cut_mix(images,labels)
+
         numpy_images = images.numpy()
         numpy_labels = labels.numpy()
         for l, img in zip(numpy_labels,numpy_images):
@@ -46,13 +47,43 @@ def display_one_flower(image, title, subplot, red=False):
     return subplot + 1
 
 
-def display_9_images_from_dataset(dataset, show_zero_labels):
+def get_high_loss_images(dataset, N, loss_fn, max_batches):
+
+    chosen_images = []
+    chosen_labels = []
+    chosen_losses = []
+    batch_count=0
+    for images, labels in tqdm(dataset,total=max_batches):
+        losses=loss_fn(images,labels)
+        numpy_images = images.numpy()
+        numpy_labels = labels.numpy()
+        numpy_losses = losses.numpy()
+
+        for lab, img, loss in zip(numpy_labels, numpy_images, numpy_losses):
+                chosen_losses.append(loss)
+                chosen_images.append(img)
+                chosen_labels.append(lab)
+
+        batch_count+=1
+        if batch_count>max_batches:
+            break
+    args=np.argsort(chosen_losses)
+    args=args[::-1]
+    args=args[:N]
+    chosen_images=[chosen_images[i] for i in args]
+    chosen_labels=[chosen_labels[i] for i in args]
+    return chosen_images, chosen_labels
+
+
+def display_9_images_from_dataset(dataset, show_zero_labels, loss_fn=None):
     subplot = 331
     plt.figure(figsize=(13, 13))
-    # labels=[0,0]
-    # while sum(labels)==0:
-    images, labels = dataset_to_numpy_util(dataset, 9, show_zero_labels)
-    #labels = np.argmax(labels, axis=-1)
+
+    if loss_fn is None:
+        images, labels = dataset_to_numpy_util(dataset, 9, show_zero_labels)
+    else:
+        images, labels = get_high_loss_images(dataset, 9, loss_fn, max_batches=10)
+
     print(labels)
     for i, image in enumerate(images):
         image = cv2.normalize(image,None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
