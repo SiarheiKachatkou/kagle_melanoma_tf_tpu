@@ -4,6 +4,7 @@ from consts import *
 from functools import partial
 #from augmentation_hair import hair_aug_tf
 from augmentations import augment_train,augment_tta,augment_val,augment_test, cut_mix, augment_val_aug
+from oversample import oversample
 from files_utils import get_train_val_filenames,get_test_filenames,count_data_items
 
 features_test = {
@@ -132,9 +133,10 @@ def get_training_dataset(training_fileimages, training_fileimages_old, config, r
 
     dataset = dataset.repeat(repeats)
     dataset=dataset.shuffle(512)
+    dataset=oversample(dataset,config)
     dataset = _augm_dataset(dataset,augment_train)
-    cut_mix_fn=partial(cut_mix,prob=config.cut_mix_prob)
-    dataset = _augm_batched_dataset(dataset, cut_mix_fn)
+    #augm_fn=partial(positive_augm,multiplier=config.positive_augm_mult)
+    #dataset = _augm_batched_dataset(dataset, augm_fn)
 
     return dataset
 

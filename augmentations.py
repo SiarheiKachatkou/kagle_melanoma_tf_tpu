@@ -177,6 +177,7 @@ def cut_mix(images,labels,*args, prob=0.5):
 
     return (images,labels,*args)
 
+
 def _normalize(image8u):
     image = tf.cast(image8u,tf.float32)
     image = tf.keras.applications.imagenet_utils.preprocess_input(image, mode='torch')

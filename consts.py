@@ -10,7 +10,7 @@ import argparse
 
 parser=argparse.ArgumentParser()
 parser.add_argument('--backbone',type=str)
-parser.add_argument('--cut-mix-prob',type=float)
+parser.add_argument('--positive_augm_mult',type=int)
 parser.add_argument('--dropout-rate',type=float)
 parser.add_argument('--lr_max',type=float)
 parser.add_argument('--lr_exp_decay',type=float)
@@ -78,15 +78,14 @@ config=namedtuple('config',['lr_max','lr_start','stepsize', 'lr_warm_up_epochs',
                             'nfolds','l2_penalty',
                             'model_fn_str','work_dir', 'gs_work_dir','ttas','use_metrics','dropout_rate',
                             'save_last_epochs',
-                            'cut_mix_prob'])
+                            'positive_augm_mult'])
 
 model = args.backbone if not is_debug else 'B0'
 
 penalty = 0
-cut_mix_prob=args.cut_mix_prob
 dropout_rate=args.dropout_rate
 
-work_dir_name = f'artifacts/val_quality_8_{model}_bce_loss_{IMAGE_HEIGHT}_epochs_{EPOCHS_FULL}_cut_mix_{cut_mix_prob}_drop_{dropout_rate}_lr_max{args.lr_max}_lr_dacay_{args.lr_exp_decay}_0' if not is_debug else 'debug'
+work_dir_name = f'artifacts/val_quality_8_{model}_bce_loss_{IMAGE_HEIGHT}_epochs_{EPOCHS_FULL}_positive_augm_mult_{args.positive_augm_mult}_drop_{dropout_rate}_lr_max{args.lr_max}_lr_dacay_{args.lr_exp_decay}_0' if not is_debug else 'debug'
 
 
 CONFIG=config(lr_max=args.lr_max*1e-4, lr_start=5e-6, stepsize=3, lr_warm_up_epochs=5, lr_min=1e-6,lr_exp_decay=args.lr_exp_decay,lr_fn='get_lrfn(CONFIG)',#get_cycling_lrfn(CONFIG) #
@@ -95,7 +94,7 @@ CONFIG=config(lr_max=args.lr_max*1e-4, lr_start=5e-6, stepsize=3, lr_warm_up_epo
               model_fn_str=f"efficientnet.tfkeras.EfficientNet{model}(weights='imagenet', include_top=False)", ttas=6,
               use_metrics=True, dropout_rate=dropout_rate,
               save_last_epochs=0,
-              cut_mix_prob=cut_mix_prob
+              positive_augm_mult=args.positive_augm_mult
               )
 
 #pretrained_model = tf.keras.applications.MobileNetV2(input_shape=[*IMAGE_SIZE, 3], include_top=False)
