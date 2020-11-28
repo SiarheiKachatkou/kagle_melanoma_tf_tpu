@@ -1,16 +1,34 @@
 import matplotlib.pyplot as plt
 import pandas as pd
-import re
+import os
+import yaml
+import consts
 
-prefix='val_quality_2_'
+
+def parse_model_fn(s):
+    for i in range(8):
+        arch='B'+str(0)
+        if arch in s:
+            return arch
+    return None
+
+prefix='val_quality_9_'
 val=pd.read_csv(prefix+'table.csv')
+yaml_keys=['lr_max','model_fn_str','oversample_mult','dropout_rate','lr_exp_decay']
+yaml_fns=[None,parse_model_fn,None,None,None]
+
+
 
 def parse_name(name):
-    ret=re.findall(prefix+'([A-Z0-9]*)_(.*)_cut_mix_([0-9\.]*)_drop_([0-9\.]*)',name)
-    arch=ret[0][0]
-    cut_mix=float(ret[0][2])
-    drop=float(ret[0][3])
-    return arch,cut_mix,drop
+    with open(os.path.join(name,'config.yaml'),'rt') as file:
+        config=yaml.load(file)
+    vals={}
+    for k,f in zip(yaml_keys,yaml_fns):
+        v=config[k]
+        if f is not None:
+            v=f(v)
+        vals[k]=v
+    return vals
 
 archs=[None]*len(val)
 cut_mixs=[None]*len(val)
