@@ -44,7 +44,7 @@ features_keys=yaml_keys
 Y=val[target_key].values
 
 clf = RandomForestRegressor(n_estimators=100, random_state=0).fit(val[features_keys], Y)
-features = ['lr_max','model_fn_str','oversample_mult',('model_fn_str','oversample_mult')]
+features = ['model_fn_str','dropout_rate',('dropout_rate','model_fn_str')]
 
 plot_partial_dependence(clf, val[features_keys], features)
 plt.show()
