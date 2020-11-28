@@ -2,17 +2,18 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import os
 import yaml
-import consts
+import numpy as np
+
 
 
 def parse_model_fn(s):
     for i in range(8):
-        arch='B'+str(0)
+        arch='B'+str(i)
         if arch in s:
             return arch
     return None
 
-prefix='val_quality_9_'
+prefix='artifacts/val_quality_9_'
 val=pd.read_csv(prefix+'table.csv')
 yaml_keys=['lr_max','model_fn_str','oversample_mult','dropout_rate','lr_exp_decay']
 yaml_fns=[None,parse_model_fn,None,None,None]
@@ -30,16 +31,13 @@ def parse_name(name):
         vals[k]=v
     return vals
 
-archs=[None]*len(val)
-cut_mixs=[None]*len(val)
-drops=[None]*len(val)
+vals_array=[]
 for i,name in enumerate(val.name.values):
-    archs[i], cut_mixs[i], drops[i] = parse_name(name)
+    val_dict = parse_name(name)
+    vals_array.append([val_dict[k] for k in yaml_keys])
+vals_array=np.array(vals_array)
+for i,k in enumerate(yaml_keys):
+    val[k]=vals_array[:,i]
 
-val['cut_mix']=cut_mixs
-val['drop']=drops
-val['arch']=archs
-
-val[(val['arch']=='B1') & (val['drop']==0)][['val_auc','with_augm_auc','avg_test_auc','test_auc','cut_mix']]
 
 dbg=1
