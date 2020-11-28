@@ -20,7 +20,7 @@ args=parser.parse_args()
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"]="1,2"#"0" #
+os.environ["CUDA_VISIBLE_DEVICES"]="0" #"1,2"#
 
 use_tpu_2 = False
 is_local = True
