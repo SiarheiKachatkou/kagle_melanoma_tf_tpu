@@ -3,22 +3,20 @@ import pandas as pd
 import os
 import yaml
 import numpy as np
-
-
+from sklearn.inspection import plot_partial_dependence
+from sklearn.ensemble import RandomForestRegressor
 
 def parse_model_fn(s):
     for i in range(8):
         arch='B'+str(i)
         if arch in s:
-            return arch
+            return i
     return None
 
 prefix='artifacts/val_quality_9_'
 val=pd.read_csv(prefix+'table.csv')
 yaml_keys=['lr_max','model_fn_str','oversample_mult','dropout_rate','lr_exp_decay']
 yaml_fns=[None,parse_model_fn,None,None,None]
-
-
 
 def parse_name(name):
     with open(os.path.join(name,'config.yaml'),'rt') as file:
@@ -38,6 +36,19 @@ for i,name in enumerate(val.name.values):
 vals_array=np.array(vals_array)
 for i,k in enumerate(yaml_keys):
     val[k]=vals_array[:,i]
+
+target_key='avg_test_auc'
+features_keys=yaml_keys
+
+
+Y=val[target_key].values
+
+clf = RandomForestRegressor(n_estimators=100, random_state=0).fit(val[features_keys], Y)
+features = ['lr_max','model_fn_str','oversample_mult',('model_fn_str','oversample_mult')]
+
+plot_partial_dependence(clf, val[features_keys], features)
+plt.show()
+
 
 
 dbg=1
