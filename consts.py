@@ -13,6 +13,7 @@ parser.add_argument('--dropout-rate',type=float)
 parser.add_argument('--lr_max',type=float)
 parser.add_argument('--lr_exp_decay',type=float)
 parser.add_argument('--hair-prob',type=float)
+parser.add_argument('--microscope-prob',type=float)
 
 parser.add_argument('--focal_loss_gamma',type=float,default=4)
 parser.add_argument('--focal_loss_alpha',type=float,default=0.5)
@@ -83,7 +84,7 @@ config=namedtuple('config',['lr_max','lr_start','stepsize', 'lr_warm_up_epochs',
                             'save_last_epochs',
                             'oversample_mult',
                             'focal_loss_gamma','focal_loss_alpha',
-                            'hair_prob'
+                            'hair_prob','microscope_prob'
                             ])
 
 model = args.backbone if not is_debug else 'B0'
@@ -93,8 +94,9 @@ dropout_rate=args.dropout_rate
 focal_loss_alpha=args.focal_loss_alpha
 focal_loss_gamma=args.focal_loss_gamma
 hair_prob=args.hair_prob
+microscope_prob=args.microscope_prob
 
-work_dir_name = f'artifacts/val_quality_11_{model}_focal_loss_{IMAGE_HEIGHT}_epochs_{EPOCHS_FULL}_drop_{dropout_rate}_lr_max{args.lr_max}_lr_dacay_{args.lr_exp_decay}_hair_prob_{hair_prob}' if not is_debug else 'debug'
+work_dir_name = f'artifacts/val_quality_11_{model}_focal_loss_{IMAGE_HEIGHT}_epochs_{EPOCHS_FULL}_drop_{dropout_rate}_lr_max{args.lr_max}_lr_dacay_{args.lr_exp_decay}_hair_prob_{hair_prob}_micro_prob_{microscope_prob}' if not is_debug else 'debug'
 
 
 CONFIG=config(lr_max=args.lr_max*1e-4, lr_start=5e-6, stepsize=3, lr_warm_up_epochs=5,
@@ -105,9 +107,8 @@ CONFIG=config(lr_max=args.lr_max*1e-4, lr_start=5e-6, stepsize=3, lr_warm_up_epo
               use_metrics=True, dropout_rate=dropout_rate,
               save_last_epochs=0,
               oversample_mult=args.oversample_mult,
-              focal_loss_gamma=focal_loss_gamma,
-              focal_loss_alpha=focal_loss_alpha,
-              hair_prob=hair_prob
+              focal_loss_gamma=focal_loss_gamma,focal_loss_alpha=focal_loss_alpha,
+              hair_prob=hair_prob,microscope_prob=microscope_prob
               )
 
 #pretrained_model = tf.keras.applications.MobileNetV2(input_shape=[*IMAGE_SIZE, 3], include_top=False)
