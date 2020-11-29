@@ -13,9 +13,9 @@ def parse_model_fn(s):
             return i
     return None
 
-prefix='artifacts/val_quality_9_'
+prefix='artifacts/val_quality_10_'
 val=pd.read_csv(prefix+'table.csv')
-yaml_keys=['lr_max','model_fn_str','oversample_mult','dropout_rate','lr_exp_decay']
+yaml_keys=['lr_max','model_fn_str','lr_exp_decay','focal_loss_alpha','focal_loss_gamma']
 yaml_fns=[None,parse_model_fn,None,None,None]
 
 def parse_name(name):
@@ -44,7 +44,7 @@ features_keys=yaml_keys
 Y=val[target_key].values
 
 clf = RandomForestRegressor(n_estimators=100, random_state=0).fit(val[features_keys], Y)
-features = ['model_fn_str','dropout_rate',('dropout_rate','model_fn_str')]
+features = ['focal_loss_gamma','focal_loss_alpha',('focal_loss_gamma','focal_loss_alpha')]
 
 plot_partial_dependence(clf, val[features_keys], features)
 plt.show()

@@ -12,9 +12,9 @@ parser.add_argument('--backbone',type=str)
 parser.add_argument('--dropout-rate',type=float)
 parser.add_argument('--lr_max',type=float)
 parser.add_argument('--lr_exp_decay',type=float)
-parser.add_argument('--focal_loss_gamma',type=float)
-parser.add_argument('--focal_loss_alpha',type=float)
 
+parser.add_argument('--focal_loss_gamma',type=float,default=4)
+parser.add_argument('--focal_loss_alpha',type=float,default=0.5)
 parser.add_argument('--oversample_mult',type=int,default=1)
 
 args=parser.parse_args()
