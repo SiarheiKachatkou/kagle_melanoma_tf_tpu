@@ -187,9 +187,9 @@ def _normalize(image8u):
 
 def augment_train(image, label, image_name, config):
     image=_augment_color(image)
+    image = hair_aug_tf(image, config)
     image = _normalize(image)
     image = transform_geometricaly(image, DIM=IMAGE_HEIGHT)
-    image = hair_aug_tf(image,config)
     return image, label, image_name
 
 
