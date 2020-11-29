@@ -13,7 +13,7 @@
     <option name="ADD_SOURCE_ROOTS" value="true" />
     <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
     <option name="SCRIPT_NAME" value="$PROJECT_DIR$/show_dataset.py" />
-    <option name="PARAMETERS" value="--backbone=B0 --cut-mix-prob=0.9 --dropout-rate=0.1 --lr_exp_decay=0.5 --lr_max=1" />
+    <option name="PARAMETERS" value="--backbone=B0 --dropout-rate=0.1 --lr_exp_decay=0.5 --lr_max=1 --hair-prob=1.0" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="false" />

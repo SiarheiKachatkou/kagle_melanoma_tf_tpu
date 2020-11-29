@@ -1,6 +1,7 @@
 import tensorflow as tf
 import tensorflow.keras.backend as K
 import math
+from augmentation_hair import hair_aug_tf
 from consts import *
 
 # COARSE DROPOUT
@@ -184,10 +185,11 @@ def _normalize(image8u):
     return image
 
 
-def augment_train(image, label, image_name):
+def augment_train(image, label, image_name, config):
     image=_augment_color(image)
     image = _normalize(image)
     image = transform_geometricaly(image, DIM=IMAGE_HEIGHT)
+    image = hair_aug_tf(image,config)
     return image, label, image_name
 
 

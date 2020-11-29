@@ -1,21 +1,16 @@
 import tensorflow as tf
 from consts import IMAGE_HEIGHT
 
-'''
-GCS_PATH_hair_images = "gs://kochetkov_kaggle_melanoma/malanoma_hairs"
+
+GCS_PATH_hair_images = "data/malanoma_hairs" # "gs://kochetkov_kaggle_melanoma/malanoma_hairs"
 hair_images = tf.io.gfile.glob(GCS_PATH_hair_images + '/*.png')
 hair_images_tf=tf.convert_to_tensor(hair_images)
 
 # the maximum number of hairs to augment:
 n_max = 20
 
-# The hair images were originally designed for the 256x256 size, so they need to be scaled to use with images of different sizes.
-if IMAGE_HEIGHT != 256:
-    scale = tf.cast(IMAGE_HEIGHT / 256, dtype=tf.int32)
-
-
-def hair_aug_tf(input_img, augment=True):
-    if augment:
+def hair_aug_tf(input_img, config):
+    if tf.random.uniform(shape=[], maxval=1, dtype=tf.float32)<config.hair_prob:
 
         # Copy the input image, so it won't be changed
         img = tf.identity(input_img)
@@ -41,15 +36,7 @@ def hair_aug_tf(input_img, augment=True):
             fname = hair_images_tf[i]
             bits = tf.io.read_file(fname)
             hair = tf.image.decode_jpeg(bits)
-
-            # Rescale the hair image to the right size
-            if 256 != IMAGE_HEIGHT:
-                # new_height, new_width, _  = scale*tf.shape(hair)
-                new_width = scale * tf.shape(hair)[1]
-                new_height = scale * tf.shape(hair)[0]
-                hair = tf.image.resize(hair, [new_height, new_width])
-
-            # Random flips of the hair image
+            hair = tf.image.resize(hair, [IMAGE_HEIGHT, IMAGE_HEIGHT])
             hair = tf.image.random_flip_left_right(hair)
             hair = tf.image.random_flip_up_down(hair)
 
@@ -101,5 +88,3 @@ def hair_aug_tf(input_img, augment=True):
         return img
     else:
         return input_img
-
-'''

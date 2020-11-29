@@ -134,9 +134,8 @@ def get_training_dataset(training_fileimages, training_fileimages_old, config, r
     dataset = dataset.repeat(repeats)
     dataset=dataset.shuffle(512)
     dataset=oversample(dataset,config)
-    dataset = _augm_dataset(dataset,augment_train)
-    #augm_fn=partial(positive_augm,multiplier=config.positive_augm_mult)
-    #dataset = _augm_batched_dataset(dataset, augm_fn)
+    augm_fn=partial(augment_train,config=config)
+    dataset = _augm_dataset(dataset,augm_fn)
 
     return dataset
 
