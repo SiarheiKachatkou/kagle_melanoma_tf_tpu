@@ -36,7 +36,7 @@ if not is_kaggle:
     os.environ["CUDA_VISIBLE_DEVICES"]="0" #"1,2"#
     use_amp = True if os.environ["CUDA_VISIBLE_DEVICES"]!="0" else False
 else:
-    use_amp=True
+    use_amp=False
 
 if (not is_local) and (not is_kaggle):
     tpu3 = "grpc://10.240.1.2:8470"
@@ -47,7 +47,7 @@ if (not is_local) and (not is_kaggle):
 EPOCHS_FINE_TUNE = 0
 EPOCHS_FULL = 1 if is_debug else 16
 
-IMAGE_HEIGHT = 384
+IMAGE_HEIGHT = 128
 
 IMAGE_SIZE=[IMAGE_HEIGHT, IMAGE_HEIGHT]
 
