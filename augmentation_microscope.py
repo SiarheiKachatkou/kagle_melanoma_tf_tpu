@@ -2,7 +2,7 @@ import tensorflow as tf
 from consts import IMAGE_HEIGHT
 from augmentations_geom import transform_geometricaly
 
-GCS_PATH_microscope_images = "data/malanoma_microscope" # "gs://kochetkov_kaggle_melanoma/malanoma_hairs"
+GCS_PATH_microscope_images = "data/melanoma-microscope" # "gs://kochetkov_kaggle_melanoma/malanoma_hairs"
 microscope_images = tf.io.gfile.glob(GCS_PATH_microscope_images + '/*.png')
 microscope_images_tf=tf.convert_to_tensor(microscope_images)
 
