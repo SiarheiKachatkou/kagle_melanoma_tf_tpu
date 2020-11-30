@@ -3,52 +3,32 @@ import pandas as pd
 import os
 import yaml
 import numpy as np
-from sklearn.inspection import plot_partial_dependence
-from sklearn.ensemble import RandomForestRegressor
+from plot_utils import parse_model_fn,parse_config,plot_pde
 
-def parse_model_fn(s):
-    for i in range(8):
-        arch='B'+str(i)
-        if arch in s:
-            return i
-    return None
 
-prefix='artifacts/val_quality_9_'
+prefix='artifacts/val_quality_11_'
 val=pd.read_csv(prefix+'table.csv')
-yaml_keys=['lr_max','model_fn_str','oversample_mult','dropout_rate','lr_exp_decay']
-yaml_fns=[None,parse_model_fn,None,None,None]
+yaml_parsers_fns={'model_fn_str':parse_model_fn}
+yaml_ignore_keys={'gs_work_dir','work_dir','lr_fn'}
+target_key='avg_test_auc'
+features = [('hair_prob','microscope_prob'), 'hair_prob','microscope_prob','focal_loss_alpha','lr_warm_up_epochs']
 
-def parse_name(name):
-    with open(os.path.join(name,'config.yaml'),'rt') as file:
-        config=yaml.load(file)
-    vals={}
-    for k,f in zip(yaml_keys,yaml_fns):
-        v=config[k]
-        if f is not None:
-            v=f(v)
-        vals[k]=v
-    return vals
 
 vals_array=[]
+yaml_keys=None
 for i,name in enumerate(val.name.values):
-    val_dict = parse_name(name)
+    val_dict = parse_config(name,yaml_ignore_keys,yaml_parsers_fns)
+    if yaml_keys is None:
+        yaml_keys=val_dict.keys()
     vals_array.append([val_dict[k] for k in yaml_keys])
 vals_array=np.array(vals_array)
 for i,k in enumerate(yaml_keys):
     val[k]=vals_array[:,i]
 
-target_key='avg_test_auc'
-features_keys=yaml_keys
 
-
-Y=val[target_key].values
-
-clf = RandomForestRegressor(n_estimators=100, random_state=0).fit(val[features_keys], Y)
-features = ['model_fn_str','dropout_rate',('dropout_rate','model_fn_str')]
-
-plot_partial_dependence(clf, val[features_keys], features)
+rows=int(np.sqrt(len(features)))
+cols=len(features)//rows+1
+for i,f in enumerate(features):
+    plt.subplot(rows,cols,i+1)
+    plot_pde(val,f,target_key)
 plt.show()
-
-
-
-dbg=1

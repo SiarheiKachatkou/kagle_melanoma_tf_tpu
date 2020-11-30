@@ -4,16 +4,21 @@ import os
 import tensorflow as tf
 import numpy as np
 import random
-import sklearn
 import argparse
 
 
 parser=argparse.ArgumentParser()
 parser.add_argument('--backbone',type=str)
-parser.add_argument('--oversample_mult',type=int)
 parser.add_argument('--dropout-rate',type=float)
 parser.add_argument('--lr_max',type=float)
 parser.add_argument('--lr_exp_decay',type=float)
+parser.add_argument('--hair-prob',type=float)
+parser.add_argument('--microscope-prob',type=float)
+parser.add_argument('--lr-warm-up-epochs',type=int)
+
+parser.add_argument('--focal_loss_gamma',type=float,default=4)
+parser.add_argument('--focal_loss_alpha',type=float,default=0.5)
+parser.add_argument('--oversample_mult',type=int,default=1)
 
 args=parser.parse_args()
 
@@ -35,7 +40,7 @@ if (not is_local) and (not is_kaggle):
     os.environ['TPU_NAME']=tpu2 if use_tpu_2 else tpu3
 
 EPOCHS_FINE_TUNE = 0
-EPOCHS_FULL = 1 if is_debug else 8
+EPOCHS_FULL = 1 if is_debug else 16
 
 IMAGE_HEIGHT = 128
 
@@ -78,23 +83,34 @@ config=namedtuple('config',['lr_max','lr_start','stepsize', 'lr_warm_up_epochs',
                             'nfolds','l2_penalty',
                             'model_fn_str','work_dir', 'gs_work_dir','ttas','use_metrics','dropout_rate',
                             'save_last_epochs',
-                            'oversample_mult'])
+                            'oversample_mult',
+                            'focal_loss_gamma','focal_loss_alpha',
+                            'hair_prob','microscope_prob'
+                            ])
 
 model = args.backbone if not is_debug else 'B0'
 
 penalty = 0
 dropout_rate=args.dropout_rate
+focal_loss_alpha=args.focal_loss_alpha
+focal_loss_gamma=args.focal_loss_gamma
+hair_prob=args.hair_prob
+microscope_prob=args.microscope_prob
+lr_warm_up_epochs=args.lr_warm_up_epochs
 
-work_dir_name = f'artifacts/val_quality_9_{model}_bce_loss_{IMAGE_HEIGHT}_epochs_{EPOCHS_FULL}_oversample_mult_{args.oversample_mult}_drop_{dropout_rate}_lr_max{args.lr_max}_lr_dacay_{args.lr_exp_decay}_0' if not is_debug else 'debug'
+work_dir_name = f'artifacts/val_quality_11_{model}_focal_loss_{IMAGE_HEIGHT}_epochs_{EPOCHS_FULL}_drop_{dropout_rate}_lr_max{args.lr_max}_lr_dacay_{args.lr_exp_decay}_hair_prob_{hair_prob}_micro_prob_{microscope_prob}_wu_epochs_{lr_warm_up_epochs}' if not is_debug else 'debug'
 
 
-CONFIG=config(lr_max=args.lr_max*1e-4, lr_start=5e-6, stepsize=3, lr_warm_up_epochs=5, lr_min=1e-6,lr_exp_decay=args.lr_exp_decay,lr_fn='get_lrfn(CONFIG)',#get_cycling_lrfn(CONFIG) #
+CONFIG=config(lr_max=args.lr_max*1e-4, lr_start=5e-6, stepsize=3, lr_warm_up_epochs=lr_warm_up_epochs,
+              lr_min=1e-6,lr_exp_decay=args.lr_exp_decay,lr_fn='get_lrfn(CONFIG)',#get_cycling_lrfn(CONFIG) #
               nfolds=4, l2_penalty=penalty, work_dir=work_dir_name,
               gs_work_dir=f'gs://kochetkov_kaggle_melanoma/{str(datetime.datetime.now())[:20]}_{work_dir_name}',
               model_fn_str=f"efficientnet.tfkeras.EfficientNet{model}(weights='imagenet', include_top=False)", ttas=6,
               use_metrics=True, dropout_rate=dropout_rate,
               save_last_epochs=0,
-              oversample_mult=args.oversample_mult
+              oversample_mult=args.oversample_mult,
+              focal_loss_gamma=focal_loss_gamma,focal_loss_alpha=focal_loss_alpha,
+              hair_prob=hair_prob,microscope_prob=microscope_prob
               )
 
 #pretrained_model = tf.keras.applications.MobileNetV2(input_shape=[*IMAGE_SIZE, 3], include_top=False)

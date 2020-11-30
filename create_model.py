@@ -33,6 +33,8 @@ def add_regularization(model, regularizer=tf.keras.regularizers.l2(0.0001)):
 
 class BinaryFocalLoss():
     def __init__(self, gamma=0.2, alpha=0.25):
+        # alpha - account for imbalance, alpha=[0,1] how much positive more important then negative"
+        # gamma - focus on hard examples increasing gamma increase focus on hard examples"
         self._alpha=alpha
         self._gamma=gamma
         self.__name__="BinaryFocalLoss"
@@ -63,7 +65,7 @@ class BinaryFocalLoss():
 
 
 def compile_model(model, metrics, cfg, lr=None):
-    loss = tf.keras.losses.BinaryCrossentropy()#label_smoothing=0.05)
+    loss = BinaryFocalLoss(gamma=cfg.focal_loss_gamma,alpha=cfg.focal_loss_alpha)#tf.keras.losses.BinaryCrossentropy()#label_smoothing=0.05)
 
     learning_rate = cfg.lr_start if lr is None else lr
 
