@@ -45,7 +45,7 @@ if (not is_local) and (not is_kaggle):
     os.environ['TPU_NAME']=tpu2 if use_tpu_2 else tpu3
 
 EPOCHS_FINE_TUNE = 0
-EPOCHS_FULL = 1 if is_debug else 16
+EPOCHS_FULL = 1 if is_debug else 128
 
 IMAGE_HEIGHT = 384
 
