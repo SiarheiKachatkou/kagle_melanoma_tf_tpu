@@ -36,7 +36,7 @@ if not is_kaggle:
     os.environ["CUDA_VISIBLE_DEVICES"]="0" #"1,2"#
     use_amp = True if os.environ["CUDA_VISIBLE_DEVICES"]!="0" else False
 else:
-    use_amp=False
+    use_amp=True
 
 if (not is_local) and (not is_kaggle):
     tpu3 = "grpc://10.240.1.2:8470"
