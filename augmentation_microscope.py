@@ -24,6 +24,7 @@ def _augm_geom_microscope(microscope_img):
 
 
 def microscope_aug_tf(input_img_8u, config):
+    return input_img_8u
     if tf.random.uniform(shape=[], maxval=1, dtype=tf.float32)<config.microscope_prob:
 
         # Copy the input image, so it won't be changed

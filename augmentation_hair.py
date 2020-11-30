@@ -20,6 +20,7 @@ def _augm_color_hair(hair):
 
 
 def hair_aug_tf(input_img_8u, config):
+    return input_img_8u
     if tf.random.uniform(shape=[], maxval=1, dtype=tf.float32)<config.hair_prob:
 
         # Copy the input image, so it won't be changed
