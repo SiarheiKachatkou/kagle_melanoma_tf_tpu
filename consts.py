@@ -63,7 +63,8 @@ if is_local:
 
 else:
     DATASETS = {
-                128: {'new': 'gs://kaggle_melanoma_isic/isic2020-128-colornormed-tfrecord' +'/train*.tfrec', 'old':''},
+                #128: {'new': 'gs://kaggle_melanoma_isic/isic2020-128-colornormed-tfrecord' +'/train*.tfrec', 'old':''},
+                128: {'new': '/kaggle/input/melanoma-128x128/train*.tfrec','old':''},
                 #128: {'new': 'data/128/train*.tfrec', 'old':''},
                 #384: {'new': 'gs://kaggle_melanoma_isic/isic2020-384-colornormed-tfrecord/train*.tfrec', 'old':''},
                 #384: {'new': 'data/isic2020-384-colornormed-tfrecord/train*.tfrec','old':''},
