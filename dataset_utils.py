@@ -133,9 +133,11 @@ def get_training_dataset(training_fileimages, training_fileimages_old, config, r
 
     dataset = dataset.repeat(repeats)
     dataset=dataset.shuffle(512)
-    dataset=oversample(dataset,config)
-    augm_fn=partial(augment_train,config=config)
-    dataset = _augm_dataset(dataset,augm_fn)
+    #dataset=oversample(dataset,config)
+    #augm_fn=partial(augment_train,config=config)
+    #dataset = _augm_dataset(dataset,augm_fn)
+    dataset = dataset.batch(BATCH_SIZE)
+    dataset = dataset.prefetch(AUTO)
 
     return dataset
 
