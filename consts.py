@@ -47,7 +47,7 @@ if (not is_local) and (not is_kaggle):
 EPOCHS_FINE_TUNE = 0
 EPOCHS_FULL = 1 if is_debug else 16
 
-IMAGE_HEIGHT = 128
+IMAGE_HEIGHT = 384
 
 IMAGE_SIZE=[IMAGE_HEIGHT, IMAGE_HEIGHT]
 
