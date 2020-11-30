@@ -27,8 +27,8 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 
 use_tpu_2 = False
-is_local = False
-is_kaggle = True
+is_local = True
+is_kaggle = False
 is_debug = False
 
 if not is_kaggle:
@@ -69,7 +69,7 @@ else:
                 #384: {'new': 'gs://kaggle_melanoma_isic/isic2020-384-colornormed-tfrecord/train*.tfrec', 'old':''},
                 #384: {'new': 'data/isic2020-384-colornormed-tfrecord/train*.tfrec','old':''},
                 #384: {'new':'gs://kds-76800f320871e548ef017f0a5a63cef5c72d1d47d6e020c81edfa286/train*.tfrec','old':''},
-                384: {'new':'/kaggle/input/melanoma-384x384/train*.tfrec','old':''},
+                384: {'new': 'gs://kds-e7dc2af9732a2987e99fc221b0c3f6278bcf5d0ef6c99302da0a7f50/train*.tfrec','old':''},
                 512: {'new': 'gs://kaggle_melanoma_isic/isic2020-512-colornormed-tfrecord/train*.tfrec', 'old':''},
                 768: {'new': 'gs://kaggle_melanoma_isic/isic2020-768-colornormed-tfrecord/archive/train*.tfrec',
                       'old': 'gs://kaggle_melanoma_isic/old-768-tfrecord/train*.tfrec'}
