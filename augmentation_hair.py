@@ -1,8 +1,8 @@
 import tensorflow as tf
-from consts import IMAGE_HEIGHT
+from consts import IMAGE_HEIGHT, is_local
 
 
-GCS_PATH_hair_images = "data/malanoma_hairs" # "gs://kochetkov_kaggle_melanoma/malanoma_hairs"
+GCS_PATH_hair_images = "data/malanoma_hairs" if is_local else "gs://kochetkov_kaggle_melanoma/malanoma_hairs"
 hair_images = tf.io.gfile.glob(GCS_PATH_hair_images + '/*.png')
 hair_images_tf=tf.convert_to_tensor(hair_images)
 

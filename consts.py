@@ -24,14 +24,19 @@ args=parser.parse_args()
 
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
-os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"]="0" #"1,2"#
+
 
 use_tpu_2 = False
-is_local = True
-is_kaggle = False
+is_local = False
+is_kaggle = True
 is_debug = False
-use_amp = True if os.environ["CUDA_VISIBLE_DEVICES"]!="0" else False
+
+if not is_kaggle:
+    os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
+    os.environ["CUDA_VISIBLE_DEVICES"]="0" #"1,2"#
+    use_amp = True if os.environ["CUDA_VISIBLE_DEVICES"]!="0" else False
+else:
+    use_amp=True
 
 if (not is_local) and (not is_kaggle):
     tpu3 = "grpc://10.240.1.2:8470"
