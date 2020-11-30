@@ -38,6 +38,7 @@ def read_tfrecord(example):
 
     example = tf.io.parse_single_example(example, features)
     image = tf.image.decode_jpeg(example['image'], channels=3)
+    image = tf.cast(image, dtype=tf.float32)
     image_name = tf.cast(example['image_name'], tf.string)
     class_label = tf.cast(example['target'], label_type)
     return image, class_label, image_name
