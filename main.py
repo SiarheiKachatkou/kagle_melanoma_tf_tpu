@@ -16,7 +16,7 @@ from create_model import create_model, set_backbone_trainable
 from runtime import get_scope
 from history import join_history
 if not os.path.exists(CONFIG.work_dir):
-    os.mkdir(CONFIG.work_dir)
+    os.makedirs(CONFIG.work_dir)
     
 shutil.copyfile('consts.py',os.path.join(CONFIG.work_dir,'consts.py'))
 
