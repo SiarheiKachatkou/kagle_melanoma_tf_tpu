@@ -31,9 +31,6 @@ if is_debug:
     train_filenames_folds=[[f[0]] for f in train_filenames_folds]
     val_filenames_folds=[[f[0]] for f in val_filenames_folds]
 
-print(f'train_filenames_folds={train_filenames_folds}\n')
-print(f'test_filenames={test_filenames}')
-
 for fold in range(CONFIG.nfolds):
 
     print(f'fold={fold}')
