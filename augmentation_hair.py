@@ -19,7 +19,7 @@ def _augm_color_hair(hair):
 
 
 def hair_aug_tf(input_img_8u, config):
-    return input_img_8u
+
     if tf.random.uniform(shape=[], maxval=1, dtype=tf.float32)<config.hair_prob:
 
         # Copy the input image, so it won't be changed
@@ -77,18 +77,17 @@ def hair_aug_tf(input_img_8u, config):
                 [[roi_h0, im_height - (roi_h0 + h_height)], [roi_w0, im_width - (roi_w0 + h_width)], [0, 0]])
             # Pad dst with zeros to make it the same shape as image.
             dst_padded = tf.pad(dst, paddings, "CONSTANT")
-            dst_padded = tf.cast(dst_padded,dtype=tf.uint8)
 
             # Create a boolean mask with zeros at the pixels of the augmentation segment and ones everywhere else
             mask_img = tf.pad(tf.ones_like(dst), paddings, "CONSTANT")
             mask_img = ~tf.cast(mask_img, dtype=tf.bool)
 
             # Make a hole in the original image at the location of the augmentation segment
-            img_hole = tf.multiply(img, tf.cast(mask_img, dtype=tf.uint8))
+            img_hole = tf.multiply(img, tf.cast(mask_img, dtype=tf.float32))
 
             # Inserting the augmentation segment in place of the hole
             img = tf.add(img_hole, dst_padded)
-            img = tf.cast(img,tf.uint8)
+
         return img
     else:
         return input_img_8u

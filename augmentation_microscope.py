@@ -23,7 +23,7 @@ def _augm_geom_microscope(microscope_img):
 
 
 def microscope_aug_tf(input_img_8u, config):
-    return input_img_8u
+
     if tf.random.uniform(shape=[], maxval=1, dtype=tf.float32)<config.microscope_prob:
 
         # Copy the input image, so it won't be changed
@@ -42,12 +42,12 @@ def microscope_aug_tf(input_img_8u, config):
         mask = gray > 10
         microscope_img=_augm_color_microscope(microscope_img)
 
-        img_bg = tf.multiply(img, tf.cast(tf.image.grayscale_to_rgb(~mask), dtype=tf.uint8))
-        microscope_fg = tf.multiply(tf.cast(microscope_img, dtype=tf.int32),
-                              tf.cast(tf.image.grayscale_to_rgb(mask), dtype=tf.int32))
-        microscope_fg = tf.cast(microscope_fg, dtype=tf.uint8)
+        img_bg = tf.multiply(img, tf.cast(tf.image.grayscale_to_rgb(~mask),tf.float32))
+        microscope_fg = tf.multiply(tf.cast(microscope_img, dtype=tf.float32),
+                              tf.cast(tf.image.grayscale_to_rgb(mask), dtype=tf.float32))
+
         dst = tf.add(img_bg, microscope_fg)
-        dst = tf.cast(dst,dtype=tf.uint8)
+
         return dst
     else:
         return input_img_8u
