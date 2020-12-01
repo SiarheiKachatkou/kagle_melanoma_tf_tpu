@@ -30,6 +30,7 @@ use_tpu_2 = False
 is_local = False
 is_kaggle = True
 is_debug = False
+do_validate=False
 
 if not is_kaggle:
     os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
