@@ -24,14 +24,19 @@ args=parser.parse_args()
 
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
-os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"]="1,2"#"0" #
+
 
 use_tpu_2 = False
-is_local = True
-is_kaggle = False
+is_local = False
+is_kaggle = True
 is_debug = False
-use_amp = True if os.environ["CUDA_VISIBLE_DEVICES"]!="0" else False
+
+if not is_kaggle:
+    os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
+    os.environ["CUDA_VISIBLE_DEVICES"]="0" #"1,2"#
+    use_amp = True if os.environ["CUDA_VISIBLE_DEVICES"]!="0" else False
+else:
+    use_amp=True
 
 if (not is_local) and (not is_kaggle):
     tpu3 = "grpc://10.240.1.2:8470"
@@ -40,9 +45,9 @@ if (not is_local) and (not is_kaggle):
     os.environ['TPU_NAME']=tpu2 if use_tpu_2 else tpu3
 
 EPOCHS_FINE_TUNE = 0
-EPOCHS_FULL = 1 if is_debug else 16
+EPOCHS_FULL = 1 if is_debug else 12
 
-IMAGE_HEIGHT = 128
+IMAGE_HEIGHT = 384
 
 IMAGE_SIZE=[IMAGE_HEIGHT, IMAGE_HEIGHT]
 
@@ -58,11 +63,13 @@ if is_local:
 
 else:
     DATASETS = {
-                128: {'new': 'gs://kaggle_melanoma_isic/isic2020-128-colornormed-tfrecord' +'/train*.tfrec', 'old':''},
+                #128: {'new': 'gs://kaggle_melanoma_isic/isic2020-128-colornormed-tfrecord' +'/train*.tfrec', 'old':''},
+                128: {'new': '/kaggle/input/melanoma-128x128/train*.tfrec','old':''},
                 #128: {'new': 'data/128/train*.tfrec', 'old':''},
                 #384: {'new': 'gs://kaggle_melanoma_isic/isic2020-384-colornormed-tfrecord/train*.tfrec', 'old':''},
                 #384: {'new': 'data/isic2020-384-colornormed-tfrecord/train*.tfrec','old':''},
-                384: {'new':'gs://kds-76800f320871e548ef017f0a5a63cef5c72d1d47d6e020c81edfa286/train*.tfrec','old':''},
+                #384: {'new':'gs://kds-76800f320871e548ef017f0a5a63cef5c72d1d47d6e020c81edfa286/train*.tfrec','old':''},
+                384: {'new': 'gs://kds-e7dc2af9732a2987e99fc221b0c3f6278bcf5d0ef6c99302da0a7f50/train*.tfrec','old':''},
                 512: {'new': 'gs://kaggle_melanoma_isic/isic2020-512-colornormed-tfrecord/train*.tfrec', 'old':''},
                 768: {'new': 'gs://kaggle_melanoma_isic/isic2020-768-colornormed-tfrecord/archive/train*.tfrec',
                       'old': 'gs://kaggle_melanoma_isic/old-768-tfrecord/train*.tfrec'}
@@ -75,7 +82,7 @@ red = 4 if use_tpu_2 else 1
 if is_local:
     red=4
 
-BATCH_SIZE = 128 if is_debug else 512
+BATCH_SIZE = 128 if is_debug else 256
 
 TRAIN_STEPS = 1 if is_debug else None
 
@@ -90,7 +97,7 @@ config=namedtuple('config',['lr_max','lr_start','stepsize', 'lr_warm_up_epochs',
 
 model = args.backbone if not is_debug else 'B0'
 
-penalty = 0
+penalty = 1e-6
 dropout_rate=args.dropout_rate
 focal_loss_alpha=args.focal_loss_alpha
 focal_loss_gamma=args.focal_loss_gamma

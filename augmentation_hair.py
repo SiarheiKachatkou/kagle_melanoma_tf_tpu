@@ -1,8 +1,9 @@
 import tensorflow as tf
-from consts import IMAGE_HEIGHT
+from consts import IMAGE_HEIGHT, is_local
 
 
-GCS_PATH_hair_images = "data/melanoma-hairs" # "gs://kochetkov_kaggle_melanoma/malanoma_hairs"
+GCS_PATH_hair_images = "data/melanoma-hairs" if is_local else "/kaggle/input/melanoma-hairs"
+
 hair_images = tf.io.gfile.glob(GCS_PATH_hair_images + '/*.png')
 hair_images_tf=tf.convert_to_tensor(hair_images)
 
@@ -20,6 +21,7 @@ def _augm_color_hair(hair):
 
 
 def hair_aug_tf(input_img_8u, config):
+    return input_img_8u
     if tf.random.uniform(shape=[], maxval=1, dtype=tf.float32)<config.hair_prob:
 
         # Copy the input image, so it won't be changed

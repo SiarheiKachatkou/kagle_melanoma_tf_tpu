@@ -38,6 +38,7 @@ def read_tfrecord(example):
 
     example = tf.io.parse_single_example(example, features)
     image = tf.image.decode_jpeg(example['image'], channels=3)
+    image = tf.cast(image, dtype=tf.float32)
     image_name = tf.cast(example['image_name'], tf.string)
     class_label = tf.cast(example['target'], label_type)
     return image, class_label, image_name
@@ -47,6 +48,7 @@ def read_tfrecord_test(example):
 
     example = tf.io.parse_single_example(example, features_test)
     image = tf.image.decode_jpeg(example['image'], channels=3)
+    image = tf.cast(image, dtype=tf.float32)
     image_name = tf.cast(example['image_name'], tf.string)
 
     class_label = tf.constant(0, dtype=label_type)
@@ -56,6 +58,7 @@ def read_tfrecord_test(example):
 def read_tfrecord_old(example):
     example = tf.io.parse_single_example(example, features_old)
     image = tf.image.decode_jpeg(example['image'], channels=3)
+    image = tf.cast(image,dtype=tf.float32)
     image_name = tf.cast(example['image_name'], tf.string)
     class_label = tf.cast(example['target'], label_type)
     return image, class_label, image_name
@@ -133,9 +136,11 @@ def get_training_dataset(training_fileimages, training_fileimages_old, config, r
 
     dataset = dataset.repeat(repeats)
     dataset=dataset.shuffle(512)
-    dataset=oversample(dataset,config)
-    augm_fn=partial(augment_train,config=config)
-    dataset = _augm_dataset(dataset,augm_fn)
+    #dataset=oversample(dataset,config)
+    #augm_fn=partial(augment_train,config=config)
+    #dataset = _augm_dataset(dataset,augm_fn)
+    dataset = dataset.batch(BATCH_SIZE)
+    dataset = dataset.prefetch(AUTO)
 
     return dataset
 

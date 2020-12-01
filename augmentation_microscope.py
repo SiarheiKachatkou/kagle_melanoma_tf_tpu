@@ -1,11 +1,10 @@
 import tensorflow as tf
-from consts import IMAGE_HEIGHT
+from consts import IMAGE_HEIGHT, is_local
 from augmentations_geom import transform_geometricaly
 
-GCS_PATH_microscope_images = "data/melanoma-microscope" # "gs://kochetkov_kaggle_melanoma/malanoma_hairs"
+GCS_PATH_microscope_images = "data/melanoma-microscope" if is_local else "/kaggle/input/melanoma-microscope"
 microscope_images = tf.io.gfile.glob(GCS_PATH_microscope_images + '/*.png')
 microscope_images_tf=tf.convert_to_tensor(microscope_images)
-
 
 def _augm_color_microscope(microscope_img):
     microscope_img = tf.image.random_brightness(microscope_img, 10)
@@ -24,6 +23,7 @@ def _augm_geom_microscope(microscope_img):
 
 
 def microscope_aug_tf(input_img_8u, config):
+    return input_img_8u
     if tf.random.uniform(shape=[], maxval=1, dtype=tf.float32)<config.microscope_prob:
 
         # Copy the input image, so it won't be changed
