@@ -134,5 +134,5 @@ tf.compat.v1.random.set_random_seed(seed)
 np.random.seed(seed)
 random.seed(seed)
 
-path_hair_images = "data/melanoma-hairs" if is_local else "/kaggle/input/melanoma-hairs"
-path_microscope_images = "data/melanoma-microscope" if is_local else "/kaggle/input/melanoma-microscope"
+path_hair_images = "data/melanoma-hairs" if is_local else "gs://kds-c1f8d68ed78af3bc82472db8c32ec9b3fe1a0dcf09e62c04e90e81fe"
+path_microscope_images = "data/melanoma-microscope" if is_local else "gs://kds-05490130d1f3d52b5eecc24712a9796337d072ebfbada94359adc410"
