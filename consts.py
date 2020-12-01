@@ -9,12 +9,13 @@ import argparse
 
 parser=argparse.ArgumentParser()
 parser.add_argument('--backbone',type=str)
-parser.add_argument('--dropout-rate',type=float)
+parser.add_argument('--dropout_rate',type=float)
 parser.add_argument('--lr_max',type=float)
 parser.add_argument('--lr_exp_decay',type=float)
-parser.add_argument('--hair-prob',type=float)
-parser.add_argument('--microscope-prob',type=float)
-parser.add_argument('--lr-warm-up-epochs',type=int)
+parser.add_argument('--hair_prob',type=float)
+parser.add_argument('--microscope_prob',type=float)
+parser.add_argument('--lr_warm_up_epochs',type=int)
+parser.add_argument('--gpus',type=str,default=None)
 
 parser.add_argument('--focal_loss_gamma',type=float,default=4)
 parser.add_argument('--focal_loss_alpha',type=float,default=0.5)
@@ -30,11 +31,15 @@ use_tpu_2 = False
 is_local = False
 is_kaggle = True
 is_debug = False
-do_validate=False
+do_validate=True
+
+if args.gpus is not None:
+    os.environ["CUDA_VISIBLE_DEVICES"] = args.gpus
 
 if not is_kaggle:
     os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
-    os.environ["CUDA_VISIBLE_DEVICES"]="1,2"#"0" #
+    if args.gpus is None:
+        os.environ["CUDA_VISIBLE_DEVICES"]="1,2"#"0" #
     use_amp = True if os.environ["CUDA_VISIBLE_DEVICES"]!="0" else False
 else:
     use_amp=True

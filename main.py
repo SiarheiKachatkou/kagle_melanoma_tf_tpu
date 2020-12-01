@@ -35,7 +35,7 @@ for fold in range(CONFIG.nfolds):
 
     print(f'fold={fold}')
     model_file_path=f'{CONFIG.work_dir}/model{fold}.h5'
-    # SAVE BEST MODEL EACH FOLD
+
     save_callback_best = tf.keras.callbacks.ModelCheckpoint(
         model_file_path, monitor='val_loss', verbose=0, save_best_only=True,
         mode='min', save_freq='epoch')
@@ -72,14 +72,14 @@ for fold in range(CONFIG.nfolds):
         history = join_history(history_fine_tune, history)
         print(history.history)
 
-        final_accuracy = history.history["val_accuracy"][-5:]
-        print("FINAL ACCURACY MEAN-5: ", np.mean(final_accuracy))
         model.save(model_file_path)
-
-        if CONFIG.use_metrics:
-            display_training_curves(history.history['auc'][1:], history.history['val_auc'][1:], 'auc', 211)
-        display_training_curves(history.history['loss'][1:], history.history['val_loss'][1:], 'loss', 212)
-        plt.savefig(os.path.join(CONFIG.work_dir, f'loss{fold}.png'))
+        if do_validate:
+            final_accuracy = history.history["val_accuracy"][-5:]
+            print("FINAL ACCURACY MEAN-5: ", np.mean(final_accuracy))
+            if CONFIG.use_metrics:
+                display_training_curves(history.history['auc'][1:], history.history['val_auc'][1:], 'auc', 211)
+            display_training_curves(history.history['loss'][1:], history.history['val_loss'][1:], 'loss', 212)
+            plt.savefig(os.path.join(CONFIG.work_dir, f'loss{fold}.png'))
 
 
 
