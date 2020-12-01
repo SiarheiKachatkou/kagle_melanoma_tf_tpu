@@ -1,10 +1,8 @@
 import tensorflow as tf
-from consts import IMAGE_HEIGHT, is_local
+from consts import IMAGE_HEIGHT, is_local, path_hair_images
 
 
-GCS_PATH_hair_images = "data/melanoma-hairs" if is_local else "/kaggle/input/melanoma-hairs"
-
-hair_images = tf.io.gfile.glob(GCS_PATH_hair_images + '/*.png')
+hair_images = tf.io.gfile.glob(path_hair_images + '/*.png')
 hair_images_tf=tf.convert_to_tensor(hair_images)
 
 # the maximum number of hairs to augment:

@@ -1,9 +1,9 @@
 import tensorflow as tf
-from consts import IMAGE_HEIGHT, is_local
+from consts import IMAGE_HEIGHT, is_local, path_microscope_images
 from augmentations_geom import transform_geometricaly
 
-GCS_PATH_microscope_images = "data/melanoma-microscope" if is_local else "/kaggle/input/melanoma-microscope"
-microscope_images = tf.io.gfile.glob(GCS_PATH_microscope_images + '/*.png')
+
+microscope_images = tf.io.gfile.glob(path_microscope_images + '/*.png')
 microscope_images_tf=tf.convert_to_tensor(microscope_images)
 
 def _augm_color_microscope(microscope_img):
