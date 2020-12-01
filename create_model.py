@@ -5,6 +5,7 @@ import os
 import tempfile
 import tensorflow.keras.backend as K
 from consts import BATCH_SIZE
+import multiprocessing as mp
 
 
 def add_regularization(model, regularizer=tf.keras.regularizers.l2(0.0001)):
@@ -21,7 +22,7 @@ def add_regularization(model, regularizer=tf.keras.regularizers.l2(0.0001)):
     model_json = model.to_json()
 
     # Save the weights before reloading the model.
-    tmp_weights_path = os.path.join(tempfile.gettempdir(), 'tmp_weights.h5')
+    tmp_weights_path = os.path.join(tempfile.gettempdir(), f'tmp_weights{mp.current_process().pid}.h5')
     model.save_weights(tmp_weights_path)
 
     # load the model from the config

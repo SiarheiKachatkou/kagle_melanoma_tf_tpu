@@ -28,10 +28,10 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 
 use_tpu_2 = False
-is_local = False
-is_kaggle = True
+is_local = True
+is_kaggle = False
 is_debug = False
-do_validate=True
+do_validate = False
 
 if args.gpus is not None:
     os.environ["CUDA_VISIBLE_DEVICES"] = args.gpus
@@ -53,7 +53,7 @@ if (not is_local) and (not is_kaggle):
 EPOCHS_FINE_TUNE = 0
 EPOCHS_FULL = 1 if is_debug else 12
 
-IMAGE_HEIGHT = 384
+IMAGE_HEIGHT = 128
 
 IMAGE_SIZE=[IMAGE_HEIGHT, IMAGE_HEIGHT]
 
@@ -88,7 +88,7 @@ red = 4 if use_tpu_2 else 1
 if is_local:
     red=4
 
-BATCH_SIZE = 128 if is_debug else 256
+BATCH_SIZE = 128 if is_debug else 64
 
 TRAIN_STEPS = 1 if is_debug else None
 
@@ -111,7 +111,7 @@ hair_prob=args.hair_prob
 microscope_prob=args.microscope_prob
 lr_warm_up_epochs=args.lr_warm_up_epochs
 
-work_dir_name = f'artifacts/tpu_{model}_focal_loss_{IMAGE_HEIGHT}_epochs_{EPOCHS_FULL}_drop_{dropout_rate}_lr_max{args.lr_max}_lr_dacay_{args.lr_exp_decay}_hair_prob_{hair_prob}_micro_prob_{microscope_prob}_wu_epochs_{lr_warm_up_epochs}' if not is_debug else 'debug'
+work_dir_name = f'artifacts/val_quality_12_{model}_focal_loss_{IMAGE_HEIGHT}_epochs_{EPOCHS_FULL}_drop_{dropout_rate}_lr_max{args.lr_max}_lr_dacay_{args.lr_exp_decay}_hair_prob_{hair_prob}_micro_prob_{microscope_prob}_wu_epochs_{lr_warm_up_epochs}' if not is_debug else 'debug'
 
 
 CONFIG=config(lr_max=args.lr_max*1e-4, lr_start=5e-6, stepsize=3, lr_warm_up_epochs=lr_warm_up_epochs,
