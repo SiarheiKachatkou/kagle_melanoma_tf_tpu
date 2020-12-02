@@ -28,8 +28,8 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 
 use_tpu_2 = False
-is_local = True
-is_kaggle = False
+is_local = False
+is_kaggle = True
 is_debug = False
 do_validate = False
 
@@ -53,7 +53,7 @@ if (not is_local) and (not is_kaggle):
 EPOCHS_FINE_TUNE = 0
 EPOCHS_FULL = 1 if is_debug else 12
 
-IMAGE_HEIGHT = 128
+IMAGE_HEIGHT = 384
 
 IMAGE_SIZE=[IMAGE_HEIGHT, IMAGE_HEIGHT]
 
@@ -88,7 +88,7 @@ red = 4 if use_tpu_2 else 1
 if is_local:
     red=4
 
-BATCH_SIZE = 128 if is_debug else 64
+BATCH_SIZE = 128 if is_debug else 64*4
 
 TRAIN_STEPS = 1 if is_debug else None
 
@@ -114,11 +114,13 @@ lr_warm_up_epochs=args.lr_warm_up_epochs
 work_dir_name = f'artifacts/val_quality_12_{model}_focal_loss_{IMAGE_HEIGHT}_epochs_{EPOCHS_FULL}_drop_{dropout_rate}_lr_max{args.lr_max}_lr_dacay_{args.lr_exp_decay}_hair_prob_{hair_prob}_micro_prob_{microscope_prob}_wu_epochs_{lr_warm_up_epochs}' if not is_debug else 'debug'
 
 
-CONFIG=config(lr_max=args.lr_max*1e-4, lr_start=5e-6, stepsize=3, lr_warm_up_epochs=lr_warm_up_epochs,
+CONFIG=config(lr_max=args.lr_max*1e-4, lr_start=5e-6, stepsize=3,
+              lr_warm_up_epochs=lr_warm_up_epochs,
               lr_min=1e-6,lr_exp_decay=args.lr_exp_decay,lr_fn='get_lrfn(CONFIG)',#get_cycling_lrfn(CONFIG) #
               nfolds=4, l2_penalty=penalty, work_dir=work_dir_name,
               gs_work_dir=f'gs://kochetkov_kaggle_melanoma/{str(datetime.datetime.now())[:20]}_{work_dir_name}',
-              model_fn_str=f"efficientnet.tfkeras.EfficientNet{model}(weights='imagenet', include_top=False)", ttas=6,
+              model_fn_str=f"efficientnet.tfkeras.EfficientNet{model}(weights='imagenet', include_top=False)",
+              ttas=12,
               use_metrics=True, dropout_rate=dropout_rate,
               save_last_epochs=0,
               oversample_mult=args.oversample_mult,
