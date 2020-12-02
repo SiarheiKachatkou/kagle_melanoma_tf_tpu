@@ -6,12 +6,14 @@ import numpy as np
 from plot_utils import parse_model_fn,parse_config,plot_pde
 
 
-prefix='artifacts/val_quality_11_'
+prefix='artifacts/val_quality_12_'
 val=pd.read_csv(prefix+'table.csv')
 yaml_parsers_fns={'model_fn_str':parse_model_fn}
 yaml_ignore_keys={'gs_work_dir','work_dir','lr_fn'}
 target_key='avg_test_auc'
-features = [('hair_prob','microscope_prob'), 'hair_prob','microscope_prob','focal_loss_alpha','lr_warm_up_epochs']
+features = [('hair_prob','model_fn_str'),('microscope_prob','model_fn_str'),
+            ('lr_warm_up_epochs','lr_max'),
+            ('model_fn_str','dropout_rate')]
 
 
 vals_array=[]

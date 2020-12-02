@@ -4,8 +4,8 @@ import multiprocessing as mp
 from tqdm import tqdm
 from itertools import product
 
-hparams={'backbone':['B0','B1'], 'dropout_rate':[0.01,0], 'lr_max':[10,30], 'lr_exp_decay':[0.8,0.5],'focal_loss_gamma':[2,4],
-         'focal_loss_alpha':[0.5,0.8],'hair_prob':[0,0.1,0.3],'microscope_prob':[0,0.01,0.02],'lr_warm_up_epochs':[0,5,7]}
+hparams={'backbone':['B0','B1'], 'dropout_rate':[0.005,0.001], 'lr_max':[8,20], 'lr_exp_decay':[0.8,0.5],'focal_loss_gamma':[2,4],
+         'focal_loss_alpha':[0.5,0.8],'hair_prob':[0,0.05, 0.1,0.3],'microscope_prob':[0,0.01],'lr_warm_up_epochs':[2,6,8]}
 
 
 keys=list(hparams.keys())

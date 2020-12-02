@@ -13,7 +13,7 @@
     <option name="ADD_SOURCE_ROOTS" value="true" />
     <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
     <option name="SCRIPT_NAME" value="$PROJECT_DIR$/submit.py" />
-    <option name="PARAMETERS" value="--work_dir=1 --folds=1" />
+    <option name="PARAMETERS" value="--work_dir=$PROJECT_DIR$/artifacts/val_quality_12_B0_focal_loss_128_epochs_12_drop_0.0_lr_max10.0_lr_dacay_0.5_hair_prob_0.1_micro_prob_0.0_wu_epochs_7 --folds=4" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="false" />

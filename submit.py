@@ -11,6 +11,9 @@ import glob
 def calc_auc(subm):
     preds=subm['target'].values
     labels=subm['labels'].values
+    if len(set(labels))==1:
+        print('warning calc_auc with single label dataset, return 0')
+        return 0
     return metrics.roc_auc_score(labels, preds)
 
 
