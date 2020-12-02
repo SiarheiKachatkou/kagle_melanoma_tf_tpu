@@ -53,7 +53,7 @@ if (not is_local) and (not is_kaggle):
 EPOCHS_FINE_TUNE = 0
 EPOCHS_FULL = 1 if is_debug else 12
 
-IMAGE_HEIGHT = 384
+IMAGE_HEIGHT = 512
 
 IMAGE_SIZE=[IMAGE_HEIGHT, IMAGE_HEIGHT]
 
@@ -76,7 +76,8 @@ else:
                 #384: {'new': 'data/isic2020-384-colornormed-tfrecord/train*.tfrec','old':''},
                 #384: {'new':'gs://kds-76800f320871e548ef017f0a5a63cef5c72d1d47d6e020c81edfa286/train*.tfrec','old':''},
                 384: {'new': 'gs://kds-e7dc2af9732a2987e99fc221b0c3f6278bcf5d0ef6c99302da0a7f50/train*.tfrec','old':''},
-                512: {'new': 'gs://kaggle_melanoma_isic/isic2020-512-colornormed-tfrecord/train*.tfrec', 'old':''},
+                #512: {'new': 'gs://kaggle_melanoma_isic/isic2020-512-colornormed-tfrecord/train*.tfrec', 'old':''},
+                512: {'new': 'gs://kds-cb7c9aaea4b354a2b47b2c0f5feced50c9ddb98be03f7856e9e71642/train*.tfrec','old':''},
                 768: {'new': 'gs://kaggle_melanoma_isic/isic2020-768-colornormed-tfrecord/archive/train*.tfrec',
                       'old': 'gs://kaggle_melanoma_isic/old-768-tfrecord/train*.tfrec'}
     }
