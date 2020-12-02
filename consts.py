@@ -31,7 +31,7 @@ use_tpu_2 = False
 is_local = False
 is_kaggle = True
 is_debug = False
-do_validate = False
+do_validate = True
 
 if args.gpus is not None:
     os.environ["CUDA_VISIBLE_DEVICES"] = args.gpus
