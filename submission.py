@@ -5,6 +5,14 @@ import gc
 
 def make_submission_dataframe(test_dataset, model):
 
+    '''
+    ds_test = get_dataset(files_test, labeled=False, return_image_names=False, augment=True,
+                          repeat=True, shuffle=False, dim=IMG_SIZES[fold], batch_size=BATCH_SIZES[fold] * 4)
+    ct_test = count_data_items(files_test)
+    STEPS = TTA * ct_test / BATCH_SIZES[fold] / 4 / REPLICAS
+    pred = model_predict(model, ds_test, steps=STEPS, verbose=VERBOSE)[:TTA * ct_test, ]
+    preds[:, 0] += np.mean(pred.reshape((ct_test, TTA), order='F'), axis=1) * WGTS[fold]
+    '''
     preds=[]
     names=[]
     labs=[]

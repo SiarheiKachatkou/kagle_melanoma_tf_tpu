@@ -1,7 +1,6 @@
 import re
 import numpy as np
 import tensorflow as tf
-from consts import BATCH_SIZE
 from sklearn.model_selection import KFold
 
 
@@ -14,8 +13,6 @@ def count_data_items(filenames):
 def get_test_filenames(gs_path_to_dataset_train):
     gcs_pattern = gs_path_to_dataset_train.replace('train', 'test')
     test_filenames = tf.io.gfile.glob(gcs_pattern)
-    test_steps = count_data_items(test_filenames) // BATCH_SIZE
-    print("TTEST IMAGES: ", count_data_items(test_filenames), ", STEPS PER EPOCH: ", test_steps)
     return test_filenames
 
 

@@ -112,9 +112,9 @@ def load_dataset_old(fileimages_old):
     dataset = force_image_sizes(dataset, IMAGE_SIZE)
     return dataset
 
-def _augm_dataset(dataset, augm_fn):
+def _augm_dataset(dataset, augm_fn, batch_size):
     dataset = dataset.map(augm_fn, num_parallel_calls=_num_parallel_calls())
-    dataset = dataset.batch(BATCH_SIZE)
+    dataset = dataset.batch(batch_size)
     dataset = dataset.prefetch(AUTO)
     return dataset
 
@@ -123,9 +123,9 @@ def _augm_batched_dataset(dataset,batch_augm_fn):
     return dataset
 
 
-def _get_dataset(filenames,is_test,augm_fn):
+def _get_dataset(filenames,is_test,augm_fn, batch_size):
     dataset = load_dataset(filenames, is_test=is_test)
-    return _augm_dataset(dataset,augm_fn)
+    return _augm_dataset(dataset,augm_fn,batch_size)
 
 
 def get_training_dataset(training_fileimages, training_fileimages_old, config, repeats=None):
@@ -139,15 +139,12 @@ def get_training_dataset(training_fileimages, training_fileimages_old, config, r
     if config.oversample_mult!=1:
         dataset=oversample(dataset,config)
     augm_fn=partial(augment_train,config=config)
-    dataset = _augm_dataset(dataset,augm_fn)
-    #dataset = dataset.batch(BATCH_SIZE)
-    #dataset = dataset.prefetch(AUTO)
-
+    dataset = _augm_dataset(dataset,augm_fn,config.batch_size)
     return dataset
 
-def get_validation_dataset_tta(val_filenames, cut_mix_prob=0):
+def get_validation_dataset_tta(val_filenames, config, cut_mix_prob=0):
 
-    dataset = _get_dataset(val_filenames,is_test=False,augm_fn=augment_tta)
+    dataset = _get_dataset(val_filenames,is_test=False,augm_fn=augment_tta,batch_size=config.batch_size_inference)
     if cut_mix_prob!=0:
         cut_mix_fn = partial(cut_mix, prob=cut_mix_prob)
         dataset = _augm_batched_dataset(dataset, cut_mix_fn)
@@ -155,23 +152,23 @@ def get_validation_dataset_tta(val_filenames, cut_mix_prob=0):
 
 
 
-def get_validation_dataset(val_filenames, is_augment=False):
+def get_validation_dataset(val_filenames, config, is_augment=False):
     augm_fn=augment_val_aug if is_augment else  augment_val
-    return _get_dataset(val_filenames, is_test=False, augm_fn=augm_fn)
+    return _get_dataset(val_filenames, is_test=False, augm_fn=augm_fn,batch_size=config.batch_size_inference)
 
 
-def get_test_dataset_tta(test_filenames):
-    return _get_dataset(test_filenames, is_test=True, augm_fn=augment_tta)
+def get_test_dataset_tta(test_filenames,config):
+    return _get_dataset(test_filenames, is_test=True, augm_fn=augment_tta,batch_size=config.batch_size_inference)
 
 
-def get_test_dataset(test_filenames):
-    return _get_dataset(test_filenames, is_test=True, augm_fn=augment_test)
+def get_test_dataset(test_filenames,config):
+    return _get_dataset(test_filenames, is_test=True, augm_fn=augment_test,batch_size=config.batch_size_inference)
 
-def get_test_dataset_with_labels(test_filenames):
-    return _get_dataset(test_filenames, is_test=False, augm_fn=augment_test)
+def get_test_dataset_with_labels(test_filenames,config):
+    return _get_dataset(test_filenames, is_test=False, augm_fn=augment_test,batch_size=config.batch_size_inference)
 
-def get_test_dataset_with_labels_tta(test_filenames):
-    return _get_dataset(test_filenames, is_test=False, augm_fn=augment_tta)
+def get_test_dataset_with_labels_tta(test_filenames,config):
+    return _get_dataset(test_filenames, is_test=False, augm_fn=augment_tta,batch_size=config.batch_size_inference)
 
 
 def return_2_values(dataset):
