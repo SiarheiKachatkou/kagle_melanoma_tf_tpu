@@ -13,34 +13,18 @@ def make_submission_dataframe(test_dataset, model):
     pred = model_predict(model, ds_test, steps=STEPS, verbose=VERBOSE)[:TTA * ct_test, ]
     preds[:, 0] += np.mean(pred.reshape((ct_test, TTA), order='F'), axis=1) * WGTS[fold]
     '''
-    preds=[]
+    preds=model.predict(test_dataset, verbose=True)
+    preds=preds.astype(np.float)
+
     names=[]
     labs=[]
-    def _process_batch(batch):
-        images, labels, image_names = batch
-        labs.extend(labels.numpy())
-        image_names = image_names.numpy()
-
-        predictions = model.predict(images, workers=8, use_multiprocessing=True)
-        preds.extend(predictions)
-        names.extend(image_names)
-
-    if isinstance(test_dataset,tuple):
-        dataset,steps=test_dataset
-        iterator=iter(dataset)
-        for _ in tqdm(range(steps)):
-            batch = iterator.get_next()
-            _process_batch(batch)
-    else:
-        for batch in tqdm(test_dataset):
-            _process_batch(batch)
-
+    for _, label, name in test_dataset.unbatch():
+        names.append(name.numpy().decode('utf-8') )
+        labs.append(label.numpy())
 
     gc.collect()
 
-    names=[n.decode('utf-8') for n in names]
     names=np.array(names)
-    preds=np.array(preds).astype(np.float32)
     labs=np.array(labs)
     #labs=np.argmax(labs,axis=1)
     names = np.reshape(names, (-1, 1))
