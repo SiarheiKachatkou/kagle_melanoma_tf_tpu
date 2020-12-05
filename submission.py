@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from tqdm import tqdm
+from dataset_utils import return_2_values
 import gc
 
 def make_submission_dataframe(test_dataset, model,repeats=1):
@@ -14,7 +14,7 @@ def make_submission_dataframe(test_dataset, model,repeats=1):
     preds[:, 0] += np.mean(pred.reshape((ct_test, TTA), order='F'), axis=1) * WGTS[fold]
     '''
     test_dataset=test_dataset.repeat(repeats)
-    preds=model.predict(test_dataset, verbose=True)
+    preds=model.predict(return_2_values(test_dataset), verbose=True)
     preds=preds.astype(np.float)
 
     names=[]
