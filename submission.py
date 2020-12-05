@@ -3,7 +3,7 @@ import pandas as pd
 from tqdm import tqdm
 import gc
 
-def make_submission_dataframe(test_dataset, model):
+def make_submission_dataframe(test_dataset, model,repeats=1):
 
     '''
     ds_test = get_dataset(files_test, labeled=False, return_image_names=False, augment=True,
@@ -13,6 +13,7 @@ def make_submission_dataframe(test_dataset, model):
     pred = model_predict(model, ds_test, steps=STEPS, verbose=VERBOSE)[:TTA * ct_test, ]
     preds[:, 0] += np.mean(pred.reshape((ct_test, TTA), order='F'), axis=1) * WGTS[fold]
     '''
+    test_dataset=test_dataset.repeat(repeats)
     preds=model.predict(test_dataset, verbose=True)
     preds=preds.astype(np.float)
 
@@ -30,11 +31,21 @@ def make_submission_dataframe(test_dataset, model):
     names = np.reshape(names, (-1, 1))
     labs = np.reshape(labs, (-1, 1)).astype(np.int32)
 
-    data=np.concatenate([names,preds,labs],axis=1)
-    df_submission = pd.DataFrame(data,columns=['image_name','target','labels'])
-    df_submission = df_submission.sort_values(by='image_name')
+    if repeats==1:
+        data=np.concatenate([names,preds,labs],axis=1)
+        df_submission = pd.DataFrame(data,columns=['image_name','target','labels'])
+        df_submission = df_submission.sort_values(by='image_name')
+        return df_submission
+    else:
+        df_submissions = []
+        dataset_length=len(preds)//repeats
+        for r in range(repeats):
+            data = np.concatenate([names, preds[r*dataset_length:(r+1)*dataset_length], labs], axis=1)
+            df_submission = pd.DataFrame(data, columns=['image_name', 'target', 'labels'])
+            df_submission = df_submission.sort_values(by='image_name')
+            df_submissions.append(df_submission)
     
-    return df_submission
+    return df_submissions
 
 def avg_submissions(subms_list):
     subms=[s.sort_values(by='image_name') for s in subms_list]
@@ -58,8 +69,7 @@ def make_submissions_all_kind(test_dataset, test_dataset_tta, models, ttas=3):
     
     single_model_tta=[[s] for s in single_model]
     for i in range(len(models)):
-        for t in range(ttas):
-            single_model_tta[i].append(make_submission_dataframe(test_dataset_tta, models[i]))
+        single_model_tta[i].append(make_submission_dataframe(test_dataset_tta, models[i],repeats=ttas))
         
     single_model_tta=[avg_submissions(s_list) for s_list in single_model_tta]
     
