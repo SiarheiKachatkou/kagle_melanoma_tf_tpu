@@ -13,15 +13,15 @@ def make_submission_dataframe(test_dataset, model,repeats=1):
     pred = model_predict(model, ds_test, steps=STEPS, verbose=VERBOSE)[:TTA * ct_test, ]
     preds[:, 0] += np.mean(pred.reshape((ct_test, TTA), order='F'), axis=1) * WGTS[fold]
     '''
+    names = []
+    labs = []
+    for _, label, name in test_dataset.unbatch():
+        names.append(name.numpy().decode('utf-8'))
+        labs.append(label.numpy())
+
     test_dataset=test_dataset.repeat(repeats)
     preds=model.predict(return_2_values(test_dataset), verbose=True)
     preds=preds.astype(np.float)
-
-    names=[]
-    labs=[]
-    for _, label, name in test_dataset.unbatch():
-        names.append(name.numpy().decode('utf-8') )
-        labs.append(label.numpy())
 
     gc.collect()
 
@@ -41,7 +41,7 @@ def make_submission_dataframe(test_dataset, model,repeats=1):
         dataset_length=len(preds)//repeats
         for r in range(repeats):
             the_slice=slice(r*dataset_length,(r+1)*dataset_length)
-            data = np.concatenate([names[the_slice], preds[the_slice], labs[the_slice]], axis=1)
+            data = np.concatenate([names, preds[the_slice], labs], axis=1)
             df_submission = pd.DataFrame(data, columns=['image_name', 'target', 'labels'])
             df_submission = df_submission.sort_values(by='image_name')
             df_submissions.append(df_submission)
