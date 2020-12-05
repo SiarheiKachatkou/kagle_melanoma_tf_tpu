@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 import glob
-prefix='artifacts/val_quality_12_'
+prefix='artifacts/val_quality_13_'
 metrics_files=glob.glob(prefix+'*/metric.txt')
 
 ms=[]
