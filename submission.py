@@ -1,7 +1,14 @@
 import numpy as np
 import pandas as pd
-from dataset_utils import return_2_values
 import gc
+
+import tensorflow as tf
+AUTO = tf.data.experimental.AUTOTUNE
+def return_2_values(dataset):
+    def two(a1,a2,*args):
+        return a1,a2
+    ds=dataset.map(two,num_parallel_calls=AUTO)
+    return ds
 
 def make_submission_dataframe(test_dataset, model,repeats=1):
 
