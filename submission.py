@@ -70,7 +70,7 @@ def make_submissions_all_kind(test_dataset, test_dataset_tta, models, ttas=3):
     
     single_model_tta=[[s] for s in single_model]
     for i in range(len(models)):
-        single_model_tta[i].append(make_submission_dataframe(test_dataset_tta, models[i],repeats=ttas))
+        single_model_tta[i].extend(make_submission_dataframe(test_dataset_tta, models[i],repeats=ttas))
         
     single_model_tta=[avg_submissions(s_list) for s_list in single_model_tta]
     
