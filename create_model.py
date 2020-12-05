@@ -4,7 +4,6 @@ import efficientnet.tfkeras as efn
 import os
 import tempfile
 import tensorflow.keras.backend as K
-from consts import BATCH_SIZE
 import multiprocessing as mp
 
 
@@ -33,11 +32,12 @@ def add_regularization(model, regularizer=tf.keras.regularizers.l2(0.0001)):
     return model
 
 class BinaryFocalLoss():
-    def __init__(self, gamma=0.2, alpha=0.25):
+    def __init__(self, batch_size, gamma=0.2, alpha=0.25):
         # alpha - account for imbalance, alpha=[0,1] how much positive more important then negative"
         # gamma - focus on hard examples increasing gamma increase focus on hard examples"
         self._alpha=alpha
         self._gamma=gamma
+        self._batch_size=batch_size
         self.__name__="BinaryFocalLoss"
     """
     Binary form of focal loss.
@@ -62,11 +62,11 @@ class BinaryFocalLoss():
         pt_0 = K.clip(pt_0, epsilon, 1. - epsilon)
         loss = -K.sum(self._alpha * K.pow(1. - pt_1, self._gamma) * K.log(pt_1)) \
                -K.sum((1 - self._alpha) * K.pow(pt_0, self._gamma) * K.log(1. - pt_0))
-        return loss/BATCH_SIZE
+        return loss/self._batch_size
 
 
 def compile_model(model, metrics, cfg, lr=None):
-    loss = BinaryFocalLoss(gamma=cfg.focal_loss_gamma,alpha=cfg.focal_loss_alpha)#tf.keras.losses.BinaryCrossentropy()#label_smoothing=0.05)
+    loss = BinaryFocalLoss(gamma=cfg.focal_loss_gamma,alpha=cfg.focal_loss_alpha, batch_size=cfg.batch_size)#tf.keras.losses.BinaryCrossentropy()#label_smoothing=0.05)
 
     learning_rate = cfg.lr_start if lr is None else lr
 

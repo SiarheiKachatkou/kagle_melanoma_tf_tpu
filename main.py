@@ -54,9 +54,9 @@ for fold in range(CONFIG.nfolds):
         model.summary()
         training_dataset = get_training_dataset(train_filenames_folds[fold], DATASETS[IMAGE_HEIGHT]['old'], CONFIG)
         if TRAIN_STEPS is None:
-            TRAIN_STEPS=count_data_items(train_filenames_folds[fold])//BATCH_SIZE
+            TRAIN_STEPS=count_data_items(train_filenames_folds[fold])//CONFIG.batch_size
         print(f'TRAIN_STEPS={TRAIN_STEPS}')
-        validation_dataset = get_validation_dataset(val_filenames_folds[fold])
+        validation_dataset = get_validation_dataset(val_filenames_folds[fold],CONFIG)
 
         history_fine_tune = model.fit(return_2_values(training_dataset),
                                       validation_data=return_2_values(validation_dataset) if do_validate else None,
@@ -83,15 +83,15 @@ for fold in range(CONFIG.nfolds):
 
 
 
-        validation_dataset = get_validation_dataset(val_filenames_folds[fold])
-        validation_dataset_tta = get_validation_dataset_tta(val_filenames_folds[fold])
+        validation_dataset = get_validation_dataset(val_filenames_folds[fold],CONFIG)
+        validation_dataset_tta = get_validation_dataset_tta(val_filenames_folds[fold],CONFIG)
         submission.calc_and_save_submissions(CONFIG, model, f'val_{fold}', validation_dataset, validation_dataset_tta,
                                              CONFIG.ttas)
         del validation_dataset
         del validation_dataset_tta
 
-        test_dataset = get_test_dataset(test_filenames)
-        test_dataset_tta = get_test_dataset_tta(test_filenames)
+        test_dataset = get_test_dataset(test_filenames,CONFIG)
+        test_dataset_tta = get_test_dataset_tta(test_filenames,CONFIG)
         submission.calc_and_save_submissions(CONFIG, model, f'test_{fold}', test_dataset, test_dataset_tta, CONFIG.ttas)
         del test_dataset
         del test_dataset_tta
