@@ -40,7 +40,8 @@ def make_submission_dataframe(test_dataset, model,repeats=1):
         df_submissions = []
         dataset_length=len(preds)//repeats
         for r in range(repeats):
-            data = np.concatenate([names, preds[r*dataset_length:(r+1)*dataset_length], labs], axis=1)
+            the_slice=slice(r*dataset_length,(r+1)*dataset_length)
+            data = np.concatenate([names[the_slice], preds[the_slice], labs[the_slice]], axis=1)
             df_submission = pd.DataFrame(data, columns=['image_name', 'target', 'labels'])
             df_submission = df_submission.sort_values(by='image_name')
             df_submissions.append(df_submission)
