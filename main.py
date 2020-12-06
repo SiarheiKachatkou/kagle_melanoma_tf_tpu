@@ -6,8 +6,9 @@ import subprocess
 from matplotlib import pyplot as plt
 from lr import get_lrfn, get_cycling_lrfn
 from display_utils import display_training_curves, plot_lr
-from consts import *
+from config import CONFIG, TRAIN_STEPS
 from dataset_utils import *
+from consts import DATASETS
 import submission
 import shutil
 from create_model import BinaryFocalLoss
@@ -18,14 +19,14 @@ from history import join_history
 if not os.path.exists(CONFIG.work_dir):
     os.makedirs(CONFIG.work_dir)
     
-shutil.copyfile('consts.py',os.path.join(CONFIG.work_dir,'consts.py'))
+shutil.copyfile('config.py',os.path.join(CONFIG.work_dir,'config.py'))
 
 lrfn = eval(CONFIG.lr_fn)
-plot_lr(lrfn,EPOCHS_FULL,CONFIG.work_dir)
+plot_lr(lrfn,CONFIG.epochs_full,CONFIG.work_dir)
 lr_callback = tf.keras.callbacks.LearningRateScheduler(lrfn, verbose=True)
 
-train_filenames_folds, val_filenames_folds=get_train_val_filenames(DATASETS[IMAGE_HEIGHT]['new'],CONFIG.nfolds)
-test_filenames=get_test_filenames(DATASETS[IMAGE_HEIGHT]['new'])
+train_filenames_folds, val_filenames_folds=get_train_val_filenames(DATASETS[CONFIG.image_height]['new'],CONFIG.nfolds)
+test_filenames=get_test_filenames(DATASETS[CONFIG.image_height]['new'])
 if is_debug:
     test_filenames = [test_filenames[0]]
     train_filenames_folds=[[f[0]] for f in train_filenames_folds]
@@ -39,9 +40,9 @@ for fold in range(CONFIG.nfolds):
     save_callback_best = tf.keras.callbacks.ModelCheckpoint(
         model_file_path, monitor='val_loss', verbose=0, save_best_only=True,
         mode='min', save_freq='epoch')
-    save_callback_last=SaveLastCallback(CONFIG.work_dir, fold, EPOCHS_FULL, CONFIG.save_last_epochs)
+    save_callback_last=SaveLastCallback(CONFIG.work_dir, fold, CONFIG.epochs_full, CONFIG.save_last_epochs)
 
-    save_callback=SaveLastCallback(CONFIG.work_dir,fold=fold, epochs=EPOCHS_FULL,
+    save_callback=SaveLastCallback(CONFIG.work_dir,fold=fold, epochs=CONFIG.epochs_full,
                                    save_last_epochs=CONFIG.save_last_epochs)
 
     callbacks=[lr_callback,save_callback_best,save_callback_last]
@@ -52,7 +53,7 @@ for fold in range(CONFIG.nfolds):
         model = create_model(CONFIG, metrics, backbone_trainable=False)
 
         model.summary()
-        training_dataset = get_training_dataset(train_filenames_folds[fold], DATASETS[IMAGE_HEIGHT]['old'], CONFIG)
+        training_dataset = get_training_dataset(train_filenames_folds[fold], DATASETS[CONFIG.image_height]['old'], CONFIG)
         if TRAIN_STEPS is None:
             TRAIN_STEPS=count_data_items(train_filenames_folds[fold])//CONFIG.batch_size
         print(f'TRAIN_STEPS={TRAIN_STEPS}')
@@ -61,13 +62,13 @@ for fold in range(CONFIG.nfolds):
         history_fine_tune = model.fit(return_2_values(training_dataset),
                                       validation_data=return_2_values(validation_dataset) if do_validate else None,
                                       steps_per_epoch=TRAIN_STEPS,
-                                      epochs=EPOCHS_FINE_TUNE, callbacks=callbacks)
+                                      epochs=CONFIG.epochs_fine_tune, callbacks=callbacks)
 
         model = set_backbone_trainable(model, metrics, True, CONFIG)
 
         history = model.fit(return_2_values(training_dataset),
                             validation_data=return_2_values(validation_dataset)  if do_validate else None,
-                            steps_per_epoch=TRAIN_STEPS, initial_epoch=EPOCHS_FINE_TUNE, epochs=EPOCHS_FULL, callbacks=callbacks)
+                            steps_per_epoch=TRAIN_STEPS, initial_epoch=CONFIG.epochs_fine_tune, epochs=CONFIG.epochs_full, callbacks=callbacks)
 
         history = join_history(history_fine_tune, history)
         print(history.history)

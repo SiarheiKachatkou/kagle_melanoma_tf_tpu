@@ -1,12 +1,11 @@
 import tensorflow as tf
-from consts import IMAGE_HEIGHT, is_local, path_hair_images
-
+from consts import path_hair_images
 
 hair_images = tf.io.gfile.glob(path_hair_images + '/*.png')
 hair_images_tf=tf.convert_to_tensor(hair_images)
 
 # the maximum number of hairs to augment:
-n_max = 20
+N_MAX = 20
 
 
 def _augm_color_hair(hair):
@@ -24,7 +23,7 @@ def hair_aug_tf(input_img_8u, config):
 
         # Copy the input image, so it won't be changed
         img = tf.identity(input_img_8u)
-        n_hairs = tf.random.uniform(shape=[], maxval=tf.constant(n_max) + 1, dtype=tf.int32)
+        n_hairs = tf.random.uniform(shape=[], maxval=tf.constant(N_MAX) + 1, dtype=tf.int32)
 
         im_height = tf.shape(img)[0]
         im_width = tf.shape(img)[1]
@@ -39,8 +38,8 @@ def hair_aug_tf(input_img_8u, config):
             fname = hair_images_tf[i]
             bits = tf.io.read_file(fname)
             hair = tf.image.decode_jpeg(bits)
-            hair_height=tf.random.uniform(shape=[], minval=IMAGE_HEIGHT//5, maxval=IMAGE_HEIGHT//2, dtype=tf.int32)
-            hair_width = tf.random.uniform(shape=[], minval=IMAGE_HEIGHT //5, maxval=IMAGE_HEIGHT//2, dtype=tf.int32)
+            hair_height=tf.random.uniform(shape=[], minval=config.image_height//5, maxval=config.image_height//2, dtype=tf.int32)
+            hair_width = tf.random.uniform(shape=[], minval=config.image_height //5, maxval=config.image_height//2, dtype=tf.int32)
             hair = tf.image.resize(hair, [hair_height, hair_width])
             hair = tf.image.random_flip_left_right(hair)
             hair = tf.image.random_flip_up_down(hair)

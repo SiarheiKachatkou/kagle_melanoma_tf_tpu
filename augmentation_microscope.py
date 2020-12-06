@@ -1,5 +1,5 @@
 import tensorflow as tf
-from consts import IMAGE_HEIGHT, is_local, path_microscope_images
+from consts import path_microscope_images
 from augmentations_geom import transform_geometricaly
 
 
@@ -17,8 +17,8 @@ def _augm_color_microscope(microscope_img):
     return microscope_img
 
 
-def _augm_geom_microscope(microscope_img):
-    microscope_img = transform_geometricaly(microscope_img,IMAGE_HEIGHT)
+def _augm_geom_microscope(microscope_img, image_height):
+    microscope_img = transform_geometricaly(microscope_img, image_height)
     return microscope_img
 
 
@@ -34,8 +34,8 @@ def microscope_aug_tf(input_img_8u, config):
         fname = microscope_images_tf[i]
         bits = tf.io.read_file(fname)
         microscope_img = tf.image.decode_jpeg(bits)
-        microscope_img = tf.image.resize(microscope_img, [IMAGE_HEIGHT, IMAGE_HEIGHT])
-        microscope_img = _augm_geom_microscope(microscope_img)
+        microscope_img = tf.image.resize(microscope_img, [config.image_height, config.image_height])
+        microscope_img = _augm_geom_microscope(microscope_img,config.image_height)
 
         gray = tf.image.rgb_to_grayscale(microscope_img)
 

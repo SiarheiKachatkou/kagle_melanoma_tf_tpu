@@ -44,7 +44,7 @@ def read_tfrecord(example):
     return image, class_label, image_name
 
 
-def read_tfrecord_test(example):
+def read_tfrecord_wo_labels(example):
 
     example = tf.io.parse_single_example(example, features_test)
     image = tf.image.decode_jpeg(example['image'], channels=3)
@@ -75,9 +75,10 @@ def force_image_sizes(dataset, image_size):
     return dataset
 
 
-def _ignore_order(dataset):
+def _ignore_order(dataset,is_deterministic):
     ignore_order = tf.data.Options()
-    if is_debug:
+    ignore_order.experimental_deterministic = True
+    if is_debug or is_deterministic:
         ignore_order.experimental_deterministic = True
     else:
         ignore_order.experimental_deterministic = False
@@ -86,30 +87,30 @@ def _ignore_order(dataset):
     return dataset
 
 
-def load_dataset(filenames, is_test):
+def load_dataset(filenames, is_wo_labels, is_deterministic, config):
     # Read from TFRecords. For optimal performance, reading from multiple files at once and
     # disregarding data order. Order does not matter since we will be shuffling the data anyway.
     dataset = tf.data.TFRecordDataset(filenames, num_parallel_reads=_num_parallel_calls()) # automatically interleaves reads from multiple files
-    dataset = _ignore_order(dataset)
+    dataset = _ignore_order(dataset,is_deterministic)
     dataset = dataset.cache()
-    the_read_tfrecord=read_tfrecord_test if is_test else read_tfrecord
+    the_read_tfrecord=read_tfrecord_wo_labels if is_wo_labels else read_tfrecord
     dataset = dataset.map(the_read_tfrecord, num_parallel_calls=_num_parallel_calls())
-    dataset = force_image_sizes(dataset, IMAGE_SIZE)
-    if not is_test: 
+    dataset = force_image_sizes(dataset, [config.image_height,config.image_height])
+    if (not is_wo_labels) and (not is_deterministic):
         dataset = dataset.shuffle(256)
         
     return dataset
 
 
-def load_dataset_old(fileimages_old):
+def load_dataset_old(fileimages_old, config):
 
     dataset = tf.data.TFRecordDataset(fileimages_old,
                                       num_parallel_reads=_num_parallel_calls())  # automatically interleaves reads from multiple files
-    dataset=_ignore_order(dataset)
+    dataset=_ignore_order(dataset,is_deterministic=False)
     dataset = dataset.cache()
     dataset = dataset.shuffle(512)
     dataset = dataset.map(read_tfrecord_old, num_parallel_calls=_num_parallel_calls())
-    dataset = force_image_sizes(dataset, IMAGE_SIZE)
+    dataset = force_image_sizes(dataset, [config.image_height,config.image_height])
     return dataset
 
 def _augm_dataset(dataset, augm_fn, batch_size):
@@ -123,15 +124,15 @@ def _augm_batched_dataset(dataset,batch_augm_fn):
     return dataset
 
 
-def _get_dataset(filenames,is_test,augm_fn, batch_size):
-    dataset = load_dataset(filenames, is_test=is_test)
+def _get_dataset(filenames,is_wo_labels,is_deterministic, augm_fn, batch_size, config):
+    dataset = load_dataset(filenames, is_wo_labels=is_wo_labels,is_deterministic=is_deterministic, config=config)
     return _augm_dataset(dataset,augm_fn,batch_size)
 
 
 def get_training_dataset(training_fileimages, training_fileimages_old, config, repeats=None):
-    dataset = load_dataset(training_fileimages, is_test=False)
+    dataset = load_dataset(training_fileimages, is_wo_labels=False, is_deterministic=False, config=config)
     if len(training_fileimages_old)!=0:
-        dataset_old = load_dataset_old(training_fileimages_old)
+        dataset_old = load_dataset_old(training_fileimages_old, config=config)
         dataset.concatenate(dataset_old)
 
     dataset = dataset.repeat(repeats)
@@ -144,7 +145,8 @@ def get_training_dataset(training_fileimages, training_fileimages_old, config, r
 
 def get_validation_dataset_tta(val_filenames, config, cut_mix_prob=0):
 
-    dataset = _get_dataset(val_filenames,is_test=False,augm_fn=augment_tta,batch_size=config.batch_size_inference)
+    dataset = _get_dataset(val_filenames,is_wo_labels=False,augm_fn=partial(augment_tta,config=config),
+                           batch_size=config.batch_size_inference,is_deterministic=True, config=config)
     if cut_mix_prob!=0:
         cut_mix_fn = partial(cut_mix, prob=cut_mix_prob)
         dataset = _augm_batched_dataset(dataset, cut_mix_fn)
@@ -154,21 +156,31 @@ def get_validation_dataset_tta(val_filenames, config, cut_mix_prob=0):
 
 def get_validation_dataset(val_filenames, config, is_augment=False):
     augm_fn=augment_val_aug if is_augment else  augment_val
-    return _get_dataset(val_filenames, is_test=False, augm_fn=augm_fn,batch_size=config.batch_size_inference)
+    augm_fn = partial(augm_fn, config=config)
+    return _get_dataset(val_filenames, is_wo_labels=False, augm_fn=augm_fn,batch_size=config.batch_size_inference,
+                        is_deterministic=True, config=config)
 
 
 def get_test_dataset_tta(test_filenames,config):
-    return _get_dataset(test_filenames, is_test=True, augm_fn=augment_tta,batch_size=config.batch_size_inference)
+    return _get_dataset(test_filenames, is_wo_labels=True, augm_fn=partial(augment_tta, config=config),
+                        batch_size=config.batch_size_inference,
+                        is_deterministic=True, config=config)
 
 
 def get_test_dataset(test_filenames,config):
-    return _get_dataset(test_filenames, is_test=True, augm_fn=augment_test,batch_size=config.batch_size_inference)
+    return _get_dataset(test_filenames, is_wo_labels=True, augm_fn=partial(augment_test,config=config),
+                        batch_size=config.batch_size_inference,
+                        is_deterministic=True, config=config)
 
 def get_test_dataset_with_labels(test_filenames,config):
-    return _get_dataset(test_filenames, is_test=False, augm_fn=augment_test,batch_size=config.batch_size_inference)
+    return _get_dataset(test_filenames, is_wo_labels=False, augm_fn=partial(augment_test,config=config),
+                        batch_size=config.batch_size_inference,
+                        is_deterministic=True, config=config)
 
 def get_test_dataset_with_labels_tta(test_filenames,config):
-    return _get_dataset(test_filenames, is_test=False, augm_fn=augment_tta,batch_size=config.batch_size_inference)
+    return _get_dataset(test_filenames, is_wo_labels=False, augm_fn=partial(augment_tta,config=config)
+                        ,batch_size=config.batch_size_inference,
+                        is_deterministic=True, config=config)
 
 
 def return_2_values(dataset):
