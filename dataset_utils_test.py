@@ -9,8 +9,8 @@ from dataset_utils import get_test_dataset,get_validation_dataset,get_test_datas
 
 
 def get_testval_files():
-    test_files = list(tf.io.gfile.glob(os.path.join(test_data_path, '128x128', '*test*')))
-    val_files = list(tf.io.gfile.glob(os.path.join(test_data_path, '128x128', '*train*')))
+    test_files = list(tf.io.gfile.glob(os.path.join(test_data_path,'128x128/test*.tfrec')))
+    val_files = list(tf.io.gfile.glob(os.path.join(test_data_path,'128x128/train*.tfrec')))
     return test_files, val_files
 
 
