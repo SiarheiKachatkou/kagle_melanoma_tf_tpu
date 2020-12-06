@@ -7,8 +7,8 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 
 use_tpu_2 = False
-is_local = True
-is_kaggle = False
+is_local = False
+is_kaggle = True
 is_debug = False
 do_validate = True
 
