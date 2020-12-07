@@ -66,7 +66,7 @@ class BinaryFocalLoss():
 
 
 def compile_model(model, metrics, cfg, lr=None):
-    loss = BinaryFocalLoss(gamma=cfg.focal_loss_gamma,alpha=cfg.focal_loss_alpha, batch_size=cfg.batch_size)#tf.keras.losses.BinaryCrossentropy()#label_smoothing=0.05)
+    loss = tf.keras.losses.BinaryCrossentropy()#BinaryFocalLoss(gamma=cfg.focal_loss_gamma,alpha=cfg.focal_loss_alpha, batch_size=cfg.batch_size)#label_smoothing=0.05)
 
     learning_rate = cfg.lr_start if lr is None else lr
 
