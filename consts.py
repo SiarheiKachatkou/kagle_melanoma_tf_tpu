@@ -8,12 +8,12 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 use_tpu_2 = False
 is_local = False
-is_kaggle = True
+is_kaggle = False
 is_debug = False
 do_validate = False
 
 
-use_amp=True
+use_amp=False
 
 if (not is_local) and (not is_kaggle):
     tpu3 = "grpc://10.240.1.2:8470"

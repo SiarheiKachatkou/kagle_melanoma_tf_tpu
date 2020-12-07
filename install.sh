@@ -5,4 +5,5 @@ pip3 install -U efficientnet
 pip3 install tqdm
 pip3 install pandas
 pip3 install scikit-learn
+sudo apt install libgl1-mesa-glx -y
 #pip3 install tensorflow-addons
