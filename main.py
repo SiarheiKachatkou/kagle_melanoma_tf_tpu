@@ -2,11 +2,12 @@ import os
 import pickle
 import gc
 import tensorflow as tf
+import yaml
 import subprocess
 from matplotlib import pyplot as plt
 from lr import get_lrfn, get_cycling_lrfn
 from display_utils import display_training_curves, plot_lr
-from config import CONFIG, TRAIN_STEPS
+from getconfig import get_config
 from dataset_utils import *
 from consts import DATASETS
 import submission
@@ -16,10 +17,14 @@ from SaveLastCallback import SaveLastCallback
 from create_model import create_model, set_backbone_trainable
 from runtime import get_scope
 from history import join_history
+
+CONFIG=get_config()
 if not os.path.exists(CONFIG.work_dir):
     os.makedirs(CONFIG.work_dir)
-    
-shutil.copyfile('config.py',os.path.join(CONFIG.work_dir,'config.py'))
+
+with open(os.path.join(CONFIG.work_dir,'config.yaml'),'wt') as file:
+    config_dict=dict(CONFIG._asdict())
+    file.write(yaml.dump(config_dict))
 
 lrfn = eval(CONFIG.lr_fn)
 plot_lr(lrfn,CONFIG.epochs_full,CONFIG.work_dir)
@@ -54,21 +59,23 @@ for fold in range(CONFIG.nfolds):
 
         model.summary()
         training_dataset = get_training_dataset(train_filenames_folds[fold], DATASETS[CONFIG.image_height]['old'], CONFIG)
-        if TRAIN_STEPS is None:
-            TRAIN_STEPS=count_data_items(train_filenames_folds[fold])//CONFIG.batch_size
-        print(f'TRAIN_STEPS={TRAIN_STEPS}')
+        if CONFIG.train_steps is None:
+            train_steps=count_data_items(train_filenames_folds[fold])//CONFIG.batch_size
+        else:
+            train_steps=CONFIG.train_steps
+        print(f'TRAIN_STEPS={train_steps}')
         validation_dataset = get_validation_dataset(val_filenames_folds[fold],CONFIG)
 
         history_fine_tune = model.fit(return_2_values(training_dataset),
                                       validation_data=return_2_values(validation_dataset) if do_validate else None,
-                                      steps_per_epoch=TRAIN_STEPS,
+                                      steps_per_epoch=train_steps,
                                       epochs=CONFIG.epochs_fine_tune, callbacks=callbacks)
 
         model = set_backbone_trainable(model, metrics, True, CONFIG)
 
         history = model.fit(return_2_values(training_dataset),
                             validation_data=return_2_values(validation_dataset)  if do_validate else None,
-                            steps_per_epoch=TRAIN_STEPS, initial_epoch=CONFIG.epochs_fine_tune, epochs=CONFIG.epochs_full, callbacks=callbacks)
+                            steps_per_epoch=train_steps, initial_epoch=CONFIG.epochs_fine_tune, epochs=CONFIG.epochs_full, callbacks=callbacks)
 
         history = join_history(history_fine_tune, history)
         print(history.history)

@@ -41,6 +41,7 @@ def read_tfrecord(example):
     image = tf.cast(image, dtype=tf.float32)
     image_name = tf.cast(example['image_name'], tf.string)
     class_label = tf.cast(example['target'], label_type)
+    #print(f'{image} {class_label} {image_name}')
     return image, class_label, image_name
 
 
