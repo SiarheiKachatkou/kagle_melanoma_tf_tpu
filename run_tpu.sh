@@ -13,10 +13,12 @@ ctpu up --project=${PROJECT_ID} \
  --machine-type=n1-standard-8
  #--preemptible
 
+exit 0
+
 git clone https://github.com/SiarheiKachatkou/kagle_melanoma_tf_tpu.git &&
 cd kagle_melanoma_tf_tpu &&
 ./install.sh &&
-sudo python3 main.py --backbone=B6 --dropout_rate=0.01 --lr_max=1 --lr_exp_decay=0.8 --focal_loss_gamma=2 --focal_loss_alpha=0.5 --hair_prob=0.01 --microscope_prob=0.01 --lr_warm_up_epochs=5 --image_height=384
+sudo python3 main.py --backbone=B6 --dropout_rate=0.01 --lr_max=1 --lr_exp_decay=0.8 --focal_loss_gamma=2 --focal_loss_alpha=0.5 --hair_prob=0.1 --microscope_prob=0.05 --lr_warm_up_epochs=5 --image_height=384
 
 exit 0
 
