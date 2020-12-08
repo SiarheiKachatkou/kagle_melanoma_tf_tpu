@@ -31,7 +31,7 @@ if not is_local:
 
 
 epochs_fine_tune = 0
-epochs_full = 1 if is_debug else 1#20
+epochs_full = 1 if is_debug else 20
 
 
 BATCH_SIZE = 128 if is_debug else 64*4

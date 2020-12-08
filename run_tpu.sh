@@ -9,7 +9,8 @@ ctpu up --project=${PROJECT_ID} \
  --zone=us-central1-b \
  --tf-version=2.3.1 \
  --tpu-size=v${TPU}-8 \
- --name=tpu-melanoma-${TPU} #\
+ --name=tpu-melanoma-${TPU} \
+ --machine-type=n1-standard-8
  #--preemptible
 
 git clone https://github.com/SiarheiKachatkou/kagle_melanoma_tf_tpu.git &&
