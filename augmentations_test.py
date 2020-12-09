@@ -2,7 +2,9 @@ import tensorflow as tf
 import unittest
 from unittest.mock import patch
 import getconfig
+import glob
 from dataset_utils import get_training_dataset
+from oversample import oversample
 
 
 class dict2obj(object):
@@ -12,31 +14,37 @@ class dict2obj(object):
 class AugmentationTestCase(unittest.TestCase):
 
     @patch('getconfig.parseargs')
-    @patch('augmentations_geom.transform_geometricaly')
-    @patch('dataset_utils.read_tfrecord')
-    def test_augmentation(self, mock_transform_geometricaly, mock_parse_args, mock_read_tfrecord):
+    @patch('augmentations.transform_geometricaly')
+    @patch('dataset_utils.oversample')
+    def test_augmentation(self, mock_oversample, mock_transform_geometricaly, mock_parse_args):
 
-        img_height=384
+        img_height=128
+        oversample_mult=2
         mock_parse_args.parse_args.return_value=dict2obj({'backbone':'B0','dropout_rate':0.1,
                                                           'lr_warm_up_epochs':5,'lr_max':1e-6,'lr_exp_decay':0.5,
-                                                          'oversample_mult':1,
+                                                          'oversample_mult':oversample_mult,
                                                           'focal_loss_alpha':0.5,'focal_loss_gamma':4,
                                                           'image_height':img_height,'hair_prob':0.1,'microscope_prob':0.1,
-                                                          'batch_size':32,'gpus':''})
+                                                          'batch_size':4,'gpus':''})
 
-        image=tf.constant(value=0, shape=(img_height,img_height,3),dtype=tf.float32)
-        class_label=tf.constant(0,dtype=tf.float32)
-        image_name=tf.constant("test_image",dtype=tf.string)
-        mock_read_tfrecord.return_value= image, class_label, image_name
-
+        mock_oversample.side_effect=oversample
+        mock_transform_geometricaly.return_value=tf.constant(value=0,shape=(img_height,img_height,3),dtype=tf.float32)
         config=getconfig.get_config()
+        files=list(glob.glob(f'data/test_data/{img_height}x{img_height}/*train*'))
+        train_dataset=get_training_dataset(training_fileimages=[files[0]], training_fileimages_old='', config=config)
 
-        train_dataset=get_training_dataset(training_fileimages=['no_file'], training_fileimages_old='', config=config)
-
+        count=0
+        batch_count=10
         for batch in train_dataset:
-            break
+            if count>batch_count:
+                break
+            count+=1
 
-        mock_transform_geometricaly.assert_called()
+        self.assertTrue(mock_transform_geometricaly.call_count==1)
+        if oversample_mult==1:
+            mock_oversample.assert_not_called()
+        else:
+            mock_oversample.assert_called()
 
     def runTest(self):
         self.test_augmentation()
