@@ -55,7 +55,7 @@ for fold in range(CONFIG.nfolds):
         model.summary()
         training_dataset = get_training_dataset(train_filenames_folds[fold], DATASETS[CONFIG.image_height]['old'], CONFIG)
         if TRAIN_STEPS is None:
-            TRAIN_STEPS=count_data_items(train_filenames_folds[fold])//CONFIG.batch_size
+            TRAIN_STEPS=(count_data_items(train_filenames_folds[fold])+count_data_items(DATASETS[CONFIG.image_height]['old']))//CONFIG.batch_size
         print(f'TRAIN_STEPS={TRAIN_STEPS}')
         validation_dataset = get_validation_dataset(val_filenames_folds[fold],CONFIG)
 

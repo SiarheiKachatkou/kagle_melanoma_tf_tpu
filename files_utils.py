@@ -5,6 +5,8 @@ from sklearn.model_selection import KFold
 
 
 def count_data_items(filenames):
+    if len(filenames)==0:
+        return 0
     # the number of data items is written in the name of the .tfrec files, i.e. flowers00-230.tfrec = 230 data items
     n = [int(re.compile(r"-([0-9]*)\.").search(filename).group(1)) for filename in filenames]
     return np.sum(n)
