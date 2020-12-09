@@ -5,31 +5,34 @@ import subprocess
 from matplotlib import pyplot as plt
 from debugtools.display_utils import display_training_curves, plot_lr
 from dataset.dataset_utils import *
-import submission
+from submission import submission
 import shutil
 import pandas as pd
 from model.create_model import BinaryFocalLoss
-from SaveLastCallback import SaveLastCallback
+from model.savelastcallback import SaveLastCallback
 from model.create_model import create_model, set_backbone_trainable
 from config.runtime import get_scope
 from model.history import join_history
 from submission.submit import calc_auc
+from config.getconfig import get_config
+from lr.lr import get_lrfn,get_cycling_lrfn
+from dataset.files_utils import get_test_filenames,get_train_val_filenames,count_data_items
+
+CONFIG=get_config()
 
 if not os.path.exists(CONFIG.work_dir):
     os.mkdir(CONFIG.work_dir)
-    
-shutil.copyfile('config/consts.py', os.path.join(CONFIG.work_dir, 'config/consts.py'))
 
 with open(os.path.join(CONFIG.work_dir,'config.yaml'),'wt') as file:
     config_dict=dict(CONFIG._asdict())
     file.write(yaml.dump(config_dict))
 
 lrfn = eval(CONFIG.lr_fn)
-plot_lr(lrfn,EPOCHS_FULL,CONFIG.work_dir)
+plot_lr(lrfn,CONFIG.epochs_full,CONFIG.work_dir)
 lr_callback = tf.keras.callbacks.LearningRateScheduler(lrfn, verbose=True)
 
-train_filenames_folds, val_filenames_folds=get_train_val_filenames(DATASETS[IMAGE_HEIGHT]['new'],CONFIG.nfolds)
-test_filenames=get_test_filenames(DATASETS[IMAGE_HEIGHT]['new'])
+train_filenames_folds, val_filenames_folds=get_train_val_filenames(DATASETS[CONFIG.image_height]['new'],CONFIG.nfolds)
+test_filenames=get_test_filenames(DATASETS[CONFIG.image_height]['new'])
 if is_debug:
     test_filenames = [test_filenames[0]]
     train_filenames_folds=[[f[0]] for f in train_filenames_folds]
@@ -43,9 +46,9 @@ for fold in range(CONFIG.nfolds):
     save_callback_best = tf.keras.callbacks.ModelCheckpoint(
         model_file_path, monitor='val_loss', verbose=0, save_best_only=True,
         mode='min', save_freq='epoch')
-    save_callback_last=SaveLastCallback(CONFIG.work_dir, fold, EPOCHS_FULL, CONFIG.save_last_epochs)
+    save_callback_last=SaveLastCallback(CONFIG.work_dir, fold, CONFIG.epochs_full, CONFIG.save_last_epochs)
 
-    save_callback=SaveLastCallback(CONFIG.work_dir,fold=fold, epochs=EPOCHS_FULL,
+    save_callback=SaveLastCallback(CONFIG.work_dir,fold=fold, epochs=CONFIG.epochs_full,
                                    save_last_epochs=CONFIG.save_last_epochs)
 
     callbacks=[lr_callback,save_callback_best,save_callback_last]
@@ -56,20 +59,20 @@ for fold in range(CONFIG.nfolds):
         model = create_model(CONFIG, metrics, backbone_trainable=False)
 
         model.summary()
-        training_dataset = get_training_dataset(train_filenames_folds[fold], DATASETS[IMAGE_HEIGHT]['old'], CONFIG)
-        if TRAIN_STEPS is None:
-            TRAIN_STEPS=count_data_items(train_filenames_folds[fold])//BATCH_SIZE
-        print(f'TRAIN_STEPS={TRAIN_STEPS}')
-        validation_dataset = get_validation_dataset(val_filenames_folds[fold])
+        training_dataset = get_training_dataset(train_filenames_folds[fold], DATASETS[CONFIG.image_height]['old'], CONFIG)
+        if CONFIG.train_steps is None:
+            CONFIG.train_steps=count_data_items(train_filenames_folds[fold])//CONFIG.batch_size
+        print(f'CONFIG.train_steps={CONFIG.train_steps}')
+        validation_dataset = get_validation_dataset(val_filenames_folds[fold],CONFIG)
 
         history_fine_tune = model.fit(return_2_values(training_dataset),
-                                      validation_data=return_2_values(validation_dataset), steps_per_epoch=TRAIN_STEPS,
-                                      epochs=EPOCHS_FINE_TUNE, callbacks=callbacks)
+                                      validation_data=return_2_values(validation_dataset), steps_per_epoch=CONFIG.train_steps,
+                                      epochs=CONFIG.epochs_fine_tune, callbacks=callbacks)
 
         model = set_backbone_trainable(model, metrics, True, CONFIG)
 
         history = model.fit(return_2_values(training_dataset), validation_data=return_2_values(validation_dataset),
-                            steps_per_epoch=TRAIN_STEPS, initial_epoch=EPOCHS_FINE_TUNE, epochs=EPOCHS_FULL, callbacks=callbacks)
+                            steps_per_epoch=CONFIG.train_steps, initial_epoch=CONFIG.epochs_fine_tune, epochs=CONFIG.epochs_full, callbacks=callbacks)
 
         history = join_history(history_fine_tune, history)
         print(history.history)
@@ -83,24 +86,24 @@ for fold in range(CONFIG.nfolds):
 
 
         for cut_mix_prob in []:
-            validation_with_augm_dataset = get_validation_dataset(val_filenames_folds[fold])
-            validation_with_augm_dataset_tta = get_validation_dataset_tta(val_filenames_folds[fold], cut_mix_prob=cut_mix_prob)
+            validation_with_augm_dataset = get_validation_dataset(val_filenames_folds[fold], CONFIG)
+            validation_with_augm_dataset_tta = get_validation_dataset_tta(val_filenames_folds[fold], CONFIG, cut_mix_prob=cut_mix_prob)
             submission.calc_and_save_submissions(CONFIG, model, f'with_augm_val_{fold}_{cut_mix_prob}',
                                                  validation_with_augm_dataset, validation_with_augm_dataset_tta,
                                                  CONFIG.ttas)
             del validation_with_augm_dataset
             del validation_with_augm_dataset_tta
 
-        validation_dataset = get_validation_dataset(val_filenames_folds[fold])
-        validation_dataset_tta = get_validation_dataset_tta(val_filenames_folds[fold])
+        validation_dataset = get_validation_dataset(val_filenames_folds[fold], CONFIG)
+        validation_dataset_tta = get_validation_dataset_tta(val_filenames_folds[fold], CONFIG)
         submission.calc_and_save_submissions(CONFIG, model, f'val_{fold}', validation_dataset, validation_dataset_tta,
                                              CONFIG.ttas)
         del validation_dataset
         del validation_dataset_tta
 
 
-        test_dataset = get_test_dataset_with_labels(test_filenames)
-        test_dataset_tta = get_test_dataset_with_labels_tta(test_filenames)
+        test_dataset = get_test_dataset_with_labels(test_filenames, CONFIG)
+        test_dataset_tta = get_test_dataset_with_labels_tta(test_filenames, CONFIG)
         submission.calc_and_save_submissions(CONFIG, model, f'test_{fold}', test_dataset, test_dataset_tta, CONFIG.ttas)
 
         del test_dataset

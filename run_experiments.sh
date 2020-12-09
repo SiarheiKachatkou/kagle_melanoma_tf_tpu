@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 dropout_rate=0
+image_height=256
 
 for backbone in B0 B1
 do
@@ -18,7 +19,7 @@ do
                 do
                   for micro_prob in 0 0.01
                   do
-                    python train_and_test.py --backbone=$backbone --dropout-rate=$dropout_rate --lr_max=$lr_max --lr_exp_decay=$lr_exp_decay --focal_loss_gamma=$focal_loss_gamma --focal_loss_alpha=$focal_loss_alpha --hair-prob=$hair_prob --microscope-prob=$micro_prob --lr-warm-up-epochs=$lr_warm_up_epochs
+                    python train_and_test.py --backbone=$backbone --dropout_rate=$dropout_rate --lr_max=$lr_max --lr_exp_decay=$lr_exp_decay --focal_loss_gamma=$focal_loss_gamma --focal_loss_alpha=$focal_loss_alpha --hair_prob=$hair_prob --microscope_prob=$micro_prob --lr_warm_up_epochs=$lr_warm_up_epochs --image_height=$image_height
                   done
                 done
               done

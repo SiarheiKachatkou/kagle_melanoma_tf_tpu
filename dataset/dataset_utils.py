@@ -3,7 +3,7 @@ AUTO = tf.data.experimental.AUTOTUNE
 from config.consts import *
 from functools import partial
 #from augmentation_hair import hair_aug_tf
-from augmentations import augment_train,augment_tta,augment_val,augment_test, cut_mix, augment_val_aug
+from augmentations.augmentations import augment_train,augment_tta,augment_val,augment_test, cut_mix, augment_val_aug
 from augmentations.oversample import oversample
 
 features_test = {

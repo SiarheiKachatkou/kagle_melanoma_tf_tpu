@@ -9,7 +9,7 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 use_tpu_2 = False
 is_local = True
 is_kaggle = False
-is_debug = False
+is_debug = True
 do_validate = True
 
 
@@ -25,15 +25,16 @@ red = 4 if use_tpu_2 else 1
 if is_local:
     red=4
 
+data_root=os.path.join(os.path.dirname(__file__),'..','data')
 
 if is_local:
     DATASETS = {
-                128: {'new': 'data/128_with_labels/train*.tfrec', 'old': ''},
-                256: {'new': 'data/256_with_labels/train*.tfrec', 'old': ''},
-                #128: {'new': 'data/128/train*.tfrec', 'old': ''},
-                #384: {'new': 'data/isic2020-384-colornormed-tfrecord/train*.tfrec', 'old': ''},
-                384: {'new': 'data/384_triple_2020_with_labels/train*.tfrec', 'old': ''},
-                768: {'new': 'data/dataset_768/train*.tfrec', 'old': ''}
+                128: {'new': os.path.join(data_root,'128_with_labels/train*.tfrec'), 'old': ''},
+                256: {'new': os.path.join(data_root,'256_with_labels/train*.tfrec'), 'old': ''},
+                #128: {'new': os.path.join(data_root,'128/train*.tfrec'), 'old': ''},
+                #384: {'new': os.path.join(data_root,'isic2020-384-colornormed-tfrecord/train*.tfrec'), 'old': ''},
+                384: {'new': os.path.join(data_root,'384_triple_2020_with_labels/train*.tfrec'), 'old': ''},
+                768: {'new': os.path.join(data_root,'dataset_768/train*.tfrec'), 'old': ''}
     }
 
 else:

@@ -52,7 +52,8 @@ def get_config():
     lr_warm_up_epochs=args.lr_warm_up_epochs
     image_height=args.image_height
 
-    work_dir_name = f'artifacts/val_quality_13_{model}_focal_loss_{image_height}_epochs_{epochs_full}_drop_{dropout_rate}_lr_max{args.lr_max}_lr_dacay_{args.lr_exp_decay}_hair_prob_{hair_prob}_micro_prob_{microscope_prob}_wu_epochs_{lr_warm_up_epochs}' if not is_debug else 'debug'
+    work_dir_name = f'artifacts/val_quality_13_{model}_focal_loss_{image_height}_epochs_{epochs_full}_drop_{dropout_rate}_lr_max{args.lr_max}_lr_dacay_{args.lr_exp_decay}_hair_prob_{hair_prob}_micro_prob_{microscope_prob}_wu_epochs_{lr_warm_up_epochs}' \
+        if not is_debug else 'artifacts/debug'
 
 
     config=config_type(lr_max=args.lr_max*1e-4, lr_start=5e-6, stepsize=3,
