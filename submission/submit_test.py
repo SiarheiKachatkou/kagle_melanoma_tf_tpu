@@ -12,7 +12,7 @@ from submission.submit import main
 
 COL_NAMES=['image_name', 'target', 'labels']
 DATA=[['img1',1,1],['img2',0,0],['img3',3,1],['img4',4,0],['img5',5,1]]
-DATA_EXACT=[['img1',1,1],['img2',0,0],['img3',1,1],['img4',0,0],['img5',1,1]]
+DATA_EXACT=[['img1',1,1],['img2',0,0],['img3',0,0],['img4',1,0],['img5',1,1],['img6',0,0],['img7',1,1],['img8',1,1],['img9',1,1]]
 
 def read_scv_synth(filename):
     #print(filename)
@@ -75,7 +75,7 @@ class SubmitTTATest(unittest.TestCase):
     @patch('submission.parseargs')
     def test_averaging_improves_auc(self, mock_parse_args, mock_to_csv, mock_read_csv, mock_exists):
         random.seed(0)
-        nfolds=3
+        nfolds=10
         args=argparse.Namespace()
         args.folds=nfolds
         args.work_dir=os.path.join(ARTIFACTS_ROOT,'tmp')
