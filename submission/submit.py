@@ -1,24 +1,16 @@
 import os
-
+import glob
 import pandas as pd
 import numpy as np
 from submission.submission_filenames import single_model_val_csv, single_model_test_csv
-from submission.submission import avg_submissions, calc_auc, save_submission
+from submission.submission_utils import avg_submissions, calc_auc, save_submission
+import submission.parseargs
 
-import argparse
-import glob
-
-
-
-
-parser = argparse.ArgumentParser()
-parser.add_argument('--work_dir',type=str)
-parser.add_argument('--folds',type=int, default=0)
 
 
 def main():
 
-    args = parser.parse_args()
+    args=submission.parseargs.parse_args()
 
     if args.folds == 0:
         nfolds = len(glob.glob(os.path.join(args.work_dir, 'loss*.png')))
@@ -28,27 +20,27 @@ def main():
 
     for le in ['', 'le']:
         for m_type in ['', 'tta_']:
-            a = []
+            aucs = []
 
             for fold in range(nfolds):
                 name=single_model_val_csv(le, fold, m_type)
                 filename = os.path.join(args.work_dir, name)
                 if os.path.exists(filename):
                     sub = pd.read_csv(filename)
-                    a.append(calc_auc(sub))
-            print(f'{le}_val_single_model_{m_type}metrics={a}')
-            print(f'{le}_val_single_model_{m_type}avg_metric={np.mean(a)}')
+                    aucs.append(calc_auc(sub))
+            print(f'{le}_val_single_model_{m_type}metrics={aucs}')
+            print(f'{le}_val_single_model_{m_type}avg_metric={np.mean(aucs)}')
 
     for le in ['', 'le']:
         for m_type in ['', 'tta_']:
-            a = []
+            aucs = []
             subs = []
             for fold in range(nfolds):
                 name=single_model_test_csv(le, fold, m_type)
                 filename = os.path.join(args.work_dir, name)
                 if os.path.exists(filename):
                     sub = pd.read_csv(filename)
-                    a.append(calc_auc(sub))
+                    aucs.append(calc_auc(sub))
                     save_submission(sub, os.path.join(args.work_dir, 'kaggle_' + name))
                     subs.append(sub)
             if subs:
@@ -58,9 +50,11 @@ def main():
             else:
                 auc_avg_sub = None
 
-            print(f'{le}_test_single_model_{m_type}metrics={a}')
-            print(f'{le}_test_single_model_{m_type}avg_metric={np.mean(a)}')
+            print(f'{le}_test_single_model_{m_type}metrics={aucs}')
+            print(f'{le}_test_single_model_{m_type}avg_metric={np.mean(aucs)}')
             print(f'{le}_test_avg_model_{m_type}_metric={auc_avg_sub}')
+
+    return aa
 
 
 if __name__=="__main__":
