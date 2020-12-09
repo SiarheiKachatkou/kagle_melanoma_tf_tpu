@@ -18,6 +18,7 @@ def main():
     else:
         nfolds = args.folds
 
+    mean_auc_val=None
     for le in ['', 'le']:
         for m_type in ['', 'tta_']:
             aucs = []
@@ -30,6 +31,7 @@ def main():
                     aucs.append(calc_auc(sub))
             print(f'{le}_val_single_model_{m_type}metrics={aucs}')
             print(f'{le}_val_single_model_{m_type}avg_metric={np.mean(aucs)}')
+    mean_auc_val=np.mean(aucs)
 
     avg_test_subms=[]
     for le in ['', 'le']:
@@ -56,7 +58,7 @@ def main():
             print(f'{le}_test_single_model_{m_type}avg_metric={np.mean(aucs)}')
             print(f'{le}_test_avg_model_{m_type}_metric={auc_avg_sub}')
 
-    return avg_test_subms
+    return avg_test_subms, mean_auc_val
 
 
 if __name__=="__main__":
