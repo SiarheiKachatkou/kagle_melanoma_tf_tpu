@@ -1,6 +1,8 @@
+import os
 import numpy as np
 import pandas as pd
 import gc
+from sklearn import metrics
 
 import tensorflow as tf
 AUTO = tf.data.experimental.AUTOTUNE
@@ -95,3 +97,21 @@ def calc_and_save_submissions(CONFIG,model,prefix, dataset, dataset_tta, ttas=3)
 
     single_model_submission.to_csv(f'{CONFIG.work_dir}/{prefix}_single_model_submission.csv')
     single_model_tta_submission.to_csv(f'{CONFIG.work_dir}/{prefix}_single_model_tta_submission.csv')
+
+
+def calc_auc(subm):
+    preds=subm['target'].values
+    labels=subm['labels'].values
+    if len(set(labels))==1:
+        print('warning calc_auc with single label dataset, return 0')
+        return 0
+    return metrics.roc_auc_score(labels, preds)
+
+
+def save_submission(df, name, send_to_kaggle=False):
+    df_submission = df[['image_name', 'target']]
+
+    df_submission.to_csv(name, index=False)
+    if send_to_kaggle:
+        name_with_quotes='\"'+name+'\"'
+        os.system(f'kaggle competitions submit -c siim-isic-melanoma-classification -f {name_with_quotes} -m {name_with_quotes}')
