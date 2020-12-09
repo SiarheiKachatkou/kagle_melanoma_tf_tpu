@@ -1,21 +1,9 @@
-
-import os
-import pickle
 import tensorflow as tf
-import numpy as np
 from tqdm import tqdm
 from matplotlib import pyplot as plt
 print("Tensorflow version " + tf.__version__)
-from lr import get_lrfn
-from display_utils import display_training_curves
-from consts import *
-from dataset_utils import *
-import submission
-import shutil
-from create_model import BinaryFocalLoss
-from SaveLastCallback import SaveLastCallback
-from create_model import create_model, set_backbone_trainable
-
+from dataset.dataset_utils import *
+from model.create_model import create_model
 
 train_filenames_folds, val_filenames_folds =get_train_val_filenames(DATASETS[IMAGE_HEIGHT]['new'] ,CONFIG.nfolds)
 lrs = np.linspace(1e-6, 1e-5, 10)

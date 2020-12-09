@@ -1,17 +1,13 @@
 import tensorflow as tf
-from display_utils import display_9_images_from_dataset
-from tensorflow.keras import backend as K
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib import cm
 from tf_keras_vis.saliency import Saliency
-from tf_keras_vis.gradcam import GradcamPlusPlus
 from tf_keras_vis.scorecam import ScoreCAM
 from tf_keras_vis.utils import normalize
-from dataset_utils import get_train_val_filenames, get_training_dataset, return_2_values
-from display_utils import dataset_to_numpy_util
-from consts import CONFIG, IMAGE_HEIGHT, DATASETS
-from create_model import create_model
+from dataset.dataset_utils import get_train_val_filenames, get_training_dataset, return_2_values
+from debugtools.display_utils import dataset_to_numpy_util
+from config.consts import CONFIG, IMAGE_HEIGHT, DATASETS
+from model.create_model import create_model
 
 
 def plot_overlay(nrows, ncols, images, maps):

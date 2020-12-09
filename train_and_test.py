@@ -1,30 +1,24 @@
-
-
-import os
 import glob
 import yaml
 import gc
-import tensorflow as tf
 import subprocess
 from matplotlib import pyplot as plt
-from lr import get_lrfn, get_cycling_lrfn
-from display_utils import display_training_curves, plot_lr
-from consts import *
-from dataset_utils import *
+from debugtools.display_utils import display_training_curves, plot_lr
+from dataset.dataset_utils import *
 import submission
 import shutil
 import pandas as pd
-from create_model import BinaryFocalLoss
+from model.create_model import BinaryFocalLoss
 from SaveLastCallback import SaveLastCallback
-from create_model import create_model, set_backbone_trainable
-from runtime import get_scope
-from history import join_history
-from submit import calc_auc
+from model.create_model import create_model, set_backbone_trainable
+from config.runtime import get_scope
+from model.history import join_history
+from submission.submit import calc_auc
 
 if not os.path.exists(CONFIG.work_dir):
     os.mkdir(CONFIG.work_dir)
     
-shutil.copyfile('consts.py',os.path.join(CONFIG.work_dir,'consts.py'))
+shutil.copyfile('config/consts.py', os.path.join(CONFIG.work_dir, 'config/consts.py'))
 
 with open(os.path.join(CONFIG.work_dir,'config.yaml'),'wt') as file:
     config_dict=dict(CONFIG._asdict())

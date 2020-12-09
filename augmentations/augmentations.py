@@ -1,10 +1,8 @@
-import tensorflow as tf
 import tensorflow.keras.backend as K
-import math
-from augmentation_hair import hair_aug_tf
-from augmentation_microscope import microscope_aug_tf
-from augmentations_geom import transform_geometricaly
-from consts import *
+from augmentations.augmentation_hair import hair_aug_tf
+from augmentations.augmentation_microscope import microscope_aug_tf
+from augmentations.augmentations_geom import transform_geometricaly
+from config.consts import *
 
 # COARSE DROPOUT
 

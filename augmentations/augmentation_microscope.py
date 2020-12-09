@@ -1,6 +1,6 @@
 import tensorflow as tf
-from consts import path_microscope_images
-from augmentations_geom import transform_geometricaly
+from config.consts import path_microscope_images
+from augmentations.augmentations_geom import transform_geometricaly
 
 
 microscope_images = tf.io.gfile.glob(path_microscope_images + '/*.png')

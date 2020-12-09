@@ -12,7 +12,7 @@
     <option name="ADD_CONTENT_ROOTS" value="true" />
     <option name="ADD_SOURCE_ROOTS" value="true" />
     <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-    <option name="SCRIPT_NAME" value="$PROJECT_DIR$/show_high_loss_samples.py" />
+    <option name="SCRIPT_NAME" value="$PROJECT_DIR$/debugtools/show_high_loss_samples.py" />
     <option name="PARAMETERS" value="--backbone=B1 --cut-mix-prob=0 --dropout-rate=0.1 --lr_exp_decay=0.5 --lr_max=1" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />

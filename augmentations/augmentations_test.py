@@ -1,10 +1,10 @@
 import tensorflow as tf
 import unittest
 from unittest.mock import patch
-import getconfig
+from config import getconfig
 import glob
-from dataset_utils import get_training_dataset
-from oversample import oversample
+from dataset.dataset_utils import get_training_dataset
+from augmentations.oversample import oversample
 
 
 class dict2obj(object):
@@ -29,7 +29,7 @@ class AugmentationTestCase(unittest.TestCase):
 
         mock_oversample.side_effect=oversample
         mock_transform_geometricaly.return_value=tf.constant(value=0,shape=(img_height,img_height,3),dtype=tf.float32)
-        config=getconfig.get_config()
+        config= getconfig.get_config()
         files=list(glob.glob(f'data/test_data/{img_height}x{img_height}/*train*'))
         train_dataset=get_training_dataset(training_fileimages=[files[0]], training_fileimages_old='', config=config)
 

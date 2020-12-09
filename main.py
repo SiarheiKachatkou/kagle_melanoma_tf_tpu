@@ -1,22 +1,17 @@
-import os
-import pickle
 import gc
-import tensorflow as tf
 import yaml
 import subprocess
 from matplotlib import pyplot as plt
-from lr import get_lrfn, get_cycling_lrfn
-from display_utils import display_training_curves, plot_lr
-from getconfig import get_config
-from dataset_utils import *
-from consts import DATASETS
+from debugtools.display_utils import display_training_curves, plot_lr
+from config.getconfig import get_config
+from dataset.dataset_utils import *
+from config.consts import DATASETS
 import submission
-import shutil
-from create_model import BinaryFocalLoss
+from model.create_model import BinaryFocalLoss
 from SaveLastCallback import SaveLastCallback
-from create_model import create_model, set_backbone_trainable
-from runtime import get_scope
-from history import join_history
+from model.create_model import create_model, set_backbone_trainable
+from config.runtime import get_scope
+from model.history import join_history
 
 CONFIG=get_config()
 if not os.path.exists(CONFIG.work_dir):

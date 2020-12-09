@@ -1,5 +1,5 @@
 import tensorflow as tf
-from consts import path_hair_images
+from config.consts import path_hair_images
 
 hair_images = tf.io.gfile.glob(path_hair_images + '/*.png')
 hair_images_tf=tf.convert_to_tensor(hair_images)

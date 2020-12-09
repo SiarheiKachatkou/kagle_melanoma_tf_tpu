@@ -1,11 +1,11 @@
 import os
 import tensorflow as tf
 import unittest
-from consts import test_data_path
+from config.consts import test_data_path
 from config import CONFIG
 import numpy as np
 from copy import copy
-from dataset_utils import get_test_dataset,get_validation_dataset,get_test_dataset_tta,get_validation_dataset_tta
+from dataset.dataset_utils import get_test_dataset,get_validation_dataset,get_test_dataset_tta,get_validation_dataset_tta
 
 
 def get_testval_files():

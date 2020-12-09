@@ -1,6 +1,6 @@
-from display_utils import display_9_images_from_dataset
-from dataset_utils import get_train_val_filenames, get_training_dataset, return_2_values
-from consts import CONFIG, IMAGE_HEIGHT, DATASETS
+from debugtools.display_utils import display_9_images_from_dataset
+from dataset.dataset_utils import get_train_val_filenames, get_training_dataset, return_2_values
+from config.consts import CONFIG, IMAGE_HEIGHT, DATASETS
 
 if __name__=="__main__":
     fold=0

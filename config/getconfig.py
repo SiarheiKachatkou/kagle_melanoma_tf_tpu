@@ -1,8 +1,8 @@
 import datetime
 from collections import namedtuple
 import os
-import parseargs
-from consts import is_local, is_debug
+from config import parseargs
+from config.consts import is_local, is_debug
 
 
 
