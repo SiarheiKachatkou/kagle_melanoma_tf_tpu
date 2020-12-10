@@ -41,12 +41,10 @@ for fold in range(CONFIG.nfolds):
     save_callback_best = tf.keras.callbacks.ModelCheckpoint(
         model_file_path, monitor='val_loss', verbose=0, save_best_only=True,
         mode='min', save_freq='epoch')
+    '''
     save_callback_last=SaveLastCallback(CONFIG.work_dir, fold, CONFIG.epochs_full, CONFIG.save_last_epochs)
-
-    save_callback=SaveLastCallback(CONFIG.work_dir,fold=fold, epochs=CONFIG.epochs_full,
-                                   save_last_epochs=CONFIG.save_last_epochs)
-
-    callbacks=[lr_callback,save_callback_best,save_callback_last]
+    '''
+    callbacks=[lr_callback,save_callback_best]#,save_callback_last]
 
     scope = get_scope()
     with scope:
@@ -75,7 +73,6 @@ for fold in range(CONFIG.nfolds):
         history = join_history(history_fine_tune, history)
         print(history.history)
 
-        model.save(model_file_path)
         if do_validate:
             final_accuracy = history.history["val_accuracy"][-5:]
             print("FINAL ACCURACY MEAN-5: ", np.mean(final_accuracy))
@@ -84,7 +81,7 @@ for fold in range(CONFIG.nfolds):
             display_training_curves(history.history['loss'][1:], history.history['val_loss'][1:], 'loss', 212)
             plt.savefig(os.path.join(CONFIG.work_dir, f'loss{fold}.png'))
 
-
+        model.load_weights(model_file_path)
 
         validation_dataset = get_validation_dataset(val_filenames_folds[fold],CONFIG)
         validation_dataset_tta = get_validation_dataset_tta(val_filenames_folds[fold],CONFIG)
