@@ -41,14 +41,15 @@ for fold in range(CONFIG.nfolds):
     save_callback_best = tf.keras.callbacks.ModelCheckpoint(
         model_file_path, monitor='val_loss', verbose=0, save_best_only=True,
         mode='min', save_freq='epoch')
-    '''
-    save_callback_last=SaveLastCallback(CONFIG.work_dir, fold, CONFIG.epochs_full, CONFIG.save_last_epochs)
-    '''
-    callbacks=[lr_callback,save_callback_best]#,save_callback_last]
+
+    callbacks=[lr_callback,save_callback_best]
+    if CONFIG.save_last_epochs != 0:
+        save_callback_last = SaveLastCallback(CONFIG.work_dir, fold, CONFIG.epochs_full, CONFIG.save_last_epochs)
+        callbacks.append(save_callback_last)
 
     scope = get_scope()
     with scope:
-        metrics = ['accuracy', SparceAUC()] if CONFIG.use_metrics else None
+        metrics = [SparceAUC()] if CONFIG.use_metrics else None
         model = create_model(CONFIG, metrics, backbone_trainable=False)
 
         model.summary()
@@ -74,8 +75,8 @@ for fold in range(CONFIG.nfolds):
         print(history.history)
 
         if do_validate:
-            final_accuracy = history.history["val_accuracy"][-5:]
-            print("FINAL ACCURACY MEAN-5: ", np.mean(final_accuracy))
+            final_auc = history.history["val_auc"][-5:]
+            print("FINAL VAL AUC MEAN-5: ", np.mean(final_auc))
             if CONFIG.use_metrics:
                 display_training_curves(history.history['auc'][1:], history.history['val_auc'][1:], 'auc', 211)
             display_training_curves(history.history['loss'][1:], history.history['val_loss'][1:], 'loss', 212)
@@ -98,7 +99,7 @@ for fold in range(CONFIG.nfolds):
 
         if CONFIG.save_last_epochs!=0:
             models=[]
-            filepaths=save_callback.get_filepaths()
+            filepaths=save_callback_last.get_filepaths()
             for filepath in filepaths:
                 m=tf.keras.models.load_model(filepath, custom_objects={'BinaryFocalLoss':BinaryFocalLoss}, compile=True)
                 m.trainable=False
