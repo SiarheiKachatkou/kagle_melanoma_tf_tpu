@@ -69,7 +69,7 @@ work_dir_name = f'artifacts/with_old_{model}_focal_loss_{image_height}_epochs_{e
 CONFIG=config(lr_max=args.lr_max*1e-4, lr_start=5e-6, stepsize=3,
               lr_warm_up_epochs=lr_warm_up_epochs,
               lr_min=1e-6, lr_exp_decay=args.lr_exp_decay, lr_fn='get_lrfn(CONFIG)',  #get_cycling_lrfn(CONFIG) #
-              nfolds=4, l2_penalty=penalty, work_dir=work_dir_name,
+              nfolds=5, l2_penalty=penalty, work_dir=work_dir_name,
               gs_work_dir=f'gs://kochetkov_kaggle_melanoma/{str(datetime.datetime.now())[:20]}_{work_dir_name}',
               model_fn_str=f"efficientnet.tfkeras.EfficientNet{model}(weights='imagenet', include_top=False)",
               ttas=12,
