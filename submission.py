@@ -30,11 +30,14 @@ def make_submission_dataframe(test_dataset, model,repeats=1):
     preds=model.predict(return_2_values(test_dataset), verbose=True)
     preds=preds.astype(np.float)
 
+    if preds.shape[-1]==2:
+        preds=preds[:,1]
+        preds=np.reshape(preds,(-1,1))
+
     gc.collect()
 
     names=np.array(names)
     labs=np.array(labs)
-    #labs=np.argmax(labs,axis=1)
     names = np.reshape(names, (-1, 1))
     labs = np.reshape(labs, (-1, 1)).astype(np.int32)
 

@@ -15,6 +15,7 @@ from create_model import BinaryFocalLoss
 from SaveLastCallback import SaveLastCallback
 from create_model import create_model, set_backbone_trainable
 from runtime import get_scope
+from sparceauc import SparceAUC
 from history import join_history
 if not os.path.exists(CONFIG.work_dir):
     os.makedirs(CONFIG.work_dir)
@@ -49,7 +50,7 @@ for fold in range(CONFIG.nfolds):
 
     scope = get_scope()
     with scope:
-        metrics = ['accuracy', tf.keras.metrics.AUC(name='auc')] if CONFIG.use_metrics else None
+        metrics = ['accuracy', SparceAUC()] if CONFIG.use_metrics else None
         model = create_model(CONFIG, metrics, backbone_trainable=False)
 
         model.summary()

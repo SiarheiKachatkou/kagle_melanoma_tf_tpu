@@ -31,11 +31,11 @@ if not is_local:
 
 
 epochs_fine_tune = 0
-epochs_full = 1 if is_debug else 20
+epochs_full = 1 if is_debug else 12
 
 
-BATCH_SIZE = 128 if is_debug else 64*3
-BATCH_SIZE_INCREASE_FOR_INFERENCE = 16
+BATCH_SIZE = 128 if is_debug else 64*4
+BATCH_SIZE_INCREASE_FOR_INFERENCE = 8
 
 
 TRAIN_STEPS = 1 if is_debug else None
@@ -54,7 +54,7 @@ config=namedtuple('config',['lr_max','lr_start','stepsize', 'lr_warm_up_epochs',
 
 model = args.backbone if not is_debug else 'B0'
 
-penalty = 1e-4
+penalty = 0
 dropout_rate=args.dropout_rate
 focal_loss_alpha=args.focal_loss_alpha
 focal_loss_gamma=args.focal_loss_gamma
