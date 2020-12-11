@@ -35,7 +35,7 @@ epochs_full = 1 if is_debug else 12
 
 
 BATCH_SIZE = 128 if is_debug else 64*4
-BATCH_SIZE_INCREASE_FOR_INFERENCE = 8
+BATCH_SIZE_INCREASE_FOR_INFERENCE = 4
 
 
 TRAIN_STEPS = 1 if is_debug else None
