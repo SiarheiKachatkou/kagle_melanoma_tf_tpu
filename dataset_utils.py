@@ -97,7 +97,7 @@ def load_dataset(filenames, is_wo_labels, is_deterministic, config):
     dataset = dataset.map(the_read_tfrecord, num_parallel_calls=_num_parallel_calls())
     dataset = force_image_sizes(dataset, [config.image_height,config.image_height])
     if (not is_wo_labels) and (not is_deterministic):
-        dataset = dataset.shuffle(256)
+        dataset = dataset.shuffle(1024*8)
         
     return dataset
 
@@ -136,7 +136,7 @@ def get_training_dataset(training_fileimages, training_fileimages_old, config, r
         dataset.concatenate(dataset_old)
 
     dataset = dataset.repeat(repeats)
-    dataset=dataset.shuffle(512)
+    dataset=dataset.shuffle(1024*8)
     if config.oversample_mult!=1:
         dataset=oversample(dataset,config)
     augm_fn=partial(augment_train,config=config)
