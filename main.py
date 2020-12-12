@@ -9,6 +9,12 @@ import matplotlib.pyplot as plt
 from model import build_model
 from dataset_utils import get_dataset, count_data_items
 from lr import get_lr_callback
+import  os
+
+tpu3 = "grpc://10.240.1.2:8470"
+tpu2 = 'grpc://10.240.1.10:8470'
+
+os.environ['TPU_NAME'] = tpu3
 
 AUTO = tf.data.experimental.AUTOTUNE
 
