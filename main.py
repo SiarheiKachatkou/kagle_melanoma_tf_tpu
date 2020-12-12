@@ -123,7 +123,7 @@ for fold, (idxT, idxV) in enumerate(skf.split(np.arange(15))):
     files_test = np.sort(np.array(tf.io.gfile.glob(GCS_PATH[fold] + '/test*.tfrec')))
 
     # BUILD MODEL
-    K.clear_session()
+    #K.clear_session()
     with strategy.scope():
         model = build_model(dim=IMG_SIZES[fold], ef=EFF_NETS[fold])
 
