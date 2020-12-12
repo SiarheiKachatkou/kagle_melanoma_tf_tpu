@@ -75,6 +75,6 @@ def get_dataset(files, augment=False, shuffle=False, repeat=False,
                                                imgname_or_label),
                 num_parallel_calls=AUTO)
 
-    ds = ds.batch(batch_size * replicas)
+    ds = ds.batch(batch_size)
     ds = ds.prefetch(AUTO)
     return ds
