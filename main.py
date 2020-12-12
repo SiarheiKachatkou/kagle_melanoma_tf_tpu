@@ -95,7 +95,7 @@ oof_tar = []
 oof_val = []
 oof_names = []
 oof_folds = []
-preds = np.zeros((count_data_items(files_test), 1))
+preds = np.zeros((int(count_data_items(files_test)), 1))
 
 for fold, (idxT, idxV) in enumerate(skf.split(np.arange(15))):
 
