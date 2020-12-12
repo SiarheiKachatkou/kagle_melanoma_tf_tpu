@@ -7,6 +7,7 @@ from sklearn.metrics import roc_auc_score
 import matplotlib.pyplot as plt
 from model import build_model
 from dataset_utils import get_dataset, count_data_items
+from getscope import get_scope
 from lr import get_lr_callback
 import  os
 
@@ -58,36 +59,14 @@ files_test  = np.sort(np.array(tf.io.gfile.glob(GCS_PATH[0] + '/test*.tfrec')))
 
 if DEVICE == "TPU":
     print("connecting to TPU...")
-    try:
-        tpu_key = 'TPU_NAME'
-        tpu = tf.distribute.cluster_resolver.TPUClusterResolver(tpu=os.environ[tpu_key])
-        #print('Running on TPU ', tpu.master())
-    except ValueError:
-        print("Could not connect to TPU")
-        tpu = None
 
-    if tpu:
-        try:
-            print("initializing  TPU ...")
-            tf.config.experimental_connect_to_cluster(tpu)
-            tf.tpu.experimental.initialize_tpu_system(tpu)
-            print("All devices: ", tf.config.list_logical_devices('TPU'))
-            strategy = tf.distribute.experimental.TPUStrategy(tpu)
-            print("TPU initialized")
-        except:
-            print("failed to initialize TPU")
-    else:
-        DEVICE = "GPU"
-
-if DEVICE != "TPU":
+else:
+    DEVICE = "GPU"
     print("Using default strategy for CPU and single GPU")
-    strategy = tf.distribute.get_strategy()
-
-if DEVICE == "GPU":
-    print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('GPU')))
+    scope = tf.distribute.get_strategy().scope()
 
 
-REPLICAS = strategy.num_replicas_in_sync
+REPLICAS = 8
 print(f'REPLICAS: {REPLICAS}')
 
 VERBOSE = 1
@@ -103,13 +82,12 @@ preds = np.zeros((int(count_data_items(files_test)), 1))
 
 for fold, (idxT, idxV) in enumerate(skf.split(np.arange(15))):
 
-    # DISPLAY FOLD INFO
-    if DEVICE == 'TPU' and fold!=0:
-        if tpu: tf.tpu.experimental.initialize_tpu_system(tpu)
     print('#' * 25)
     print('#### FOLD', fold + 1)
     print('#### Image Size %i with EfficientNet B%i and batch_size %i' %
           (IMG_SIZES[fold], EFF_NETS[fold], BATCH_SIZES[fold] * REPLICAS))
+
+    scope = get_scope()
 
     # CREATE TRAIN AND VALIDATION SUBSETS
     files_train = tf.io.gfile.glob([GCS_PATH[fold] + '/train%.2i*.tfrec' % x for x in idxT])
@@ -126,7 +104,7 @@ for fold, (idxT, idxV) in enumerate(skf.split(np.arange(15))):
 
     # BUILD MODEL
     #K.clear_session()
-    with strategy.scope():
+    with scope:
         model = build_model(dim=IMG_SIZES[fold], ef=EFF_NETS[fold])
 
     # SAVE BEST MODEL EACH FOLD
