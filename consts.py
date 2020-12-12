@@ -44,7 +44,7 @@ else:
                 #384: {'new': 'gs://kaggle_melanoma_isic/isic2020-384-colornormed-tfrecord/train*.tfrec', 'old':''},
                 #384: {'new': 'data/isic2020-384-colornormed-tfrecord/train*.tfrec','old':''},
                 #384: {'new':'gs://kds-76800f320871e548ef017f0a5a63cef5c72d1d47d6e020c81edfa286/train*.tfrec','old':''},
-                384: {'new': 'gs://kds-75a917daec566c2b42116a9a645afc875650848c1e1070e4feafcb89/train*.tfrec','old':''},#'gs://kds-4e8502fa6aa4c08b11f43ab8b42505960a29dc73fbcea54ba2bd1f9a/train*.tfrec'},
+                384: {'new': 'gs://kds-68d604aee5addfebbabae3fcfe5376b86711f3cd42993bd8e0dc80a5/train*.tfrec','old':''},#'gs://kds-4e8502fa6aa4c08b11f43ab8b42505960a29dc73fbcea54ba2bd1f9a/train*.tfrec'},
                 #512: {'new': 'gs://kaggle_melanoma_isic/isic2020-512-colornormed-tfrecord/train*.tfrec', 'old':''},
                 512: {'new': 'gs://kds-cb7c9aaea4b354a2b47b2c0f5feced50c9ddb98be03f7856e9e71642/train*.tfrec','old':''},
                 768: {'new': 'gs://kaggle_melanoma_isic/isic2020-768-colornormed-tfrecord/archive/train*.tfrec',
