@@ -96,89 +96,89 @@ def main():
         with scope:
             model = build_model(dim=IMG_SIZES[fold], ef=EFF_NETS[fold])
 
-        # SAVE BEST MODEL EACH FOLD
-        sv = tf.keras.callbacks.ModelCheckpoint(
-            'fold-%i.h5' % fold, monitor='val_loss', verbose=0, save_best_only=True,
-            save_weights_only=True, mode='min', save_freq='epoch')
+            # SAVE BEST MODEL EACH FOLD
+            sv = tf.keras.callbacks.ModelCheckpoint(
+                'fold-%i.h5' % fold, monitor='val_loss', verbose=0, save_best_only=True,
+                save_weights_only=True, mode='min', save_freq='epoch')
 
-        # TRAIN
-        print('Training...')
-        validation_dataset=get_dataset(files_valid, replicas=REPLICAS, augment=False, shuffle=False,
-                                        repeat=False, dim=IMG_SIZES[fold])
-        train_data_items=count_data_items(files_train)
-        print(f'train_data_items={train_data_items}')
-        training_dataset=get_dataset(files_train, replicas=REPLICAS, augment=True, shuffle=True, repeat=True,
-                        dim=IMG_SIZES[fold], batch_size=BATCH_SIZES[fold])
-        history = model.fit(
-            training_dataset,
-            epochs=EPOCHS[fold], callbacks=[sv, get_lr_callback(BATCH_SIZES[fold],replicas=REPLICAS)],
-            steps_per_epoch=train_data_items / BATCH_SIZES[fold] // REPLICAS,
-            validation_data=validation_dataset,verbose=VERBOSE) #,  # class_weight = {0:1,1:2}
+            # TRAIN
+            print('Training...')
+            validation_dataset=get_dataset(files_valid, replicas=REPLICAS, augment=False, shuffle=False,
+                                            repeat=False, dim=IMG_SIZES[fold])
+            train_data_items=count_data_items(files_train)
+            print(f'train_data_items={train_data_items}')
+            training_dataset=get_dataset(files_train, replicas=REPLICAS, augment=True, shuffle=True, repeat=True,
+                            dim=IMG_SIZES[fold], batch_size=BATCH_SIZES[fold])
+            history = model.fit(
+                training_dataset,
+                epochs=EPOCHS[fold], callbacks=[sv, get_lr_callback(BATCH_SIZES[fold],replicas=REPLICAS)],
+                steps_per_epoch=train_data_items / BATCH_SIZES[fold] // REPLICAS,
+                validation_data=validation_dataset,verbose=VERBOSE) #,  # class_weight = {0:1,1:2}
 
-        print('Loading best model...')
-        model.load_weights('fold-%i.h5' % fold)
+            print('Loading best model...')
+            model.load_weights('fold-%i.h5' % fold)
 
-        # PREDICT OOF USING TTA
-        print('Predicting OOF with TTA...')
-        ds_valid = get_dataset(files_valid, labeled=False, return_image_names=False, augment=True,
-                               repeat=True, shuffle=False, dim=IMG_SIZES[fold], batch_size=BATCH_SIZES[fold] * 4)
-        ct_valid = count_data_items(files_valid)
-        STEPS = TTA * ct_valid / BATCH_SIZES[fold] / 4 / REPLICAS
-        pred = model.predict(ds_valid, steps=STEPS, verbose=VERBOSE)[:TTA * ct_valid, ]
-        oof_pred.append(np.mean(pred.reshape((ct_valid, TTA), order='F'), axis=1))
-        # oof_pred.append(model.predict(get_dataset(files_valid,dim=IMG_SIZES[fold]),verbose=1))
+            # PREDICT OOF USING TTA
+            print('Predicting OOF with TTA...')
+            ds_valid = get_dataset(files_valid, labeled=False, return_image_names=False, augment=True,
+                                   repeat=True, shuffle=False, dim=IMG_SIZES[fold], batch_size=BATCH_SIZES[fold] * 4)
+            ct_valid = count_data_items(files_valid)
+            STEPS = TTA * ct_valid / BATCH_SIZES[fold] / 4 / REPLICAS
+            pred = model.predict(ds_valid, steps=STEPS, verbose=VERBOSE)[:TTA * ct_valid, ]
+            oof_pred.append(np.mean(pred.reshape((ct_valid, TTA), order='F'), axis=1))
+            # oof_pred.append(model.predict(get_dataset(files_valid,dim=IMG_SIZES[fold]),verbose=1))
 
-        # GET OOF TARGETS AND NAMES
-        ds_valid = get_dataset(files_valid, augment=False, repeat=False, dim=IMG_SIZES[fold],
-                               labeled=True, return_image_names=True)
-        oof_tar.append(np.array([target.numpy() for img, target in iter(ds_valid.unbatch())]))
-        oof_folds.append(np.ones_like(oof_tar[-1], dtype='int8') * fold)
-        ds = get_dataset(files_valid, augment=False, repeat=False, dim=IMG_SIZES[fold],
-                         labeled=False, return_image_names=True)
-        oof_names.append(np.array([img_name.numpy().decode("utf-8") for img, img_name in iter(ds.unbatch())]))
+            # GET OOF TARGETS AND NAMES
+            ds_valid = get_dataset(files_valid, augment=False, repeat=False, dim=IMG_SIZES[fold],
+                                   labeled=True, return_image_names=True)
+            oof_tar.append(np.array([target.numpy() for img, target in iter(ds_valid.unbatch())]))
+            oof_folds.append(np.ones_like(oof_tar[-1], dtype='int8') * fold)
+            ds = get_dataset(files_valid, augment=False, repeat=False, dim=IMG_SIZES[fold],
+                             labeled=False, return_image_names=True)
+            oof_names.append(np.array([img_name.numpy().decode("utf-8") for img, img_name in iter(ds.unbatch())]))
 
-        # PREDICT TEST USING TTA
-        print('Predicting Test with TTA...')
-        ds_test = get_dataset(files_test, replicas=REPLICAS, labeled=False, return_image_names=False, augment=True,
-                              repeat=True, shuffle=False, dim=IMG_SIZES[fold], batch_size=BATCH_SIZES[fold] * 4)
-        ct_test = count_data_items(files_test)
-        STEPS = TTA * ct_test / BATCH_SIZES[fold] / 4 / REPLICAS
-        pred = model.predict(ds_test, steps=STEPS, verbose=VERBOSE)[:TTA * ct_test, ]
-        preds[:, 0] += np.mean(pred.reshape((ct_test, TTA), order='F'), axis=1) * WGTS[fold]
+            # PREDICT TEST USING TTA
+            print('Predicting Test with TTA...')
+            ds_test = get_dataset(files_test, replicas=REPLICAS, labeled=False, return_image_names=False, augment=True,
+                                  repeat=True, shuffle=False, dim=IMG_SIZES[fold], batch_size=BATCH_SIZES[fold] * 4)
+            ct_test = count_data_items(files_test)
+            STEPS = TTA * ct_test / BATCH_SIZES[fold] / 4 / REPLICAS
+            pred = model.predict(ds_test, steps=STEPS, verbose=VERBOSE)[:TTA * ct_test, ]
+            preds[:, 0] += np.mean(pred.reshape((ct_test, TTA), order='F'), axis=1) * WGTS[fold]
 
-        # REPORT RESULTS
-        auc = roc_auc_score(oof_tar[-1], oof_pred[-1])
-        oof_val.append(np.max(history.history['val_auc']))
-        print('#### FOLD %i OOF AUC without TTA = %.3f, with TTA = %.3f' % (fold + 1, oof_val[-1], auc))
+            # REPORT RESULTS
+            auc = roc_auc_score(oof_tar[-1], oof_pred[-1])
+            oof_val.append(np.max(history.history['val_auc']))
+            print('#### FOLD %i OOF AUC without TTA = %.3f, with TTA = %.3f' % (fold + 1, oof_val[-1], auc))
 
-        # PLOT TRAINING
-        if DISPLAY_PLOT:
-            plt.figure(figsize=(15, 5))
-            plt.plot(np.arange(EPOCHS[fold]), history.history['auc'], '-o', label='Train AUC', color='#ff7f0e')
-            plt.plot(np.arange(EPOCHS[fold]), history.history['val_auc'], '-o', label='Val AUC', color='#1f77b4')
-            x = np.argmax(history.history['val_auc'])
-            y = np.max(history.history['val_auc'])
-            xdist = plt.xlim()[1] - plt.xlim()[0]
-            ydist = plt.ylim()[1] - plt.ylim()[0]
-            plt.scatter(x, y, s=200, color='#1f77b4')
-            plt.text(x - 0.03 * xdist, y - 0.13 * ydist, 'max auc\n%.2f' % y, size=14)
-            plt.ylabel('AUC', size=14)
-            plt.xlabel('Epoch', size=14)
-            plt.legend(loc=2)
-            plt2 = plt.gca().twinx()
-            plt2.plot(np.arange(EPOCHS[fold]), history.history['loss'], '-o', label='Train Loss', color='#2ca02c')
-            plt2.plot(np.arange(EPOCHS[fold]), history.history['val_loss'], '-o', label='Val Loss', color='#d62728')
-            x = np.argmin(history.history['val_loss'])
-            y = np.min(history.history['val_loss'])
-            ydist = plt.ylim()[1] - plt.ylim()[0]
-            plt.scatter(x, y, s=200, color='#d62728')
-            plt.text(x - 0.03 * xdist, y + 0.05 * ydist, 'min loss', size=14)
-            plt.ylabel('Loss', size=14)
-            plt.title('FOLD %i - Image Size %i, EfficientNet B%i, inc2019=%i, inc2018=%i' %
-                      (fold + 1, IMG_SIZES[fold], EFF_NETS[fold], INC2019[fold], INC2018[fold]), size=18)
-            plt.legend(loc=3)
+            # PLOT TRAINING
+            if DISPLAY_PLOT:
+                plt.figure(figsize=(15, 5))
+                plt.plot(np.arange(EPOCHS[fold]), history.history['auc'], '-o', label='Train AUC', color='#ff7f0e')
+                plt.plot(np.arange(EPOCHS[fold]), history.history['val_auc'], '-o', label='Val AUC', color='#1f77b4')
+                x = np.argmax(history.history['val_auc'])
+                y = np.max(history.history['val_auc'])
+                xdist = plt.xlim()[1] - plt.xlim()[0]
+                ydist = plt.ylim()[1] - plt.ylim()[0]
+                plt.scatter(x, y, s=200, color='#1f77b4')
+                plt.text(x - 0.03 * xdist, y - 0.13 * ydist, 'max auc\n%.2f' % y, size=14)
+                plt.ylabel('AUC', size=14)
+                plt.xlabel('Epoch', size=14)
+                plt.legend(loc=2)
+                plt2 = plt.gca().twinx()
+                plt2.plot(np.arange(EPOCHS[fold]), history.history['loss'], '-o', label='Train Loss', color='#2ca02c')
+                plt2.plot(np.arange(EPOCHS[fold]), history.history['val_loss'], '-o', label='Val Loss', color='#d62728')
+                x = np.argmin(history.history['val_loss'])
+                y = np.min(history.history['val_loss'])
+                ydist = plt.ylim()[1] - plt.ylim()[0]
+                plt.scatter(x, y, s=200, color='#d62728')
+                plt.text(x - 0.03 * xdist, y + 0.05 * ydist, 'min loss', size=14)
+                plt.ylabel('Loss', size=14)
+                plt.title('FOLD %i - Image Size %i, EfficientNet B%i, inc2019=%i, inc2018=%i' %
+                          (fold + 1, IMG_SIZES[fold], EFF_NETS[fold], INC2019[fold], INC2018[fold]), size=18)
+                plt.legend(loc=3)
 
-            plt.show()
+                plt.show()
 
 
 
