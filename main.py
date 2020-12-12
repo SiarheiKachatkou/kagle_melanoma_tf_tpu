@@ -61,7 +61,7 @@ if DEVICE == "TPU":
     try:
         tpu_key = 'TPU_NAME'
         tpu = tf.distribute.cluster_resolver.TPUClusterResolver(tpu=os.environ[tpu_key])
-        print('Running on TPU ', tpu.master())
+        #print('Running on TPU ', tpu.master())
     except ValueError:
         print("Could not connect to TPU")
         tpu = None
@@ -71,6 +71,7 @@ if DEVICE == "TPU":
             print("initializing  TPU ...")
             tf.config.experimental_connect_to_cluster(tpu)
             tf.tpu.experimental.initialize_tpu_system(tpu)
+            print("All devices: ", tf.config.list_logical_devices('TPU'))
             strategy = tf.distribute.experimental.TPUStrategy(tpu)
             print("TPU initialized")
         except:
