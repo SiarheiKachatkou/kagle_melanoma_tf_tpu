@@ -110,7 +110,7 @@ def main():
             history = model.fit(
                 training_dataset,
                 epochs=EPOCHS[fold], callbacks=callbacks,
-                steps_per_epoch=train_data_items / BATCH_SIZES[fold] // REPLICAS,
+                steps_per_epoch=train_data_items / BATCH_SIZES[fold], #// REPLICAS,
                 validation_data=validation_dataset,verbose=VERBOSE) #,  # class_weight = {0:1,1:2}
 
             print('Loading best model...')
@@ -121,7 +121,7 @@ def main():
             ds_valid = get_dataset(files_valid, labeled=False, return_image_names=False, augment=True,
                                    repeat=True, shuffle=False, dim=IMG_SIZES[fold], batch_size=BATCH_SIZES[fold] * 4)
             ct_valid = count_data_items(files_valid)
-            STEPS = TTA * ct_valid / BATCH_SIZES[fold] / 4 / REPLICAS
+            STEPS = TTA * ct_valid / BATCH_SIZES[fold] / 4 #/ REPLICAS
             pred = model.predict(ds_valid, steps=STEPS, verbose=VERBOSE)[:TTA * ct_valid, ]
             oof_pred.append(np.mean(pred.reshape((ct_valid, TTA), order='F'), axis=1))
             # oof_pred.append(model.predict(get_dataset(files_valid,dim=IMG_SIZES[fold]),verbose=1))

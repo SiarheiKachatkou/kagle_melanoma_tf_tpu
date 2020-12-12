@@ -2,7 +2,7 @@ import tensorflow as tf
 
 def get_lr_callback(batch_size=8, replicas=8):
     lr_start = 0.000005
-    lr_max = 0.00000125 * replicas * batch_size
+    lr_max = 0.00000125 * batch_size #* replicas
     lr_min = 0.000001
     lr_ramp_ep = 5
     lr_sus_ep = 0
