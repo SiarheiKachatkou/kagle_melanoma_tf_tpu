@@ -59,7 +59,8 @@ files_test  = np.sort(np.array(tf.io.gfile.glob(GCS_PATH[0] + '/test*.tfrec')))
 if DEVICE == "TPU":
     print("connecting to TPU...")
     try:
-        tpu = tf.distribute.cluster_resolver.TPUClusterResolver()
+        tpu_key = 'TPU_NAME'
+        tpu = tf.distribute.cluster_resolver.TPUClusterResolver(tpu=os.environ[tpu_key])
         print('Running on TPU ', tpu.master())
     except ValueError:
         print("Could not connect to TPU")
