@@ -1,3 +1,4 @@
+import  os
 import pandas as pd, numpy as np
 
 import tensorflow as tf, re, math
@@ -8,7 +9,7 @@ from model import build_model
 from dataset_utils import get_dataset, count_data_items
 from getscope import get_scope
 from lr import get_lr_callback
-import  os
+
 
 print(tf.__version__)
 
@@ -77,8 +78,6 @@ def main():
         print('#### Image Size %i with EfficientNet B%i and batch_size %i' %
               (IMG_SIZES[fold], EFF_NETS[fold], BATCH_SIZES[fold] * REPLICAS))
 
-        scope = get_scope()
-
         # CREATE TRAIN AND VALIDATION SUBSETS
         files_train = tf.io.gfile.glob([GCS_PATH[fold] + '/train%.2i*.tfrec' % x for x in idxT])
         if INC2019[fold]:
@@ -92,26 +91,25 @@ def main():
         files_valid = tf.io.gfile.glob([GCS_PATH[fold] + '/train%.2i*.tfrec' % x for x in idxV])
         files_test = np.sort(np.array(tf.io.gfile.glob(GCS_PATH[fold] + '/test*.tfrec')))
 
-        # BUILD MODEL
+        sv = tf.keras.callbacks.ModelCheckpoint(
+            'fold-%i.h5' % fold, monitor='val_loss', verbose=0, save_best_only=True,
+            save_weights_only=True, mode='min', save_freq='epoch')
+        callbacks=[sv, get_lr_callback(BATCH_SIZES[fold],replicas=REPLICAS)]
+        scope = get_scope()
         with scope:
             model = build_model(dim=IMG_SIZES[fold], ef=EFF_NETS[fold])
-
-            # SAVE BEST MODEL EACH FOLD
-            sv = tf.keras.callbacks.ModelCheckpoint(
-                'fold-%i.h5' % fold, monitor='val_loss', verbose=0, save_best_only=True,
-                save_weights_only=True, mode='min', save_freq='epoch')
 
             # TRAIN
             print('Training...')
             validation_dataset=get_dataset(files_valid, replicas=REPLICAS, augment=False, shuffle=False,
-                                            repeat=False, dim=IMG_SIZES[fold])
+                                            repeat=False, dim=IMG_SIZES[fold], batch_size=BATCH_SIZES[fold])
             train_data_items=count_data_items(files_train)
             print(f'train_data_items={train_data_items}')
             training_dataset=get_dataset(files_train, replicas=REPLICAS, augment=True, shuffle=True, repeat=True,
                             dim=IMG_SIZES[fold], batch_size=BATCH_SIZES[fold])
             history = model.fit(
                 training_dataset,
-                epochs=EPOCHS[fold], callbacks=[sv, get_lr_callback(BATCH_SIZES[fold],replicas=REPLICAS)],
+                epochs=EPOCHS[fold], callbacks=callbacks,
                 steps_per_epoch=train_data_items / BATCH_SIZES[fold] // REPLICAS,
                 validation_data=validation_dataset,verbose=VERBOSE) #,  # class_weight = {0:1,1:2}
 
