@@ -102,7 +102,7 @@ preds = np.zeros((int(count_data_items(files_test)), 1))
 for fold, (idxT, idxV) in enumerate(skf.split(np.arange(15))):
 
     # DISPLAY FOLD INFO
-    if DEVICE == 'TPU':
+    if DEVICE == 'TPU' and fold!=0:
         if tpu: tf.tpu.experimental.initialize_tpu_system(tpu)
     print('#' * 25)
     print('#### FOLD', fold + 1)
