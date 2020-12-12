@@ -132,15 +132,17 @@ for fold, (idxT, idxV) in enumerate(skf.split(np.arange(15))):
 
     # TRAIN
     print('Training...')
+    validation_dataset=get_dataset(files_valid, replicas=REPLICAS, augment=False, shuffle=False,
+                                    repeat=False, dim=IMG_SIZES[fold])
+    train_data_items=count_data_items(files_train)
+    print(f'train_data_items={train_data_items}')
+    training_dataset=get_dataset(files_train, replicas=REPLICAS, augment=True, shuffle=True, repeat=True,
+                    dim=IMG_SIZES[fold], batch_size=BATCH_SIZES[fold])
     history = model.fit(
-        get_dataset(files_train, replicas=REPLICAS, augment=True, shuffle=True, repeat=True,
-                    dim=IMG_SIZES[fold], batch_size=BATCH_SIZES[fold]),
+        training_dataset,
         epochs=EPOCHS[fold], callbacks=[sv, get_lr_callback(BATCH_SIZES[fold],replicas=REPLICAS)],
-        steps_per_epoch=count_data_items(files_train) / BATCH_SIZES[fold] // REPLICAS,
-        validation_data=get_dataset(files_valid, replicas=REPLICAS, augment=False, shuffle=False,
-                                    repeat=False, dim=IMG_SIZES[fold]),  # class_weight = {0:1,1:2},
-        verbose=VERBOSE
-    )
+        steps_per_epoch=train_data_items / BATCH_SIZES[fold] // REPLICAS,
+        validation_data=validation_dataset,verbose=VERBOSE) #,  # class_weight = {0:1,1:2}
 
     print('Loading best model...')
     model.load_weights('fold-%i.h5' % fold)
