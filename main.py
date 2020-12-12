@@ -75,8 +75,9 @@ print(f'REPLICAS: {REPLICAS}')
 
 GCS_PATH = [None]*FOLDS; GCS_PATH2 = [None]*FOLDS
 for i,k in enumerate(IMG_SIZES):
-    GCS_PATH[i] = KaggleDatasets().get_gcs_path('melanoma-%ix%i'%(k,k))
-    GCS_PATH2[i] = KaggleDatasets().get_gcs_path('isic2019-%ix%i'%(k,k))
+    assert IMG_SIZES[i]==384
+    GCS_PATH[i] = 'gs://kds-75a917daec566c2b42116a9a645afc875650848c1e1070e4feafcb89'
+    GCS_PATH2[i] = 'gs://kds-4e8502fa6aa4c08b11f43ab8b42505960a29dc73fbcea54ba2bd1f9a'
 files_train = np.sort(np.array(tf.io.gfile.glob(GCS_PATH[0] + '/train*.tfrec')))
 files_test  = np.sort(np.array(tf.io.gfile.glob(GCS_PATH[0] + '/test*.tfrec')))
 
