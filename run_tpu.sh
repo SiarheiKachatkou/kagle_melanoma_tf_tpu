@@ -7,7 +7,7 @@ gcloud config set project $PROJECT_ID
 
 ctpu up --project=${PROJECT_ID} \
  --zone=us-central1-b \
- --tf-version=2.3.1 \
+ --tf-version=2.2 \
  --tpu-size=v${TPU}-8 \
  --name=tpu-melanoma-${TPU} \
  --machine-type=n1-standard-8
@@ -35,3 +35,7 @@ gcloud config set project $PROJECT_ID &&
 ctpu status --details --project=${PROJECT_ID}
 
 
+
+export PROJECT_ID=turing-audio-146210 &&
+gcloud config set project $PROJECT_ID &&
+ctpu tf-versions --project=${PROJECT_ID}

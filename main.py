@@ -16,7 +16,7 @@ print(tf.__version__)
 tpu3 = "grpc://10.240.1.2:8470"
 tpu2 = 'grpc://10.240.1.10:8470'
 
-#os.environ['TPU_NAME'] = tpu3
+os.environ['TPU_NAME'] = tpu3
 
 DEVICE = "TPU" #or "GPU"
 
