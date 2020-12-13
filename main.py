@@ -127,7 +127,8 @@ def main():
         # oof_pred.append(model.predict(get_dataset(files_valid,dim=IMG_SIZES[fold]),verbose=1))
 
         # GET OOF TARGETS AND NAMES
-        ds_valid = get_dataset(files_valid, augment=False, repeat=False, dim=IMG_SIZES[fold],
+        ds_valid = get_dataset(files_valid, batch_size=BATCH_SIZES[fold], replicas=REPLICAS,
+                               augment=False, repeat=False, dim=IMG_SIZES[fold],
                                labeled=True, return_image_names=True)
         oof_tar.append(np.array([target.numpy() for img, target in iter(ds_valid.unbatch())]))
         oof_folds.append(np.ones_like(oof_tar[-1], dtype='int8') * fold)
@@ -140,7 +141,7 @@ def main():
         ds_test = get_dataset(files_test, replicas=REPLICAS, labeled=False, return_image_names=False, augment=True,
                               repeat=True, shuffle=False, dim=IMG_SIZES[fold], batch_size=BATCH_SIZES[fold] * 4)
         ct_test = count_data_items(files_test)
-        STEPS = TTA * ct_test / BATCH_SIZES[fold] / 4
+        STEPS = TTA * ct_test / BATCH_SIZES[fold] / 4 / REPLICAS
         pred = model.predict(ds_test, steps=STEPS, verbose=VERBOSE)[:TTA * ct_test, ]
         preds[:, 0] += np.mean(pred.reshape((ct_test, TTA), order='F'), axis=1) * WGTS[fold]
 
