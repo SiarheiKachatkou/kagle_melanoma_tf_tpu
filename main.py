@@ -35,7 +35,7 @@ INC2019 = [0]*FOLDS
 INC2018 = [0]*FOLDS
 
 # BATCH SIZE AND EPOCHS
-BATCH_SIZES = [128]*FOLDS
+BATCH_SIZES = [32]*FOLDS
 EPOCHS = [12]*FOLDS
 
 # WHICH EFFICIENTNET B? TO USE
@@ -110,7 +110,7 @@ def main():
         history = model.fit(
             training_dataset,
             epochs=EPOCHS[fold], callbacks=callbacks,
-            steps_per_epoch=train_data_items / BATCH_SIZES[fold], #// REPLICAS,
+            steps_per_epoch=train_data_items / BATCH_SIZES[fold] // REPLICAS,
             validation_data=validation_dataset,verbose=VERBOSE) #,  # class_weight = {0:1,1:2}
 
         print('Loading best model...')
@@ -118,10 +118,10 @@ def main():
 
         # PREDICT OOF USING TTA
         print('Predicting OOF with TTA...')
-        ds_valid = get_dataset(files_valid, labeled=False, return_image_names=False, augment=True,
+        ds_valid = get_dataset(files_valid, labeled=False, return_image_names=False, augment=True,replicas=REPLICAS,
                                repeat=True, shuffle=False, dim=IMG_SIZES[fold], batch_size=BATCH_SIZES[fold] * 4)
         ct_valid = count_data_items(files_valid)
-        STEPS = TTA * ct_valid / BATCH_SIZES[fold] / 4 #/ REPLICAS
+        STEPS = TTA * ct_valid / BATCH_SIZES[fold] / 4 / REPLICAS
         pred = model.predict(ds_valid, steps=STEPS, verbose=VERBOSE)[:TTA * ct_valid, ]
         oof_pred.append(np.mean(pred.reshape((ct_valid, TTA), order='F'), axis=1))
         # oof_pred.append(model.predict(get_dataset(files_valid,dim=IMG_SIZES[fold]),verbose=1))
