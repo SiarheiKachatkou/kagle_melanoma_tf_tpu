@@ -57,6 +57,7 @@ for fold in range(CONFIG.nfolds):
         training_dataset = get_training_dataset(train_filenames_folds[fold], train_filenames_old, CONFIG)
         if TRAIN_STEPS is None:
             TRAIN_STEPS=(count_data_items(train_filenames_folds[fold])+count_data_items(train_filenames_old))//CONFIG.batch_size
+        TRAIN_STEPS*=2
         print(f'TRAIN_STEPS={TRAIN_STEPS}')
         validation_dataset = get_validation_dataset(val_filenames_folds[fold],CONFIG)
 
