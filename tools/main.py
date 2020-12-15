@@ -55,7 +55,7 @@ for fold in range(CONFIG.nfolds):
     scope = get_scope()
     with scope:
         metrics = [SparceAUC()] if CONFIG.use_metrics else None
-        model = create_model(CONFIG, metrics, backbone_trainable=True)
+        model = create_model(CONFIG, metrics, backbone_trainable=False)
 
         model.summary()
         train_filenames_old = tf.io.gfile.glob(DATASETS[CONFIG.image_height]['old'])
@@ -66,10 +66,17 @@ for fold in range(CONFIG.nfolds):
         print(f'TRAIN_STEPS={TRAIN_STEPS}')
         validation_dataset = get_validation_dataset(val_filenames_folds[fold],CONFIG)
 
+        history_fine_tune = model.fit(return_2_values(training_dataset),
+                                      validation_data=return_2_values(validation_dataset) if do_validate else None,
+                                      steps_per_epoch=TRAIN_STEPS,
+                                      epochs=CONFIG.epochs_fine_tune, callbacks=callbacks)
+
+        model = set_backbone_trainable(model, metrics, True, CONFIG)
+
         history = model.fit(return_2_values(training_dataset),
                             validation_data=return_2_values(validation_dataset)  if do_validate else None,
                             steps_per_epoch=TRAIN_STEPS, initial_epoch=CONFIG.epochs_fine_tune, epochs=CONFIG.epochs_full, callbacks=callbacks)
-
+        history=join_history(history_fine_tune,history)
         print(history.history)
 
         if do_validate:
