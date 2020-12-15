@@ -2,7 +2,7 @@ import os
 from sklearn import metrics
 import pandas as pd
 import numpy as np
-import submission
+from submission import submission
 import argparse
 import glob
 
@@ -17,12 +17,13 @@ def calc_auc(subm):
     return metrics.roc_auc_score(labels, preds)
 
 
-def save_submission(df, name):
+def save_submission(df, name, do_submit=False):
     df_submission = df[['image_name', 'target']]
 
     df_submission.to_csv(name, index=False)
-    name_with_quotes='\"'+name+'\"'
-    os.system(f'kaggle competitions submit -c siim-isic-melanoma-classification -f {name_with_quotes} -m {name_with_quotes}')
+    if do_submit:
+        name_with_quotes='\"'+name+'\"'
+        os.system(f'kaggle competitions submit -c siim-isic-melanoma-classification -f {name_with_quotes} -m {name_with_quotes}')
 
 
 def main(nfolds, work_dir):

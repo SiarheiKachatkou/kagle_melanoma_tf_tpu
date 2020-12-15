@@ -1,7 +1,7 @@
 import tensorflow as tf
 import tensorflow.keras.backend as K
 import math
-from consts import *
+from config.consts import *
 
 ROT_ = 180.0
 SHR_ = 2.0

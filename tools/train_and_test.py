@@ -7,19 +7,19 @@ import gc
 import tensorflow as tf
 import subprocess
 from matplotlib import pyplot as plt
-from lr import get_lrfn, get_cycling_lrfn
-from display_utils import display_training_curves, plot_lr
-from consts import *
-from dataset_utils import *
-import submission
+from model.lr import get_lrfn, get_cycling_lrfn
+from dataset.display_utils import display_training_curves, plot_lr
+from config.consts import *
+from dataset.dataset_utils import *
+from submission import submission
 import shutil
 import pandas as pd
-from create_model import BinaryFocalLoss
-from SaveLastCallback import SaveLastCallback
-from create_model import create_model, set_backbone_trainable
-from runtime import get_scope
-from history import join_history
-from submit import calc_auc
+from model.create_model import BinaryFocalLoss
+from model.SaveLastCallback import SaveLastCallback
+from model.create_model import create_model, set_backbone_trainable
+from config.runtime import get_scope
+from model.history import join_history
+from submission.submit import calc_auc
 
 if not os.path.exists(CONFIG.work_dir):
     os.mkdir(CONFIG.work_dir)
@@ -147,7 +147,7 @@ test_auc=calc_mean_auc('test_*_tta_*.csv')
 
 test_subms=glob.glob(os.path.join(CONFIG.work_dir,'test_*_tta_*.csv'))
 test_subms=[pd.read_csv(s) for s in test_subms]
-avg_test_sub=submission.avg_submissions(test_subms)
+avg_test_sub= submission.avg_submissions(test_subms)
 test_avg_auc=calc_auc(avg_test_sub)
 
 with open(os.path.join(CONFIG.work_dir,'metric.txt'),'wt') as file:

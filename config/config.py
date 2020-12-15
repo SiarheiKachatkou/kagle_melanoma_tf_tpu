@@ -2,7 +2,7 @@ import datetime
 from collections import namedtuple
 import os
 import argparse
-from consts import is_local, is_debug
+from config.consts import is_local, is_debug
 
 
 parser=argparse.ArgumentParser()
@@ -15,6 +15,7 @@ parser.add_argument('--microscope_prob',type=float)
 parser.add_argument('--lr_warm_up_epochs',type=int)
 parser.add_argument('--gpus',type=str,default=None)
 parser.add_argument('--image_height',type=int)
+parser.add_argument('--work_dir',type=str)
 
 parser.add_argument('--focal_loss_gamma',type=float,default=4)
 parser.add_argument('--focal_loss_alpha',type=float,default=0.5)
@@ -34,7 +35,7 @@ epochs_fine_tune = 0
 epochs_full = 1 if is_debug else 12
 
 
-BATCH_SIZE = 128 if is_debug else 1024
+BATCH_SIZE = 36 if is_debug else 1024
 BATCH_SIZE_INCREASE_FOR_INFERENCE = 4
 
 
@@ -63,16 +64,15 @@ microscope_prob=args.microscope_prob
 lr_warm_up_epochs=args.lr_warm_up_epochs
 image_height=args.image_height
 
-work_dir_name = f'artifacts/with_old_{model}_focal_loss_{image_height}_epochs_{epochs_full}_drop_{dropout_rate}_lr_max{args.lr_max}_lr_dacay_{args.lr_exp_decay}_hair_prob_{hair_prob}_micro_prob_{microscope_prob}_wu_epochs_{lr_warm_up_epochs}' if not is_debug else 'debug'
-
+ttas=2 if is_debug else 12
 
 CONFIG=config(lr_max=args.lr_max*1e-4, lr_start=5e-6, stepsize=3,
               lr_warm_up_epochs=lr_warm_up_epochs,
               lr_min=1e-6, lr_exp_decay=args.lr_exp_decay, lr_fn='get_lrfn(CONFIG)',  #get_cycling_lrfn(CONFIG) #
-              nfolds=5, l2_penalty=penalty, work_dir=work_dir_name,
-              gs_work_dir=f'gs://kochetkov_kaggle_melanoma/{str(datetime.datetime.now())[:20]}_{work_dir_name}',
+              nfolds=2, l2_penalty=penalty, work_dir=args.work_dir,
+              gs_work_dir=f'gs://kochetkov_kaggle_melanoma/{str(datetime.datetime.now())[:20]}_{args.work}',
               model_fn_str=f"efficientnet.tfkeras.EfficientNet{model}(weights='imagenet', include_top=False)",
-              ttas=12,
+              ttas=ttas,
               use_metrics=True, dropout_rate=dropout_rate,
               save_last_epochs=0,
               oversample_mult=args.oversample_mult,

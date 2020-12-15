@@ -6,15 +6,15 @@ import numpy as np
 from tqdm import tqdm
 from matplotlib import pyplot as plt
 print("Tensorflow version " + tf.__version__)
-from lr import get_lrfn
-from display_utils import display_training_curves
-from consts import *
-from dataset_utils import *
-import submission
+from model.lr import get_lrfn
+from dataset.display_utils import display_training_curves
+from config.consts import *
+from dataset.dataset_utils import *
+from submission import submission
 import shutil
-from create_model import BinaryFocalLoss
-from SaveLastCallback import SaveLastCallback
-from create_model import create_model, set_backbone_trainable
+from model.create_model import BinaryFocalLoss
+from model.SaveLastCallback import SaveLastCallback
+from model.create_model import create_model, set_backbone_trainable
 
 
 train_filenames_folds, val_filenames_folds =get_train_val_filenames(DATASETS[IMAGE_HEIGHT]['new'] ,CONFIG.nfolds)

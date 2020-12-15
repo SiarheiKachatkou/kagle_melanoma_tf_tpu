@@ -1,26 +1,31 @@
 import os
 import pickle
 import gc
+import yaml
 import tensorflow as tf
 import subprocess
 from matplotlib import pyplot as plt
-from lr import get_lrfn, get_cycling_lrfn
-from display_utils import display_training_curves, plot_lr
-from config import CONFIG, TRAIN_STEPS
-from dataset_utils import *
-from consts import DATASETS, metrics_path
-import submission
+from model.lr import get_lrfn, get_cycling_lrfn
+from dataset.display_utils import display_training_curves, plot_lr
+from config.config import CONFIG, TRAIN_STEPS
+from dataset.dataset_utils import *
+from config.consts import DATASETS, metrics_path
+from submission import submission
 import shutil
-from create_model import BinaryFocalLoss
-from SaveLastCallback import SaveLastCallback
-from create_model import create_model, set_backbone_trainable
-from runtime import get_scope
-from sparceauc import SparceAUC
-from history import join_history
+from model.create_model import BinaryFocalLoss
+from model.SaveLastCallback import SaveLastCallback
+from model.create_model import create_model, set_backbone_trainable
+from config.runtime import get_scope
+from model.sparceauc import SparceAUC
+from submission import submit
+from model.history import join_history
+
 if not os.path.exists(CONFIG.work_dir):
     os.makedirs(CONFIG.work_dir)
-    
-shutil.copyfile('config.py',os.path.join(CONFIG.work_dir,'config.py'))
+
+with open(os.path.join(CONFIG.work_dir,'config.yaml'),'wt') as file:
+    config_dict=dict(CONFIG._asdict())
+    file.write(yaml.dump(config_dict))
 
 lrfn = eval(CONFIG.lr_fn)
 plot_lr(lrfn,CONFIG.epochs_full,CONFIG.work_dir)

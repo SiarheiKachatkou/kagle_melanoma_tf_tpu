@@ -2,14 +2,15 @@ import os
 import tensorflow as tf
 import numpy as np
 import random
+from pathlib import Path
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 
 use_tpu_2 = False
-is_local = False
+is_local = True
 is_kaggle = False
-is_debug = False
+is_debug = True
 do_validate = True
 
 
@@ -25,10 +26,11 @@ red = 4 if use_tpu_2 else 1
 if is_local:
     red=4
 
+root=Path(os.path.split(__file__)[0])/'..'
 
 if is_local:
     DATASETS = {
-                128: {'new': 'data/128_with_labels/train*.tfrec', 'old': ''},
+                128: {'new': root/'data/128x128/train*.tfrec', 'old': ''},
                 256: {'new': 'data/256_with_labels/train*.tfrec', 'old': ''},
                 #128: {'new': 'data/128/train*.tfrec', 'old': ''},
                 #384: {'new': 'data/isic2020-384-colornormed-tfrecord/train*.tfrec', 'old': ''},
@@ -62,9 +64,9 @@ tf.compat.v1.random.set_random_seed(seed)
 np.random.seed(seed)
 random.seed(seed)
 
-path_hair_images = "data/melanoma-hairs" if is_local else ("gs://kds-c1f8d68ed78af3bc82472db8c32ec9b3fe1a0dcf09e62c04e90e81fe" if is_kaggle else "gs://kochetkov_kaggle_melanoma/malanoma_hairs")
-path_microscope_images = "data/melanoma-microscope" if is_local else ("gs://kds-05490130d1f3d52b5eecc24712a9796337d072ebfbada94359adc410" if is_kaggle else "gs://kochetkov_kaggle_melanoma/melanoma-microscope" )
+path_hair_images = root/"data/melanoma_hairs" if is_local else ("gs://kds-c1f8d68ed78af3bc82472db8c32ec9b3fe1a0dcf09e62c04e90e81fe" if is_kaggle else "gs://kochetkov_kaggle_melanoma/melanoma_hairs")
+path_microscope_images = root/"data/melanoma_microscope" if is_local else ("gs://kds-05490130d1f3d52b5eecc24712a9796337d072ebfbada94359adc410" if is_kaggle else "gs://kochetkov_kaggle_melanoma/melanoma_microscope" )
 
-test_data_path='data/test_data'
+test_data_path=root/'data/test_data'
 
-metrics_path='metrics/metrics.txt'
+metrics_path=root/'metrics/metrics.txt'

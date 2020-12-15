@@ -1,8 +1,8 @@
 import os
 import tensorflow as tf
 import contextlib
-from consts import *
-from dataset_utils import *
+from config.consts import *
+from dataset.dataset_utils import *
 
 print("Tensorflow version " + tf.__version__)
 

@@ -13,13 +13,13 @@ def count_data_items(filenames):
 
 
 def get_test_filenames(gs_path_to_dataset_train):
-    gcs_pattern = gs_path_to_dataset_train.replace('train', 'test')
+    gcs_pattern = str(gs_path_to_dataset_train).replace('train', 'test')
     test_filenames = tf.io.gfile.glob(gcs_pattern)
     return test_filenames
 
 
 def get_train_val_filenames(gs_path_to_dataset_train, nfolds):
-    filenames = tf.io.gfile.glob(gs_path_to_dataset_train)
+    filenames = tf.io.gfile.glob(str(gs_path_to_dataset_train))
     filenames = np.array(filenames)
     kf = KFold(n_splits=nfolds, random_state=0, shuffle=True)
     train_filenames_folds = []
