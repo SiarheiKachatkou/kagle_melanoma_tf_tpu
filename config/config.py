@@ -23,7 +23,7 @@ parser.add_argument('--oversample_mult',type=int,default=1)
 
 args=parser.parse_args()
 
-if not is_local:
+if is_local:
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
     if args.gpus is None:
         os.environ["CUDA_VISIBLE_DEVICES"] = "1,2"  # "0" #
@@ -32,7 +32,7 @@ if not is_local:
 
 
 epochs_fine_tune = 5
-epochs_full = 1 if is_debug else 12
+epochs_full = 1 if is_debug else 16
 
 
 BATCH_SIZE = 36 if is_debug else 256

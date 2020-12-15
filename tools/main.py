@@ -4,6 +4,7 @@ import gc
 import yaml
 import tensorflow as tf
 import subprocess
+import config.config
 from matplotlib import pyplot as plt
 from model.lr import get_lrfn, get_cycling_lrfn
 from dataset.display_utils import display_training_curves, plot_lr
@@ -69,14 +70,14 @@ for fold in range(CONFIG.nfolds):
         history_fine_tune = model.fit(return_2_values(training_dataset),
                                       validation_data=return_2_values(validation_dataset) if do_validate else None,
                                       steps_per_epoch=TRAIN_STEPS,
-                                      epochs=CONFIG.epochs_fine_tune, callbacks=callbacks)
+                                      epochs=CONFIG.epochs_fine_tune, callbacks=[lr_callback])
 
         model = set_backbone_trainable(model, metrics, True, CONFIG)
 
         history = model.fit(return_2_values(training_dataset),
                             validation_data=return_2_values(validation_dataset)  if do_validate else None,
                             steps_per_epoch=TRAIN_STEPS, initial_epoch=CONFIG.epochs_fine_tune, epochs=CONFIG.epochs_full, callbacks=callbacks)
-        history=join_history(history_fine_tune,history)
+        #history=join_history(history_fine_tune,history)
         print(history.history)
 
         if do_validate:
