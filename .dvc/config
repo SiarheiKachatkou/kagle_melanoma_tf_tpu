@@ -1,0 +1,6 @@
+[core]
+    remote = gs_storage_k
+['remote "gs_storage"']
+    url = gs://kochetkov_kaggle_melanoma_dvc_storage
+['remote "gs_storage_k"']
+    url = gs://kochetkov_kaggle_melanoma_dvc_storage?key=AIzaSyAKQB2aYik_iWtTf9dRFd3TzuO7wno4k5

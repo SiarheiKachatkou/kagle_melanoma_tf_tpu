@@ -2,6 +2,7 @@ import os
 import pickle
 import gc
 import yaml
+import config.config
 import tensorflow as tf
 import subprocess
 from matplotlib import pyplot as plt
@@ -86,20 +87,17 @@ for fold in range(CONFIG.nfolds):
         validation_dataset_tta = get_validation_dataset_tta(val_filenames_folds[fold],CONFIG)
         submission.calc_and_save_submissions(CONFIG, model, f'val_{fold}', validation_dataset, validation_dataset_tta,
                                              CONFIG.ttas)
-        del validation_dataset
-        del validation_dataset_tta
+
 
         test_dataset = get_test_dataset(test_filenames,CONFIG)
         test_dataset_tta = get_test_dataset_tta(test_filenames,CONFIG)
         submission.calc_and_save_submissions(CONFIG, model, f'test_{fold}', test_dataset, test_dataset_tta, CONFIG.ttas)
-        del test_dataset
-        del test_dataset_tta
 
         if CONFIG.save_last_epochs!=0:
             models=[]
             filepaths=save_callback_last.get_filepaths()
             for filepath in filepaths:
-                m=tf.keras.models.load_model(filepath, custom_objects={'BinaryFocalLoss':BinaryFocalLoss}, compile=True)
+                m=tf.keras.models.load_model(filepath, custom_objects={'BinaryFocalLoss':BinaryFocalLoss,'SparceAUC':SparceAUC}, compile=True)
                 m.trainable=False
                 models.append(m)
             submission.calc_and_save_submissions(CONFIG, models, f'val_le_{fold}', validation_dataset,
@@ -107,6 +105,11 @@ for fold in range(CONFIG.nfolds):
                                                  CONFIG.ttas)
             submission.calc_and_save_submissions(CONFIG, models, f'test_le_{fold}', test_dataset,
                                                  test_dataset_tta, CONFIG.ttas)
+
+        del validation_dataset
+        del validation_dataset_tta
+        del test_dataset
+        del test_dataset_tta
 
     if (not is_local) and (not is_kaggle):
         if fold!=0:

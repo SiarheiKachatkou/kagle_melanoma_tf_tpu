@@ -23,7 +23,7 @@ parser.add_argument('--oversample_mult',type=int,default=1)
 
 args=parser.parse_args()
 
-if not is_local:
+if is_local:
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
     if args.gpus is None:
         os.environ["CUDA_VISIBLE_DEVICES"] = "1,2"  # "0" #
@@ -74,7 +74,7 @@ CONFIG=config(lr_max=args.lr_max*1e-4, lr_start=5e-6, stepsize=3,
               model_fn_str=f"efficientnet.tfkeras.EfficientNet{model}(weights='imagenet', include_top=False)",
               ttas=ttas,
               use_metrics=True, dropout_rate=dropout_rate,
-              save_last_epochs=0,
+              save_last_epochs=3,
               oversample_mult=args.oversample_mult,
               focal_loss_gamma=focal_loss_gamma, focal_loss_alpha=focal_loss_alpha,
               hair_prob=hair_prob, microscope_prob=microscope_prob,
