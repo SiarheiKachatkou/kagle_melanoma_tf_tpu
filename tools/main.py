@@ -6,7 +6,7 @@ import tensorflow as tf
 import subprocess
 import config.config
 from matplotlib import pyplot as plt
-from model.lr import get_lrfn, get_cycling_lrfn
+from model.lr import get_lrfn, get_cycling_lrfn, get_lrfn_fine_tune
 from dataset.display_utils import display_training_curves, plot_lr
 from config.config import CONFIG, TRAIN_STEPS
 from dataset.dataset_utils import *
@@ -77,7 +77,7 @@ for fold in range(CONFIG.nfolds):
         history = model.fit(return_2_values(training_dataset),
                             validation_data=return_2_values(validation_dataset)  if do_validate else None,
                             steps_per_epoch=TRAIN_STEPS, initial_epoch=CONFIG.epochs_fine_tune, epochs=CONFIG.epochs_full, callbacks=callbacks)
-        #history=join_history(history_fine_tune,history)
+        history=join_history(history_fine_tune,history)
         print(history.history)
 
         if do_validate:
