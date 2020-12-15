@@ -5,7 +5,7 @@ from augmentations.augmentation_hair import hair_aug_tf
 from augmentations.augmentation_microscope import microscope_aug_tf
 from augmentations.augmentations_geom import transform_geometricaly
 from config.consts import *
-
+from efficientnet.keras import preprocess_input
 # COARSE DROPOUT
 
 def cutout(image, image_height=256, prob = 0.75, holes_count = 8, hole_size = 0.2):
@@ -103,7 +103,7 @@ def cut_mix(images,labels,*args, config, prob=0.5):
 
 def _normalize(image8u):
     image = tf.cast(image8u,tf.float32)
-    image = tf.keras.applications.imagenet_utils.preprocess_input(image, mode='torch')
+    image = preprocess_input(image)
     return image
 
 
