@@ -8,7 +8,7 @@ from lr import get_lrfn, get_cycling_lrfn
 from display_utils import display_training_curves, plot_lr
 from config import CONFIG, TRAIN_STEPS
 from dataset_utils import *
-from consts import DATASETS
+from consts import DATASETS, metrics_path
 import submission
 import shutil
 from create_model import BinaryFocalLoss
@@ -57,7 +57,7 @@ for fold in range(CONFIG.nfolds):
         training_dataset = get_training_dataset(train_filenames_folds[fold], train_filenames_old, CONFIG)
         if TRAIN_STEPS is None:
             TRAIN_STEPS=(count_data_items(train_filenames_folds[fold])+count_data_items(train_filenames_old))//CONFIG.batch_size
-        TRAIN_STEPS*=2
+
         print(f'TRAIN_STEPS={TRAIN_STEPS}')
         validation_dataset = get_validation_dataset(val_filenames_folds[fold],CONFIG)
 
@@ -109,3 +109,7 @@ for fold in range(CONFIG.nfolds):
         subprocess.check_call(['gsutil', '-m', 'cp', '-r', CONFIG.work_dir,CONFIG.gs_work_dir])
 
     gc.collect()
+
+val_avg_tta_le_auc, val_avg_tta_auc = submit.main(CONFIG.nfolds,CONFIG.work_dir)
+with open(metrics_path,'wt') as file:
+    file.write(f'val_avg_tta_le_auc:\n    {val_avg_tta_le_auc}\nval_avg_tta_auc:\n    {val_avg_tta_auc}')

@@ -66,3 +66,5 @@ path_hair_images = "data/melanoma-hairs" if is_local else ("gs://kds-c1f8d68ed78
 path_microscope_images = "data/melanoma-microscope" if is_local else ("gs://kds-05490130d1f3d52b5eecc24712a9796337d072ebfbada94359adc410" if is_kaggle else "gs://kochetkov_kaggle_melanoma/melanoma-microscope" )
 
 test_data_path='data/test_data'
+
+metrics_path='metrics/metrics.txt'
