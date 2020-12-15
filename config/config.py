@@ -35,7 +35,7 @@ epochs_fine_tune = 0
 epochs_full = 1 if is_debug else 12
 
 
-BATCH_SIZE = 36 if is_debug else 1024
+BATCH_SIZE = 36 if is_debug else 256
 BATCH_SIZE_INCREASE_FOR_INFERENCE = 4
 
 
@@ -70,7 +70,7 @@ CONFIG=config(lr_max=args.lr_max*1e-4, lr_start=5e-6, stepsize=3,
               lr_warm_up_epochs=lr_warm_up_epochs,
               lr_min=1e-6, lr_exp_decay=args.lr_exp_decay, lr_fn='get_lrfn(CONFIG)',  #get_cycling_lrfn(CONFIG) #
               nfolds=2, l2_penalty=penalty, work_dir=args.work_dir,
-              gs_work_dir=f'gs://kochetkov_kaggle_melanoma/{str(datetime.datetime.now())[:20]}_{args.work}',
+              gs_work_dir=f'gs://kochetkov_kaggle_melanoma/{str(datetime.datetime.now())[:20]}_{args.work_dir}',
               model_fn_str=f"efficientnet.tfkeras.EfficientNet{model}(weights='imagenet', include_top=False)",
               ttas=ttas,
               use_metrics=True, dropout_rate=dropout_rate,
