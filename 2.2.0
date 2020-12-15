@@ -1,0 +1,11 @@
+Collecting keras
+  Downloading Keras-2.4.3-py2.py3-none-any.whl (36 kB)
+Requirement already satisfied: scipy>=0.14 in /home/sergey/anaconda3/envs/tensorflow_2/lib/python3.7/site-packages (from keras) (1.5.4)
+Requirement already satisfied: pyyaml in /home/sergey/anaconda3/envs/tensorflow_2/lib/python3.7/site-packages (from keras) (5.3.1)
+Requirement already satisfied: h5py in /home/sergey/anaconda3/envs/tensorflow_2/lib/python3.7/site-packages (from keras) (2.10.0)
+Requirement already satisfied: numpy>=1.9.1 in /home/sergey/anaconda3/envs/tensorflow_2/lib/python3.7/site-packages (from keras) (1.18.5)
+Requirement already satisfied: six in /home/sergey/anaconda3/envs/tensorflow_2/lib/python3.7/site-packages (from h5py->keras) (1.15.0)
+Requirement already satisfied: numpy>=1.9.1 in /home/sergey/anaconda3/envs/tensorflow_2/lib/python3.7/site-packages (from keras) (1.18.5)
+Requirement already satisfied: numpy>=1.9.1 in /home/sergey/anaconda3/envs/tensorflow_2/lib/python3.7/site-packages (from keras) (1.18.5)
+Installing collected packages: keras
+Successfully installed keras-2.4.3
