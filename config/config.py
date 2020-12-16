@@ -31,7 +31,7 @@ if is_local:
         os.environ["CUDA_VISIBLE_DEVICES"] = args.gpus
 
 
-epochs_fine_tune = 20
+epochs_fine_tune = 16
 epochs_full = 1 if is_debug else 45
 
 
