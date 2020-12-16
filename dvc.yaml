@@ -2,7 +2,7 @@ stages:
   baseline:
     cmd: export LD_LIBRARY_PATH=/usr/local/cuda/lib64 && export PYTHONPATH=/mnt/850G/GIT/kagle_melanoma_tf_tpu
       && /home/sergey/anaconda3/envs/tensorflow_2/bin/python3 tools/main.py --work_dir=artifacts/baseline
-      --backbone=B0 --dropout_rate=0.01 --lr_max=0.01 --lr_exp_decay=0.8 --focal_loss_gamma=4
+      --backbone=B0 --dropout_rate=0.01 --lr_max=1 --lr_exp_decay=0.8 --focal_loss_gamma=4
       --focal_loss_alpha=0.8 --hair_prob=0.1 --microscope_prob=0.01 --lr_warm_up_epochs=5
       --image_height=128
     deps:

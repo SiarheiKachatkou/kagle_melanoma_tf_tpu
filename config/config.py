@@ -66,7 +66,7 @@ image_height=args.image_height
 
 ttas=2 if is_debug else 12
 
-CONFIG=config(lr_max=args.lr_max*1e-4, lr_start=1e-10, stepsize=3,lr_fine_tune=1e-4,
+CONFIG=config(lr_max=args.lr_max*1e-4, lr_start=1e-6, stepsize=3,lr_fine_tune=1e-3,
               lr_warm_up_epochs=lr_warm_up_epochs,
               lr_min=1e-6, lr_exp_decay=args.lr_exp_decay, lr_fn='get_lrfn_fine_tune(CONFIG)',  #get_cycling_lrfn(CONFIG) #
               nfolds=4, l2_penalty=penalty, work_dir=args.work_dir,
