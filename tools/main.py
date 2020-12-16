@@ -124,5 +124,9 @@ for fold in range(CONFIG.nfolds):
     gc.collect()
 
 val_avg_tta_le_auc, val_avg_tta_auc = submit.main(CONFIG.nfolds,CONFIG.work_dir)
+
+metric_dir=os.path.dirname(metrics_path)
+if not os.path.exists(metric_dir):
+    os.mkdir(metric_dir)
 with open(metrics_path,'wt') as file:
     file.write(f'val_avg_tta_le_auc:\n    {val_avg_tta_le_auc}\nval_avg_tta_auc:\n    {val_avg_tta_auc}')
