@@ -1,7 +1,7 @@
 baseline:
   cmd: export LD_LIBRARY_PATH=/usr/local/cuda/lib64 && export PYTHONPATH=/mnt/850G/GIT/kagle_melanoma_tf_tpu
     && /home/sergey/anaconda3/envs/tensorflow_2/bin/python3 tools/main.py --work_dir=artifacts/baseline
-    --backbone=B0 --dropout_rate=0.01 --lr_max=0.1 --lr_exp_decay=0.5 --focal_loss_gamma=4
+    --backbone=B0 --dropout_rate=0.01 --lr_max=1 --lr_exp_decay=0.8 --focal_loss_gamma=4
     --focal_loss_alpha=0.8 --hair_prob=0.1 --microscope_prob=0.01 --lr_warm_up_epochs=5
     --image_height=128
   deps:
@@ -10,13 +10,13 @@ baseline:
     size: 24788
     nfiles: 9
   - path: config
-    md5: 130d779de116e120817363564d354b47.dir
-    size: 13569
+    md5: 3a7e35bf244e357ebdea1fd4b202fa0c.dir
+    size: 13634
     nfiles: 6
   - path: data
-    md5: fff96d004c52f4c449ce7c00a9f30569.dir
-    size: 259025238
-    nfiles: 41
+    md5: 25ae7c7744209603a1f9c0dd534ab444.dir
+    size: 259025335
+    nfiles: 42
   - path: dataset
     md5: 85cc1aafcf8ceea343919a9ec7ee2f5e.dir
     size: 34469
@@ -26,8 +26,8 @@ baseline:
     size: 8791
     nfiles: 7
   - path: model
-    md5: 7fee0b300f8267024494dfd0f500cfcf.dir
-    size: 19102
+    md5: 8348f7e934cbc76f81a607ca7cdcf39d.dir
+    size: 19507
     nfiles: 13
   - path: submission
     md5: a489bbaf4664206e7fb9cf2ff5a9574b.dir
@@ -39,9 +39,9 @@ baseline:
     nfiles: 6
   outs:
   - path: artifacts/baseline
-    md5: a75c449ee384e8ffb5039a3e7b03f823.dir
-    size: 207153130
+    md5: 98d028dd2e55e95c019566a335bc3e24.dir
+    size: 207289726
     nfiles: 36
   - path: metrics/metrics.txt
-    md5: 7d8144eefc5fabfbc3f75b30e42034a9
+    md5: a444dbc8486d25ba4103a37e1e074488
     size: 67
