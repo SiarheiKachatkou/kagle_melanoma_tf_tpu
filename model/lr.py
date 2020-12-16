@@ -8,8 +8,8 @@ def get_lrfn_fine_tune(CONFIG):
         LR_SUSTAIN_EPOCHS = 0
 
         if epoch<CONFIG.epochs_fine_tune:
-            lr=CONFIG.lr_start
-        elif epoch < CONFIG.lr_warm_up_epochs:
+            lr=CONFIG.lr_fine_tune
+        elif epoch < CONFIG.epochs_fine_tune+CONFIG.lr_warm_up_epochs:
             lr = (CONFIG.lr_max - CONFIG.lr_start) / CONFIG.lr_warm_up_epochs * (epoch-CONFIG.epochs_fine_tune) + CONFIG.lr_start
         elif epoch < CONFIG.lr_warm_up_epochs + LR_SUSTAIN_EPOCHS:
             lr = CONFIG.lr_max

@@ -31,8 +31,8 @@ if is_local:
         os.environ["CUDA_VISIBLE_DEVICES"] = args.gpus
 
 
-epochs_fine_tune = 8
-epochs_full = 1 if is_debug else 16
+epochs_fine_tune = 16
+epochs_full = 1 if is_debug else 32
 
 
 BATCH_SIZE = 36 if is_debug else 256
@@ -41,7 +41,7 @@ BATCH_SIZE_INCREASE_FOR_INFERENCE = 4
 
 TRAIN_STEPS = 1 if is_debug else None
 
-config=namedtuple('config',['lr_max','lr_start','stepsize', 'lr_warm_up_epochs','lr_min','lr_exp_decay','lr_fn',
+config=namedtuple('config',['lr_max','lr_start','lr_fine_tune','stepsize', 'lr_warm_up_epochs','lr_min','lr_exp_decay','lr_fn',
                             'nfolds','l2_penalty',
                             'model_fn_str','work_dir', 'gs_work_dir','ttas','use_metrics','dropout_rate',
                             'save_last_epochs',
@@ -66,9 +66,9 @@ image_height=args.image_height
 
 ttas=2 if is_debug else 12
 
-CONFIG=config(lr_max=args.lr_max*1e-4, lr_start=1e-4, stepsize=3,
+CONFIG=config(lr_max=args.lr_max*1e-4, lr_start=1e-10, stepsize=3,lr_fine_tune=1e-4,
               lr_warm_up_epochs=lr_warm_up_epochs,
-              lr_min=1e-8, lr_exp_decay=args.lr_exp_decay, lr_fn='get_lrfn_fine_tune(CONFIG)',  #get_cycling_lrfn(CONFIG) #
+              lr_min=1e-6, lr_exp_decay=args.lr_exp_decay, lr_fn='get_lrfn_fine_tune(CONFIG)',  #get_cycling_lrfn(CONFIG) #
               nfolds=4, l2_penalty=penalty, work_dir=args.work_dir,
               gs_work_dir=f'gs://kochetkov_kaggle_melanoma/{str(datetime.datetime.now())[:20]}_{args.work_dir}',
               model_fn_str=f"efficientnet.tfkeras.EfficientNet{model}(weights='imagenet', include_top=False)",

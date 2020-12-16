@@ -93,8 +93,14 @@ def create_model(cfg,  metrics, backbone_trainable=True, lr=None):
 
     pretrained_model.trainable = backbone_trainable
 
+    x=tf.keras.Input(shape=(cfg.image_height,cfg.image_height,3))
+
+    features=pretrained_model(x,training=False)
+
+    backbone=tf.keras.Model(x,features)
+
     model = tf.keras.Sequential([
-        pretrained_model,
+        backbone,
         tf.keras.layers.Dropout(rate=cfg.dropout_rate),
         tf.keras.layers.GlobalAveragePooling2D(),
         tf.keras.layers.Dense(2, activation='softmax')
