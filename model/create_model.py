@@ -66,7 +66,7 @@ class BinaryFocalLoss():
 
 
 def compile_model(model, metrics, cfg, lr=None):
-    loss = tf.keras.losses.SparseCategoricalCrossentropy()#BinaryCrossentropy()#BinaryFocalLoss(gamma=cfg.focal_loss_gamma,alpha=cfg.focal_loss_alpha, batch_size=cfg.batch_size)#label_smoothing=0.05)
+    loss = tf.keras.losses.BinaryCrossentropy()#SparseCategoricalCrossentropy()#BinaryFocalLoss(gamma=cfg.focal_loss_gamma,alpha=cfg.focal_loss_alpha, batch_size=cfg.batch_size)#label_smoothing=0.05)
 
     learning_rate = cfg.lr_start if lr is None else lr
 
@@ -104,7 +104,7 @@ def create_model(cfg,  metrics, backbone_trainable=True, lr=None):
         backbone,
         tf.keras.layers.Dropout(rate=cfg.dropout_rate),
         tf.keras.layers.GlobalAveragePooling2D(),
-        tf.keras.layers.Dense(2, activation='softmax')
+        tf.keras.layers.Dense(1, activation='sigmoid')
     ])
 
     if cfg.l2_penalty != 0:

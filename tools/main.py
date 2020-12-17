@@ -55,7 +55,7 @@ for fold in range(CONFIG.nfolds):
 
     scope = get_scope()
     with scope:
-        metrics = [SparceAUC()] if CONFIG.use_metrics else None
+        metrics = ["AUC"] if CONFIG.use_metrics else None
         model = create_model(CONFIG, metrics, backbone_trainable=False)
 
         model.summary()
