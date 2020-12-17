@@ -91,7 +91,10 @@ def create_model(cfg,  metrics, backbone_trainable=True, lr=None):
         regularizer = tf.keras.regularizers.l2(cfg.l2_penalty)
         pretrained_model=add_regularization(pretrained_model, regularizer)
 
-    pretrained_model.trainable = backbone_trainable
+    pretrained_model.trainable = False
+    if backbone_trainable:
+        for layer in pretrained_model.layers[-cfg.fine_tune_last:]:
+            layer.trainable=True
 
     x=tf.keras.Input(shape=(cfg.image_height,cfg.image_height,3))
 

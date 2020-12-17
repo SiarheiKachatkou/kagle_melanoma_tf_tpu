@@ -6,12 +6,12 @@ baseline:
     --image_height=128
   deps:
   - path: augmentations
-    md5: d06d93bd4a0a770f7bd4ffa94b0a91e0.dir
+    md5: 8131b5c8123ea3309df5f247417712af.dir
     size: 24788
     nfiles: 9
   - path: config
-    md5: 35838538152872c23ff428b5cdd1fa4d.dir
-    size: 13625
+    md5: 526cfe1999f054ce24587a2341c81163.dir
+    size: 13687
     nfiles: 6
   - path: data
     md5: 25ae7c7744209603a1f9c0dd534ab444.dir
@@ -26,8 +26,8 @@ baseline:
     size: 8791
     nfiles: 7
   - path: model
-    md5: b27272fcb265d2e68d6dfe86626f24c8.dir
-    size: 19433
+    md5: 9406d7608bb14ad2c4fd1306aba5bd8d.dir
+    size: 19689
     nfiles: 13
   - path: submission
     md5: a489bbaf4664206e7fb9cf2ff5a9574b.dir
@@ -39,9 +39,9 @@ baseline:
     nfiles: 6
   outs:
   - path: artifacts/baseline
-    md5: a094ca3691a14ec8c2163a48b85fae00.dir
-    size: 207211680
+    md5: 966ef4d78d7858e56edb514f635fe816.dir
+    size: 207219760
     nfiles: 36
   - path: metrics/metrics.txt
-    md5: 5ab5b4ce1fc3c6c8d19c3cec8980b557
+    md5: a41113aa64d9d7555b35b1eb65861cac
     size: 67
