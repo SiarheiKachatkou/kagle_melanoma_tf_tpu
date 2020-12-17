@@ -1,4 +1,8 @@
 val_avg_tta_le_auc:
     nan
 val_avg_tta_auc:
+<<<<<<< HEAD
     0.9056745793974366
+=======
+    0.8953666160162629
+>>>>>>> fine_tune_5

@@ -95,7 +95,8 @@ def create_model(cfg,  metrics, backbone_trainable=True, lr=None):
 
     x=tf.keras.Input(shape=(cfg.image_height,cfg.image_height,3))
 
-    features=pretrained_model(x,training=False)
+    training=cfg.epochs_fine_tune==0
+    features=pretrained_model(x,training=training)
 
     backbone=tf.keras.Model(x,features)
 
