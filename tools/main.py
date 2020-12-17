@@ -18,6 +18,7 @@ from model.SaveLastCallback import SaveLastCallback
 from model.create_model import create_model, set_backbone_trainable
 from config.runtime import get_scope
 from model.sparceauc import SparceAUC
+from model.fixed_save_best_callback import FixedSaveBestCallback
 from submission import submit
 from model.history import join_history
 
@@ -44,11 +45,9 @@ for fold in range(CONFIG.nfolds):
     print(f'fold={fold}')
     model_file_path=f'{CONFIG.work_dir}/model{fold}.h5'
 
-    save_callback_best = tf.keras.callbacks.ModelCheckpoint(
-        model_file_path, monitor='val_loss', verbose=0, save_best_only=True,
-        mode='min', save_freq='epoch')
 
-    callbacks=[lr_callback,save_callback_best]
+
+    callbacks=[lr_callback]
     if CONFIG.save_last_epochs != 0:
         save_callback_last = SaveLastCallback(CONFIG.work_dir, fold, CONFIG.epochs_full, CONFIG.save_last_epochs)
         callbacks.append(save_callback_last)
@@ -56,7 +55,11 @@ for fold in range(CONFIG.nfolds):
     scope = get_scope()
     with scope:
         metrics = [SparceAUC()] if CONFIG.use_metrics else None
-        model = create_model(CONFIG, metrics, backbone_trainable=False)
+
+
+        opt = tf.keras.optimizers.Adam(learning_rate=CONFIG.lr_start)
+
+        model = create_model(CONFIG, metrics, optimizer=opt, backbone_trainable=False)
 
         model.summary()
         train_filenames_old = tf.io.gfile.glob(DATASETS[CONFIG.image_height]['old'])
@@ -72,8 +75,14 @@ for fold in range(CONFIG.nfolds):
                                       steps_per_epoch=TRAIN_STEPS,
                                       epochs=CONFIG.epochs_fine_tune, callbacks=[lr_callback])
 
-        model = set_backbone_trainable(model, metrics, True, CONFIG)
+        model = set_backbone_trainable(model, metrics, optimizer=opt, flag=True, cfg=CONFIG, fine_tune_last=CONFIG.fine_tune_last)
 
+        save_callback_best = FixedSaveBestCallback(
+            set_backbone_trainable_partial_fn=partial(set_backbone_trainable, optimizer=opt, metrics=metrics, cfg=CONFIG, flag=True, fine_tune_last=CONFIG.fine_tune_last),
+            filepath=model_file_path, monitor='val_loss', verbose=0, save_best_only=True,
+            mode='min', save_freq='epoch')
+
+        callbacks.append(save_callback_best)
         history = model.fit(return_2_values(training_dataset),
                             validation_data=return_2_values(validation_dataset)  if do_validate else None,
                             steps_per_epoch=TRAIN_STEPS, initial_epoch=CONFIG.epochs_fine_tune, epochs=CONFIG.epochs_full, callbacks=callbacks)

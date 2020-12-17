@@ -26,7 +26,7 @@ args=parser.parse_args()
 if is_local:
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
     if args.gpus is None:
-        os.environ["CUDA_VISIBLE_DEVICES"] = "1,2"  # "0" #
+        os.environ["CUDA_VISIBLE_DEVICES"] = "2"#"1,2"  # "0" #
     else:
         os.environ["CUDA_VISIBLE_DEVICES"] = args.gpus
 
@@ -81,7 +81,7 @@ CONFIG=config(lr_max=args.lr_max*1e-4, lr_start=1e-6, stepsize=3,lr_fine_tune=1e
               hair_prob=hair_prob, microscope_prob=microscope_prob,
               batch_size=BATCH_SIZE, batch_size_inference=BATCH_SIZE * BATCH_SIZE_INCREASE_FOR_INFERENCE,
               image_height=image_height,
-              epochs_full=epochs_full,epochs_fine_tune=epochs_fine_tune, fine_tune_last=1
+              epochs_full=epochs_full,epochs_fine_tune=epochs_fine_tune, fine_tune_last=3
               )
 
 #pretrained_model = tf.keras.applications.MobileNetV2(input_shape=[*IMAGE_SIZE, 3], include_top=False)

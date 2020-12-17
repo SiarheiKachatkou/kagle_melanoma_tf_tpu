@@ -65,15 +65,11 @@ class BinaryFocalLoss():
         return loss/self._batch_size
 
 
-def compile_model(model, metrics, cfg, lr=None):
+def compile_model(model, metrics, cfg, optimizer):
     loss = tf.keras.losses.SparseCategoricalCrossentropy()#BinaryCrossentropy()#BinaryFocalLoss(gamma=cfg.focal_loss_gamma,alpha=cfg.focal_loss_alpha, batch_size=cfg.batch_size)#label_smoothing=0.05)
 
-    learning_rate = cfg.lr_start if lr is None else lr
-
-    opt = tf.keras.optimizers.Adam(learning_rate=learning_rate)
-
     model.compile(
-        optimizer=opt,
+        optimizer=optimizer,
         loss=loss,
         metrics=metrics
     )
@@ -84,7 +80,7 @@ EFNS = [efn.EfficientNetB0, efn.EfficientNetB1, efn.EfficientNetB2, efn.Efficien
         efn.EfficientNetB4, efn.EfficientNetB5, efn.EfficientNetB6]
 
 
-def create_model(cfg,  metrics, backbone_trainable=True, lr=None):
+def create_model(cfg,  metrics, optimizer, fine_tune_last=None, backbone_trainable=True):
 
     pretrained_model = eval(cfg.model_fn_str) 
     if cfg.l2_penalty != 0:
@@ -92,9 +88,6 @@ def create_model(cfg,  metrics, backbone_trainable=True, lr=None):
         pretrained_model=add_regularization(pretrained_model, regularizer)
 
     pretrained_model.trainable = False
-    if backbone_trainable:
-        for layer in pretrained_model.layers[-cfg.fine_tune_last:]:
-            layer.trainable=True
 
     x=tf.keras.Input(shape=(cfg.image_height,cfg.image_height,3))
 
@@ -114,11 +107,16 @@ def create_model(cfg,  metrics, backbone_trainable=True, lr=None):
         regularizer = tf.keras.regularizers.l2(cfg.l2_penalty)
         model=add_regularization(model, regularizer)
 
-    model = compile_model(model, metrics, cfg, lr)
-
-    return model
+    return set_backbone_trainable(model, metrics, optimizer, backbone_trainable, cfg, fine_tune_last=fine_tune_last)
 
 
-def set_backbone_trainable(model, metrics, flag, cfg):
-    model.layers[0].trainable = flag
-    return compile_model(model, metrics, cfg)
+def set_backbone_trainable(model, metrics, optimizer, flag, cfg, fine_tune_last=None):
+    backbone=model.layers[0]
+    if flag:
+        if fine_tune_last is not None:
+            last_block=backbone.layers[-1]
+            print(f' unfreeze {fine_tune_last} layers from total {len(last_block.layers)}')
+            for layer in last_block.layers[-fine_tune_last:]:
+                print(f'unfreeze {layer}')
+                layer.trainable=True
+    return compile_model(model, metrics, cfg, optimizer)
