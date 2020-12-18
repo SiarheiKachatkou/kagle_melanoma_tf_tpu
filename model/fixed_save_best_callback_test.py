@@ -7,7 +7,7 @@ from config.consts import test_data_path
 from fixed_save_best_callback import make_trainable, FixedSaveBestCallback, set_trainable
 from model.create_model import set_backbone_trainable,create_model, BinaryFocalLoss
 import efficientnet.tfkeras as efn
-
+from tensorflow.keras.callbacks import ModelCheckpoint
 
 class SaveTest(unittest.TestCase):
 
@@ -24,12 +24,10 @@ class SaveTest(unittest.TestCase):
         set_backbone_trainable_partial_fn=partial(set_backbone_trainable, optimizer=opt, metrics=None, cfg=CONFIG, flag=True, fine_tune_last=CONFIG.fine_tune_last)
         model=set_backbone_trainable_partial_fn(model)
 
-        callback=FixedSaveBestCallback(filepath=filepath, set_backbone_trainable_partial_fn=set_backbone_trainable_partial_fn)
+        callback=ModelCheckpoint(filepath=filepath)
         callback.set_model(model)
         callback.on_epoch_end(epoch=1)
 
-        set_trainable(model,True)
-        #model.load_weights(filepath)
         m = tf.keras.models.load_model(filepath,custom_objects={'BinaryFocalLoss':BinaryFocalLoss}, compile=True)
 
 

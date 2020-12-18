@@ -25,7 +25,7 @@ class FixedSaveBestCallback(ModelCheckpoint):
         super().__init__(*args, **kwargs)
         self._set_backbone_trainable_partial_fn=set_backbone_trainable_partial_fn
 
-    @make_trainable
+    #@make_trainable
     def on_epoch_end(self, *args, **kwargs):
         super(FixedSaveBestCallback,self).on_epoch_end(*args, **kwargs)
 
