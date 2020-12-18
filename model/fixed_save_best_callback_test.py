@@ -4,8 +4,8 @@ from functools import partial
 from unittest.mock import patch
 from pathlib import Path
 from config.consts import test_data_path
-from fixed_save_best_callback import make_trainable, FixedSaveBestCallback
-from model.create_model import set_backbone_trainable,create_model
+from fixed_save_best_callback import make_trainable, FixedSaveBestCallback, set_trainable
+from model.create_model import set_backbone_trainable,create_model, BinaryFocalLoss
 import efficientnet.tfkeras as efn
 
 
@@ -28,10 +28,10 @@ class SaveTest(unittest.TestCase):
         callback.set_model(model)
         callback.on_epoch_end(epoch=1)
 
-        model.load_weights(filepath)
+        set_trainable(model,True)
+        #model.load_weights(filepath)
+        m = tf.keras.models.load_model(filepath,custom_objects={'BinaryFocalLoss':BinaryFocalLoss}, compile=True)
 
-        self.assertTrue(model.trainable)
-        self.assertTrue(not model.layers[1].trainable)
 
 
 
