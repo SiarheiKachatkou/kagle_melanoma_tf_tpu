@@ -54,7 +54,7 @@ for fold in range(CONFIG.nfolds):
 
     scope = get_scope()
     with scope:
-        metrics = [SparceAUC()] if CONFIG.use_metrics else None
+        metrics = [SparceAUC(name="auc")] if CONFIG.use_metrics else None
 
 
         opt = tf.keras.optimizers.Adam(learning_rate=CONFIG.lr_start)

@@ -5,6 +5,7 @@ import os
 import tempfile
 import tensorflow.keras.backend as K
 import multiprocessing as mp
+from model.sparceauc import SparceAUC
 
 
 def add_regularization(model, regularizer=tf.keras.regularizers.l2(0.0001)):
@@ -125,6 +126,6 @@ def set_backbone_trainable(model, metrics, optimizer, flag, cfg, fine_tune_last=
     return compile_model(model, metrics, cfg, optimizer)
 
 def load_model(filepath):
-    m = tf.keras.models.load_model(filepath, custom_objects={'BinaryFocalLoss': BinaryFocalLoss}, compile=True)
+    m = tf.keras.models.load_model(filepath, custom_objects={'BinaryFocalLoss': BinaryFocalLoss, 'SparceAUC':SparceAUC}, compile=True)
     m.trainable = False
     return m

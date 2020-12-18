@@ -5,6 +5,7 @@ from unittest.mock import patch
 from pathlib import Path
 from config.consts import test_data_path
 from model.create_model import set_backbone_trainable,create_model, load_model
+from model.sparceauc import SparceAUC
 import efficientnet.tfkeras as efn
 from tensorflow.keras.callbacks import ModelCheckpoint
 
@@ -18,9 +19,10 @@ class SaveTest(unittest.TestCase):
         filepath=str(test_data_path/"model.h5")
         opt = tf.keras.optimizers.Adam(learning_rate=0.01)
 
-        model = create_model(CONFIG, metrics=None, optimizer=opt, backbone_trainable=False)
+        metrics=[SparceAUC(name="auc")]
+        model = create_model(CONFIG, metrics=metrics, optimizer=opt, backbone_trainable=False)
 
-        model=set_backbone_trainable(model, optimizer=opt, metrics=None, cfg=CONFIG, flag=True, fine_tune_last=CONFIG.fine_tune_last)
+        model=set_backbone_trainable(model, optimizer=opt, metrics=metrics, cfg=CONFIG, flag=True, fine_tune_last=CONFIG.fine_tune_last)
 
         callback=ModelCheckpoint(filepath=filepath)
         callback.set_model(model)
