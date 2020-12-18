@@ -101,6 +101,7 @@ def create_model(cfg,  metrics, optimizer, fine_tune_last=None, backbone_trainab
         backbone,
         tf.keras.layers.Dropout(rate=cfg.dropout_rate),
         tf.keras.layers.GlobalAveragePooling2D(),
+        tf.keras.layers.Dense(256, activation='relu'),
         tf.keras.layers.Dense(2, activation='softmax')
     ])
 
@@ -119,7 +120,7 @@ def set_backbone_trainable(model, metrics, optimizer, flag, cfg, fine_tune_last=
             last_block.trainable=True
             nlayers = len(last_block.layers)
             print(f' unfreeze {fine_tune_last} layers from total {nlayers}')
-            for layer in last_block.layers[fine_tune_last:]:
+            for layer in last_block.layers[:nlayers-fine_tune_last]:
                 if not isinstance(layer,tf.keras.layers.BatchNormalization):
                     #print(f'unfreeze {layer}')
                     layer.trainable=False
