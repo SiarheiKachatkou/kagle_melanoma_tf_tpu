@@ -4,8 +4,7 @@ from functools import partial
 from unittest.mock import patch
 from pathlib import Path
 from config.consts import test_data_path
-from fixed_save_best_callback import make_trainable, FixedSaveBestCallback, set_trainable
-from model.create_model import set_backbone_trainable,create_model, BinaryFocalLoss
+from model.create_model import set_backbone_trainable,create_model, load_model
 import efficientnet.tfkeras as efn
 from tensorflow.keras.callbacks import ModelCheckpoint
 
@@ -21,14 +20,15 @@ class SaveTest(unittest.TestCase):
 
         model = create_model(CONFIG, metrics=None, optimizer=opt, backbone_trainable=False)
 
-        set_backbone_trainable_partial_fn=partial(set_backbone_trainable, optimizer=opt, metrics=None, cfg=CONFIG, flag=True, fine_tune_last=CONFIG.fine_tune_last)
-        model=set_backbone_trainable_partial_fn(model)
+        model=set_backbone_trainable(model, optimizer=opt, metrics=None, cfg=CONFIG, flag=True, fine_tune_last=CONFIG.fine_tune_last)
 
         callback=ModelCheckpoint(filepath=filepath)
         callback.set_model(model)
         callback.on_epoch_end(epoch=1)
 
-        m = tf.keras.models.load_model(filepath,custom_objects={'BinaryFocalLoss':BinaryFocalLoss}, compile=True)
+        m = load_model(filepath)
+
+        self.assertTrue(m is not None)
 
 
 

@@ -3,6 +3,7 @@ import pickle
 import gc
 import yaml
 import tensorflow as tf
+from tensorflow.keras.callbacks import ModelCheckpoint
 import subprocess
 import config.config
 from matplotlib import pyplot as plt
@@ -15,10 +16,9 @@ from submission import submission
 import shutil
 from model.create_model import BinaryFocalLoss
 from model.SaveLastCallback import SaveLastCallback
-from model.create_model import create_model, set_backbone_trainable
+from model.create_model import create_model, set_backbone_trainable, load_model
 from config.runtime import get_scope
 from model.sparceauc import SparceAUC
-from model.fixed_save_best_callback import FixedSaveBestCallback
 from submission import submit
 from model.history import join_history
 
@@ -77,8 +77,7 @@ for fold in range(CONFIG.nfolds):
 
         model = set_backbone_trainable(model, metrics, optimizer=opt, flag=True, cfg=CONFIG, fine_tune_last=CONFIG.fine_tune_last)
 
-        save_callback_best = FixedSaveBestCallback(
-            set_backbone_trainable_partial_fn=partial(set_backbone_trainable, optimizer=opt, metrics=metrics, cfg=CONFIG, flag=True, fine_tune_last=CONFIG.fine_tune_last),
+        save_callback_best = ModelCheckpoint(
             filepath=model_file_path, monitor='val_loss', verbose=0, save_best_only=True,
             mode='min', save_freq='epoch')
 
@@ -97,7 +96,7 @@ for fold in range(CONFIG.nfolds):
             display_training_curves(history.history['loss'][1:], history.history['val_loss'][1:], 'loss', 212)
             plt.savefig(os.path.join(CONFIG.work_dir, f'loss{fold}.png'))
 
-        model.load_weights(model_file_path)
+        model=load_model(model_file_path)
 
         validation_dataset = get_validation_dataset(val_filenames_folds[fold],CONFIG)
         validation_dataset_tta = get_validation_dataset_tta(val_filenames_folds[fold],CONFIG)
@@ -116,7 +115,7 @@ for fold in range(CONFIG.nfolds):
             models=[]
             filepaths=save_callback_last.get_filepaths()
             for filepath in filepaths:
-                m=tf.keras.models.load_model(filepath, custom_objects={'BinaryFocalLoss':BinaryFocalLoss}, compile=True)
+                m=load_model(filepath)
                 m.trainable=False
                 models.append(m)
             submission.calc_and_save_submissions(CONFIG, models, f'val_le_{fold}', validation_dataset,

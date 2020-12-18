@@ -123,3 +123,8 @@ def set_backbone_trainable(model, metrics, optimizer, flag, cfg, fine_tune_last=
                     #print(f'unfreeze {layer}')
                     layer.trainable=False
     return compile_model(model, metrics, cfg, optimizer)
+
+def load_model(filepath):
+    m = tf.keras.models.load_model(filepath, custom_objects={'BinaryFocalLoss': BinaryFocalLoss}, compile=True)
+    m.trainable = False
+    return m
