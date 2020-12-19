@@ -10,8 +10,8 @@ baseline:
     size: 24788
     nfiles: 9
   - path: config
-    md5: 33a2da22b41aa05d90f4e807cb50f214.dir
-    size: 13695
+    md5: fe716330bb49b522e51fe9d91a378483.dir
+    size: 13696
     nfiles: 6
   - path: data
     md5: d27b511ad89613041f0fed401d3d86aa.dir
@@ -26,8 +26,8 @@ baseline:
     size: 8791
     nfiles: 7
   - path: model
-    md5: 0bc82392f4746f5964b75fc869e2fe40.dir
-    size: 22037
+    md5: e90f3d0d8511f13eac160132a2ed16bf.dir
+    size: 21953
     nfiles: 14
   - path: submission
     md5: a489bbaf4664206e7fb9cf2ff5a9574b.dir
@@ -39,9 +39,9 @@ baseline:
     nfiles: 6
   outs:
   - path: artifacts/baseline
-    md5: 8012aadcd19c598eea16fc35d29cae56.dir
-    size: 175269649
+    md5: 93464daab492dcccb5e0caa0d9a602ea.dir
+    size: 204115101
     nfiles: 36
   - path: metrics/metrics.txt
-    md5: 8b73ee2ebe5b5a90ce1be1f39e352a54
+    md5: 90de09dba7007ffc2871c29b2ec49f7c
     size: 67

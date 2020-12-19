@@ -101,7 +101,6 @@ def create_model(cfg,  metrics, optimizer, fine_tune_last=None, backbone_trainab
         backbone,
         tf.keras.layers.Dropout(rate=cfg.dropout_rate),
         tf.keras.layers.GlobalAveragePooling2D(),
-        tf.keras.layers.Dense(256, activation='relu'),
         tf.keras.layers.Dense(2, activation='softmax')
     ])
 
