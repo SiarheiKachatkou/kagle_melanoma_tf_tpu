@@ -105,8 +105,8 @@ def create_model(cfg,  metrics, optimizer, fine_tune_last=None, backbone_trainab
 
     image_model_output = head(features)
 
-    meta_hidden1 = 528
-    meta_hidden2 = 256
+    meta_hidden1 = 64
+    meta_hidden2 = 32
 
     meta_feature=tf.keras.layers.Dense(meta_hidden1, activation='relu')(meta_feature)
     meta_feature=tf.keras.layers.BatchNormalization()(meta_feature)
