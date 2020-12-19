@@ -22,7 +22,7 @@ def make_submission_dataframe(test_dataset, model,repeats=1):
     '''
     names = []
     labs = []
-    for _, label, name in test_dataset.unbatch():
+    for *_, label, name in test_dataset.unbatch():
         names.append(name.numpy().decode('utf-8'))
         labs.append(label.numpy())
 

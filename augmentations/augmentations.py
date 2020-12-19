@@ -107,31 +107,31 @@ def _normalize(image8u):
     return image
 
 
-def augment_train(image, label, image_name, config):
+def augment_train(image, *args, config):
     image=_augment_color(image)
     image = hair_aug_tf(image, config)
     image = microscope_aug_tf(image, config)
     image = _normalize(image)
     image = transform_geometricaly(image, DIM=config.image_height)
-    return image, label, image_name
+    return (image, *args)
 
 
-def augment_tta(image, label, image_name, config):
+def augment_tta(image, *args, config):
     image=_augment_color(image)
     image = _normalize(image)
     image = transform_geometricaly(image, DIM=config.image_height)
-    return image, label, image_name
+    return (image, *args)
 
 
-def augment_val(image, label, image_name, config):
+def augment_val(image, *args, config):
     image = _normalize(image)
-    return image, label, image_name
+    return (image, *args)
 
-def augment_val_aug(image, label, image_name, config):
+def augment_val_aug(image,*args, config):
     image = _normalize(image)
     #image = tf.image.random_flip_left_right(image)
-    return image, label, image_name
+    return (image, *args)
 
-def augment_test(image, label, image_name, config):
+def augment_test(image,*args, config):
     image = _normalize(image)
-    return image, label, image_name
+    return (image, *args)

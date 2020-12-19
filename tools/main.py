@@ -45,8 +45,6 @@ for fold in range(CONFIG.nfolds):
     print(f'fold={fold}')
     model_file_path=f'{CONFIG.work_dir}/model{fold}.h5'
 
-
-
     callbacks=[lr_callback]
     if CONFIG.save_last_epochs != 0:
         save_callback_last = SaveLastCallback(CONFIG.work_dir, fold, CONFIG.epochs_full, CONFIG.save_last_epochs)

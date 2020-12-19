@@ -34,34 +34,36 @@ features['target']=tf.io.FixedLenFeature([], tf.int64)
 
 label_type=tf.float32
 
-def read_tfrecord(example):
-
-    example = tf.io.parse_single_example(example, features)
+def _parse_example_wo_label(example):
     image = tf.image.decode_jpeg(example['image'], channels=3)
     image = tf.cast(image, dtype=tf.float32)
     image_name = tf.cast(example['image_name'], tf.string)
-    class_label = tf.cast(example['target'], label_type)
-    return image, class_label, image_name
+    sex = tf.cast(example['sex'], tf.int64)
+    age = tf.cast(example['age_approx'], tf.int64)
+    anatom_site = tf.cast(example['anatom_site_general_challenge'], tf.int64)
+    meta_features = (sex, age, anatom_site)
+    class_label = tf.constant(0, dtype=label_type)
+    return image, meta_features, class_label, image_name
 
+def _parse_example_with_label(example):
+    image, meta_features, _, image_name = _parse_example_wo_label(example)
+    class_label = tf.cast(example['target'], label_type)
+    return image, meta_features, class_label, image_name
 
 def read_tfrecord_wo_labels(example):
-
     example = tf.io.parse_single_example(example, features_test)
-    image = tf.image.decode_jpeg(example['image'], channels=3)
-    image = tf.cast(image, dtype=tf.float32)
-    image_name = tf.cast(example['image_name'], tf.string)
+    return _parse_example_wo_label(example)
 
-    class_label = tf.constant(0, dtype=label_type)
-    return image, class_label, image_name
+
+def read_tfrecord(example):
+    example = tf.io.parse_single_example(example, features)
+    return _parse_example_with_label(example)
+
 
 
 def read_tfrecord_old(example):
     example = tf.io.parse_single_example(example, features_old)
-    image = tf.image.decode_jpeg(example['image'], channels=3)
-    image = tf.cast(image,dtype=tf.float32)
-    image_name = tf.cast(example['image_name'], tf.string)
-    class_label = tf.cast(example['target'], label_type)
-    return image, class_label, image_name
+    return _parse_example_with_label(example)
 
 
 def _num_parallel_calls():
@@ -184,7 +186,7 @@ def get_test_dataset_with_labels_tta(test_filenames,config):
 
 
 def return_2_values(dataset):
-    def two(a1,a2,*args):
-        return a1,a2
+    def two(a1,a2,a3,*args):
+        return a1,a3
     ds=dataset.map(two,num_parallel_calls=_num_parallel_calls())
     return ds
