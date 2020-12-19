@@ -112,6 +112,7 @@ def create_model(cfg,  metrics, optimizer, fine_tune_last=None, backbone_trainab
     meta_feature=tf.keras.layers.BatchNormalization()(meta_feature)
     meta_feature = tf.keras.layers.Dense(meta_hidden2, activation='relu')(meta_feature)
     features=tf.concat([meta_feature,image_model_output],axis=1)
+    #features = image_model_output
 
     features = tf.keras.layers.Dropout(rate=cfg.dropout_rate)(features)
     output = tf.keras.layers.Dense(2, activation='softmax')(features)
@@ -126,19 +127,12 @@ def create_model(cfg,  metrics, optimizer, fine_tune_last=None, backbone_trainab
 
 
 def set_backbone_trainable(model, metrics, optimizer, flag, cfg, fine_tune_last=None):
-    backbone=model.layers[7]
     if flag:
-        if fine_tune_last is not None:
-            last_block=backbone.layers[1]
-            last_block.trainable=True
-            if fine_tune_last>0:
-                nlayers = len(last_block.layers)
-                print(f' unfreeze {fine_tune_last} layers from total {nlayers}')
-                for layer in last_block.layers[:nlayers-fine_tune_last]:
-                    if not isinstance(layer,tf.keras.layers.BatchNormalization):
-                        #print(f'unfreeze {layer}')
-                        layer.trainable=False
+        for l in model.layers:
+            if hasattr(l,'trainable'):
+                l.trainable=flag
     return compile_model(model, metrics, cfg, optimizer)
+
 
 def load_model(filepath):
     m = tf.keras.models.load_model(filepath, custom_objects={'BinaryFocalLoss': BinaryFocalLoss, 'SparceAUC':SparceAUC}, compile=True)
