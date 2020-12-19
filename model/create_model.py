@@ -117,12 +117,13 @@ def set_backbone_trainable(model, metrics, optimizer, flag, cfg, fine_tune_last=
         if fine_tune_last is not None:
             last_block=backbone.layers[1]
             last_block.trainable=True
-            nlayers = len(last_block.layers)
-            print(f' unfreeze {fine_tune_last} layers from total {nlayers}')
-            for layer in last_block.layers[:nlayers-fine_tune_last]:
-                if not isinstance(layer,tf.keras.layers.BatchNormalization):
-                    #print(f'unfreeze {layer}')
-                    layer.trainable=False
+            if fine_tune_last>0:
+                nlayers = len(last_block.layers)
+                print(f' unfreeze {fine_tune_last} layers from total {nlayers}')
+                for layer in last_block.layers[:nlayers-fine_tune_last]:
+                    if not isinstance(layer,tf.keras.layers.BatchNormalization):
+                        #print(f'unfreeze {layer}')
+                        layer.trainable=False
     return compile_model(model, metrics, cfg, optimizer)
 
 def load_model(filepath):
