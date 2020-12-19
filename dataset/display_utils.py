@@ -11,8 +11,9 @@ def dataset_to_numpy_util(dataset, N, show_zero_labels):
     dataset = dataset.unbatch().batch(N)
     chosen_images = []
     chosen_labels = []
-    for images, labels in dataset:
+    for input_dict, labels in dataset:
 
+        images=input_dict['image']
         numpy_images = images.numpy()
         numpy_labels = labels.numpy()
         for l, img in zip(numpy_labels,numpy_images):

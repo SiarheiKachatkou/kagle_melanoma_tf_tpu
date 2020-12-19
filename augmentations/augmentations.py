@@ -107,31 +107,40 @@ def _normalize(image8u):
     return image
 
 
-def augment_train(image, *args, config):
+def augment_train(input_dict, labels, config):
+    image=input_dict['image']
     image=_augment_color(image)
     image = hair_aug_tf(image, config)
     image = microscope_aug_tf(image, config)
     image = _normalize(image)
     image = transform_geometricaly(image, DIM=config.image_height)
-    return (image, *args)
+    input_dict['image']=image
+    return input_dict, labels
 
 
-def augment_tta(image, *args, config):
+def augment_tta(input_dict, labels, config):
+    image=input_dict['image']
     image=_augment_color(image)
     image = _normalize(image)
     image = transform_geometricaly(image, DIM=config.image_height)
-    return (image, *args)
+    input_dict['image'] = image
+    return input_dict, labels
 
-
-def augment_val(image, *args, config):
+def augment_val(input_dict, labels, config):
+    image=input_dict['image']
     image = _normalize(image)
-    return (image, *args)
+    input_dict['image'] = image
+    return input_dict, labels
 
-def augment_val_aug(image,*args, config):
+def augment_val_aug(input_dict, labels, config):
+    image=input_dict['image']
     image = _normalize(image)
     #image = tf.image.random_flip_left_right(image)
-    return (image, *args)
+    input_dict['image'] = image
+    return input_dict, labels
 
-def augment_test(image,*args, config):
+def augment_test(input_dict, labels, config):
+    image=input_dict['image']
     image = _normalize(image)
-    return (image, *args)
+    input_dict['image'] = image
+    return input_dict, labels

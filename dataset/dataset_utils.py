@@ -34,47 +34,47 @@ features['target']=tf.io.FixedLenFeature([], tf.int64)
 
 label_type=tf.float32
 
-def _parse_example_wo_label(example):
+def _parse_example_wo_label(example, image_size):
     image = tf.image.decode_jpeg(example['image'], channels=3)
     image = tf.cast(image, dtype=tf.float32)
+    image = tf.reshape(image, [*image_size, 3])
     image_name = tf.cast(example['image_name'], tf.string)
     sex = tf.cast(example['sex'], tf.int64)
-    age = tf.cast(example['age_approx'], tf.int64)
+    sex=tf.cast(tf.compat.v1.one_hot(sex, depth=2),dtype=tf.float32)
+    age = tf.cast(example['age_approx'], tf.float32)
     anatom_site = tf.cast(example['anatom_site_general_challenge'], tf.int64)
-    meta_features = (sex, age, anatom_site)
+    anatom_site = tf.cast(tf.compat.v1.one_hot(anatom_site, depth=10),dtype=tf.float32)
+
     class_label = tf.constant(0, dtype=label_type)
-    return image, meta_features, class_label, image_name
 
-def _parse_example_with_label(example):
-    image, meta_features, _, image_name = _parse_example_wo_label(example)
+    output_dict={'image':image,
+                 'sex':sex,'anatom_site':anatom_site,'age':age,'image_name':image_name}
+
+    return output_dict,class_label
+
+def _parse_example_with_label(example, image_size):
+    output_dict,_ = _parse_example_wo_label(example,image_size)
     class_label = tf.cast(example['target'], label_type)
-    return image, meta_features, class_label, image_name
+    return output_dict,class_label
 
-def read_tfrecord_wo_labels(example):
+def read_tfrecord_wo_labels(example, image_size):
     example = tf.io.parse_single_example(example, features_test)
-    return _parse_example_wo_label(example)
+    return _parse_example_wo_label(example, image_size)
 
 
-def read_tfrecord(example):
+def read_tfrecord(example, image_size):
     example = tf.io.parse_single_example(example, features)
-    return _parse_example_with_label(example)
+    return _parse_example_with_label(example, image_size)
 
 
 
-def read_tfrecord_old(example):
+def read_tfrecord_old(example, image_size):
     example = tf.io.parse_single_example(example, features_old)
-    return _parse_example_with_label(example)
+    return _parse_example_with_label(example, image_size)
 
 
 def _num_parallel_calls():
     return 1 if is_debug else AUTO
-
-
-def force_image_sizes(dataset, image_size):
-    # explicit size needed for TPU
-    reshape_images = lambda image, *args: (tf.reshape(image, [*image_size, 3]), *args)
-    dataset = dataset.map(reshape_images, _num_parallel_calls())
-    return dataset
 
 
 def _ignore_order(dataset,is_deterministic):
@@ -96,8 +96,8 @@ def load_dataset(filenames, is_wo_labels, is_deterministic, config):
     dataset = _ignore_order(dataset,is_deterministic)
     dataset = dataset.cache()
     the_read_tfrecord=read_tfrecord_wo_labels if is_wo_labels else read_tfrecord
+    the_read_tfrecord=partial(the_read_tfrecord,image_size=[config.image_height,config.image_height])
     dataset = dataset.map(the_read_tfrecord, num_parallel_calls=_num_parallel_calls())
-    dataset = force_image_sizes(dataset, [config.image_height,config.image_height])
     if (not is_wo_labels) and (not is_deterministic):
         dataset = dataset.shuffle(1024*8)
         
@@ -111,8 +111,8 @@ def load_dataset_old(fileimages_old, config):
     dataset=_ignore_order(dataset,is_deterministic=False)
     dataset = dataset.cache()
     dataset = dataset.shuffle(512)
-    dataset = dataset.map(read_tfrecord_old, num_parallel_calls=_num_parallel_calls())
-    dataset = force_image_sizes(dataset, [config.image_height,config.image_height])
+    the_read_tfrecord=partial(read_tfrecord_old,image_size=[config.image_height,config.image_height])
+    dataset = dataset.map(the_read_tfrecord, num_parallel_calls=_num_parallel_calls())
     return dataset
 
 def _augm_dataset(dataset, augm_fn, batch_size):
@@ -183,10 +183,3 @@ def get_test_dataset_with_labels_tta(test_filenames,config):
     return _get_dataset(test_filenames, is_wo_labels=False, augm_fn=partial(augment_tta,config=config)
                         ,batch_size=config.batch_size_inference,
                         is_deterministic=True, config=config)
-
-
-def return_2_values(dataset):
-    def two(a1,a2,a3,*args):
-        return a1,a3
-    ds=dataset.map(two,num_parallel_calls=_num_parallel_calls())
-    return ds

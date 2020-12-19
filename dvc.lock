@@ -1,47 +1,47 @@
 baseline:
   cmd: export LD_LIBRARY_PATH=/usr/local/cuda/lib64 && export PYTHONPATH=/mnt/850G/GIT/kagle_melanoma_tf_tpu
     && /home/sergey/anaconda3/envs/tensorflow_2/bin/python3 tools/main.py --work_dir=artifacts/baseline
-    --backbone=B0 --dropout_rate=0.01 --lr_max=1 --lr_exp_decay=0.8 --focal_loss_gamma=4
+    --backbone=B0 --dropout_rate=0.01 --lr_max=10 --lr_exp_decay=0.8 --focal_loss_gamma=4
     --focal_loss_alpha=0.8 --hair_prob=0.1 --microscope_prob=0.01 --lr_warm_up_epochs=5
     --image_height=128
   deps:
   - path: augmentations
-    md5: 2abe67d1ba1e3cb09027f673cd58d198.dir
-    size: 24642
+    md5: 9bb780dd9081bc276dac08d1aed40fb0.dir
+    size: 25148
     nfiles: 9
   - path: config
-    md5: f4ecca84806866298c5d51a5f3620b5f.dir
-    size: 13695
+    md5: 15d40311566f5a716f246fb6dd3eb6e1.dir
+    size: 13689
     nfiles: 6
   - path: data
     md5: d27b511ad89613041f0fed401d3d86aa.dir
     size: 275609839
     nfiles: 43
   - path: dataset
-    md5: 6cbaf9ab7929a7f91efb496473c9f83a.dir
-    size: 34738
+    md5: 6624380963fcb05a54bbb8316ff4874a.dir
+    size: 34344
     nfiles: 8
   - path: debug_tools
-    md5: 7d64e65f44f428ecf28e3b23894d4130.dir
-    size: 8791
+    md5: 2e2bce907de89d6d55cbc05c9b5658f2.dir
+    size: 8782
     nfiles: 7
   - path: model
-    md5: 4f499a4c30050b474cd10ba95205e274.dir
-    size: 22020
+    md5: 77f6db8627161f4a86c5db66cacf10d5.dir
+    size: 23106
     nfiles: 14
   - path: submission
-    md5: b21a9a164a42c592198188e26ef2b652.dir
-    size: 13950
+    md5: 896ace201603b544db32b6dc63f71153.dir
+    size: 13947
     nfiles: 5
   - path: tools
-    md5: 501661b2c56dddaac1125b6dee075a22.dir
-    size: 16087
+    md5: 87f3fd0140e11d9121499a9fc234c35a.dir
+    size: 16019
     nfiles: 6
   outs:
   - path: artifacts/baseline
-    md5: 94ba16c2ffbe8092609facc24f2a3acb.dir
-    size: 207071447
+    md5: 16c217cc6eeb34ada132730312617ee7.dir
+    size: 83762378
     nfiles: 36
   - path: metrics/metrics.txt
-    md5: 6388974400f2829a0293a5564d701eb0
+    md5: e3b14fccd2452cf5b0263193f0f1b195
     size: 67

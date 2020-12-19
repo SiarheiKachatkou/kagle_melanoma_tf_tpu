@@ -22,12 +22,12 @@ def make_submission_dataframe(test_dataset, model,repeats=1):
     '''
     names = []
     labs = []
-    for *_, label, name in test_dataset.unbatch():
-        names.append(name.numpy().decode('utf-8'))
+    for input_dict, label in test_dataset.unbatch():
+        names.append(input_dict['image_name'].numpy().decode('utf-8'))
         labs.append(label.numpy())
 
     test_dataset=test_dataset.repeat(repeats)
-    preds=model.predict(return_2_values(test_dataset), verbose=True)
+    preds=model.predict(test_dataset, verbose=True)
     preds=preds.astype(np.float)
 
     if preds.shape[-1]==2:

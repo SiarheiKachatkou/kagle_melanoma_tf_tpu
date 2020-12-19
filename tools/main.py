@@ -68,8 +68,8 @@ for fold in range(CONFIG.nfolds):
         print(f'TRAIN_STEPS={TRAIN_STEPS}')
         validation_dataset = get_validation_dataset(val_filenames_folds[fold],CONFIG)
 
-        history_fine_tune = model.fit(return_2_values(training_dataset),
-                                      validation_data=return_2_values(validation_dataset) if do_validate else None,
+        history_fine_tune = model.fit(training_dataset,
+                                      validation_data=validation_dataset if do_validate else None,
                                       steps_per_epoch=TRAIN_STEPS,
                                       epochs=CONFIG.epochs_fine_tune, callbacks=[lr_callback])
 
@@ -80,8 +80,8 @@ for fold in range(CONFIG.nfolds):
             mode='min', save_freq='epoch')
 
         callbacks.append(save_callback_best)
-        history = model.fit(return_2_values(training_dataset),
-                            validation_data=return_2_values(validation_dataset)  if do_validate else None,
+        history = model.fit(training_dataset,
+                            validation_data=validation_dataset  if do_validate else None,
                             steps_per_epoch=TRAIN_STEPS, initial_epoch=CONFIG.epochs_fine_tune, epochs=CONFIG.epochs_full, callbacks=callbacks)
         history=join_history(history_fine_tune,history)
         print(history.history)

@@ -90,19 +90,33 @@ def create_model(cfg,  metrics, optimizer, fine_tune_last=None, backbone_trainab
 
     pretrained_model.trainable = False
 
-    x=tf.keras.Input(shape=(cfg.image_height,cfg.image_height,3))
+    image=tf.keras.Input(shape=(cfg.image_height,cfg.image_height,3),name='image')
+    sex=tf.keras.Input(shape=(2,),name='sex')
+    age = tf.keras.Input(shape=(1,), name='age')
+    anatom=tf.keras.Input(shape=(10,), name='anatom_site')
+    meta_feature=tf.concat([sex,age,anatom],axis=1)
 
     training=cfg.epochs_fine_tune==0
-    features=pretrained_model(x,training=training)
+    features=pretrained_model(image,training=training)
 
-    backbone=tf.keras.Model(x,features)
-
-    model = tf.keras.Sequential([
-        backbone,
-        tf.keras.layers.Dropout(rate=cfg.dropout_rate),
+    head=tf.keras.Sequential([
         tf.keras.layers.GlobalAveragePooling2D(),
-        tf.keras.layers.Dense(2, activation='softmax')
     ])
+
+    image_model_output = head(features)
+
+    meta_hidden1 = 528
+    meta_hidden2 = 256
+
+    meta_feature=tf.keras.layers.Dense(meta_hidden1, activation='relu')(meta_feature)
+    meta_feature=tf.keras.layers.BatchNormalization()(meta_feature)
+    meta_feature = tf.keras.layers.Dense(meta_hidden2, activation='relu')(meta_feature)
+    features=tf.concat([meta_feature,image_model_output],axis=1)
+
+    features = tf.keras.layers.Dropout(rate=cfg.dropout_rate)(features)
+    output = tf.keras.layers.Dense(2, activation='softmax')(features)
+
+    model=tf.keras.Model(inputs=[image,sex, age,anatom],outputs=output)
 
     if cfg.l2_penalty != 0:
         regularizer = tf.keras.regularizers.l2(cfg.l2_penalty)
@@ -112,7 +126,7 @@ def create_model(cfg,  metrics, optimizer, fine_tune_last=None, backbone_trainab
 
 
 def set_backbone_trainable(model, metrics, optimizer, flag, cfg, fine_tune_last=None):
-    backbone=model.layers[0]
+    backbone=model.layers[7]
     if flag:
         if fine_tune_last is not None:
             last_block=backbone.layers[1]
