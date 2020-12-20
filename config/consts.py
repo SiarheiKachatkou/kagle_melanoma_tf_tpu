@@ -41,16 +41,16 @@ if is_local:
 else:
     DATASETS = {
                 #128: {'new': 'gs://kaggle_melanoma_isic/isic2020-128-colornormed-tfrecord' +'/train*.tfrec', 'old':''},
-                128: {'new': '/kaggle/input/melanoma-128x128/train*.tfrec','old':''},
+                128: {'new': Path('/kaggle/input/melanoma-128x128/train*.tfrec'),'old':''},
                 #128: {'new': 'data/128/train*.tfrec', 'old':''},
                 #384: {'new': 'gs://kaggle_melanoma_isic/isic2020-384-colornormed-tfrecord/train*.tfrec', 'old':''},
                 #384: {'new': 'data/isic2020-384-colornormed-tfrecord/train*.tfrec','old':''},
                 #384: {'new':'gs://kds-76800f320871e548ef017f0a5a63cef5c72d1d47d6e020c81edfa286/train*.tfrec','old':''},
-                384: {'new': 'gs://kds-68d604aee5addfebbabae3fcfe5376b86711f3cd42993bd8e0dc80a5/train*.tfrec','old':'gs://kds-4e8502fa6aa4c08b11f43ab8b42505960a29dc73fbcea54ba2bd1f9a/train*.tfrec'},
+                384: {'new': Path('gs://kds-68d604aee5addfebbabae3fcfe5376b86711f3cd42993bd8e0dc80a5/train*.tfrec'),'old':Path('gs://kds-4e8502fa6aa4c08b11f43ab8b42505960a29dc73fbcea54ba2bd1f9a/train*.tfrec')},
                 #512: {'new': 'gs://kaggle_melanoma_isic/isic2020-512-colornormed-tfrecord/train*.tfrec', 'old':''},
-                512: {'new': 'gs://kds-cb7c9aaea4b354a2b47b2c0f5feced50c9ddb98be03f7856e9e71642/train*.tfrec','old':''},
-                768: {'new': 'gs://kaggle_melanoma_isic/isic2020-768-colornormed-tfrecord/archive/train*.tfrec',
-                      'old': 'gs://kaggle_melanoma_isic/old-768-tfrecord/train*.tfrec'}
+                512: {'new': Path('gs://kds-cb7c9aaea4b354a2b47b2c0f5feced50c9ddb98be03f7856e9e71642/train*.tfrec'),'old':''},
+                768: {'new': Path('gs://kaggle_melanoma_isic/isic2020-768-colornormed-tfrecord/archive/train*.tfrec'),
+                      'old': Path('gs://kaggle_melanoma_isic/old-768-tfrecord/train*.tfrec')}
     }
 
 CLASSES = ['health','melanoma']
@@ -64,8 +64,8 @@ tf.compat.v1.random.set_random_seed(seed)
 np.random.seed(seed)
 random.seed(seed)
 
-path_hair_images = root/"data/melanoma_hairs" if is_local else ("gs://kds-c1f8d68ed78af3bc82472db8c32ec9b3fe1a0dcf09e62c04e90e81fe" if is_kaggle else "gs://kochetkov_kaggle_melanoma/melanoma_hairs")
-path_microscope_images = root/"data/melanoma_microscope" if is_local else ("gs://kds-05490130d1f3d52b5eecc24712a9796337d072ebfbada94359adc410" if is_kaggle else "gs://kochetkov_kaggle_melanoma/melanoma_microscope" )
+path_hair_images = root/"data/melanoma_hairs" if is_local else Path("gs://kds-c1f8d68ed78af3bc82472db8c32ec9b3fe1a0dcf09e62c04e90e81fe" if is_kaggle else "gs://kochetkov_kaggle_melanoma/melanoma_hairs")
+path_microscope_images = root/"data/melanoma_microscope" if is_local else Path("gs://kds-05490130d1f3d52b5eecc24712a9796337d072ebfbada94359adc410" if is_kaggle else "gs://kochetkov_kaggle_melanoma/melanoma_microscope" )
 
 test_data_path=root/'data/test_data'
 
