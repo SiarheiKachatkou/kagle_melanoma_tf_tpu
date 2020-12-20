@@ -1,47 +1,46 @@
 baseline:
-  cmd: export LD_LIBRARY_PATH=/usr/local/cuda/lib64 && export PYTHONPATH=/mnt/850G/GIT/kagle_melanoma_tf_tpu
-    && /home/sergey/anaconda3/envs/tensorflow_2/bin/python3 tools/main.py --work_dir=artifacts/baseline
-    --backbone=B6 --dropout_rate=0.01 --lr_max=1 --lr_exp_decay=0.8 --focal_loss_gamma=4
-    --focal_loss_alpha=0.8 --hair_prob=0.1 --microscope_prob=0.01 --lr_warm_up_epochs=5
-    --image_height=384
+  cmd: export LD_LIBRARY_PATH=/usr/local/cuda/lib64 && export PYTHONPATH=$PWD && python3
+    tools/main.py --work_dir=artifacts/baseline --backbone=B6 --dropout_rate=0.01
+    --lr_max=2 --lr_exp_decay=0.8 --focal_loss_gamma=4 --focal_loss_alpha=0.8 --hair_prob=0.1
+    --microscope_prob=0.01 --lr_warm_up_epochs=5 --image_height=384
   deps:
   - path: augmentations
-    md5: 9bb780dd9081bc276dac08d1aed40fb0.dir
-    size: 25148
+    md5: a167dd775523b2e80bf301d0acfa530b.dir
+    size: 25119
     nfiles: 9
   - path: config
-    md5: 39005fb882a6a9586dd5b684ccef2687.dir
-    size: 13695
+    md5: f7e42fe964b13e673b1c85c9a756f0ba.dir
+    size: 14012
     nfiles: 6
   - path: data
-    md5: d27b511ad89613041f0fed401d3d86aa.dir
-    size: 275609839
-    nfiles: 43
+    md5: d751713988987e9331980363e24189ce.dir
+    size: 0
+    nfiles: 0
   - path: dataset
-    md5: 6624380963fcb05a54bbb8316ff4874a.dir
-    size: 34344
+    md5: f75bcdb68836a343a6648a3e9e66de27.dir
+    size: 34799
     nfiles: 8
   - path: debug_tools
     md5: 2e2bce907de89d6d55cbc05c9b5658f2.dir
     size: 8782
     nfiles: 7
   - path: model
-    md5: c790075ebf2449971731806737ae8357.dir
-    size: 22473
+    md5: ff4f31b5fe56855a79018cca2e5a0074.dir
+    size: 22425
     nfiles: 14
   - path: submission
-    md5: 896ace201603b544db32b6dc63f71153.dir
-    size: 13947
+    md5: 66de56f5bdedb2cafb364d0e73939bcb.dir
+    size: 13625
     nfiles: 5
   - path: tools
-    md5: 87f3fd0140e11d9121499a9fc234c35a.dir
-    size: 16019
+    md5: 4a93434db435f5ef768a453bfe8be15e.dir
+    size: 16176
     nfiles: 6
   outs:
   - path: artifacts/baseline
-    md5: 2a8f70e7ceb405519e5f71ea6d58ea6e.dir
-    size: 207373979
+    md5: 722edb37409242208b3fc62d2f1ed008.dir
+    size: 1979315846
     nfiles: 36
   - path: metrics/metrics.txt
-    md5: 2bff6cc9c01aff36e8c87d59d875e902
-    size: 67
+    md5: 6a8c1eb21d3f03aadbe94f5197afb7b3
+    size: 66
