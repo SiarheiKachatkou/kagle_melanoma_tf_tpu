@@ -64,7 +64,7 @@ tf.compat.v1.random.set_random_seed(seed)
 np.random.seed(seed)
 random.seed(seed)
 
-path_hair_images = root/"data/melanoma_hairs" if is_local else "gs://kds-c1f8d68ed78af3bc82472db8c32ec9b3fe1a0dcf09e62c04e90e81fe" if is_kaggle else "gs://kochetkov_kaggle_melanoma/malanoma_hairs"
+path_hair_images = root/"data/melanoma_hairs" if is_local else Path(r"gs://kds-c1f8d68ed78af3bc82472db8c32ec9b3fe1a0dcf09e62c04e90e81fe" if is_kaggle else r"gs://kochetkov_kaggle_melanoma/malanoma_hairs")
 print(path_hair_images)
 path_microscope_images = root/"data/melanoma_microscope" if is_local else Path("gs://kds-05490130d1f3d52b5eecc24712a9796337d072ebfbada94359adc410" if is_kaggle else "gs://kochetkov_kaggle_melanoma/melanoma-microscope" )
 
