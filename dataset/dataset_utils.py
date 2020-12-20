@@ -186,8 +186,8 @@ def get_test_dataset_with_labels_tta(test_filenames,config):
 
 
 def remove_str(dataset):
-    def del_str(d):
+    def del_str(d, label):
         del d['image_name']
-        return d
+        return d,label
     dataset=dataset.map(del_str,num_parallel_calls=_num_parallel_calls())
     return dataset
