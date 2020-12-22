@@ -31,7 +31,7 @@ root=Path(os.path.split(__file__)[0])/'..'
 if is_local:
     DATASETS = {
                 128: {'new': root/'data/128x128/train*.tfrec', 'old': ''},
-                256: {'new': 'data/256_with_labels/train*.tfrec', 'old': ''},
+                256: {'new': root/'256x256_triple/train*.tfrec', 'old': ''},
                 #128: {'new': 'data/128/train*.tfrec', 'old': ''},
                 #384: {'new': 'data/isic2020-384-colornormed-tfrecord/train*.tfrec', 'old': ''},
                 384: {'new': 'data/384_triple_2020_with_labels/train*.tfrec', 'old': ''},
