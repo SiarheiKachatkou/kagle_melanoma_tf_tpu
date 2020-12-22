@@ -1,23 +1,23 @@
 baseline:
   cmd: export LD_LIBRARY_PATH=/usr/local/cuda/lib64 && export PYTHONPATH=$PWD && python3
-    tools/main.py --work_dir=artifacts/baseline --backbone=B6 --dropout_rate=0.1 --lr_max=0.1
-    --lr_exp_decay=0.8 --focal_loss_gamma=4 --focal_loss_alpha=0.8 --hair_prob=0.1
+    tools/main.py --work_dir=artifacts/baseline --backbone=B6 --dropout_rate=0.1 --lr_max=10
+    --lr_exp_decay=0.5 --focal_loss_gamma=4 --focal_loss_alpha=0.8 --hair_prob=0.01
     --microscope_prob=0.01 --lr_warm_up_epochs=5 --image_height=384
   deps:
   - path: augmentations
-    md5: a167dd775523b2e80bf301d0acfa530b.dir
+    md5: 04784de1fba65fb2d53fe5c259af3a73.dir
     size: 25119
     nfiles: 9
   - path: config
-    md5: f7e42fe964b13e673b1c85c9a756f0ba.dir
-    size: 14012
+    md5: 000bd51da97cfb28fb916de518ec4930.dir
+    size: 14001
     nfiles: 6
   - path: data
-    md5: d751713988987e9331980363e24189ce.dir
+    md5: 6ffbaaad7b4ac6e1afabed19a80b2560.dir
     size: 0
-    nfiles: 0
+    nfiles: 1
   - path: dataset
-    md5: f75bcdb68836a343a6648a3e9e66de27.dir
+    md5: 9cd34b801d3c3d1080cffc28d36c04ad.dir
     size: 34799
     nfiles: 8
   - path: debug_tools
@@ -25,22 +25,22 @@ baseline:
     size: 8782
     nfiles: 7
   - path: model
-    md5: ff4f31b5fe56855a79018cca2e5a0074.dir
-    size: 22425
+    md5: b304af5c24d6826a17ab54ad5b4423a8.dir
+    size: 22430
     nfiles: 14
   - path: submission
-    md5: 66de56f5bdedb2cafb364d0e73939bcb.dir
+    md5: 9f654e886768fc061678ad7e1e3d2f80.dir
     size: 13625
     nfiles: 5
   - path: tools
-    md5: 28eb7e6874a0d7df6d0f8f8af59f4bef.dir
-    size: 16203
-    nfiles: 6
+    md5: 362d9e62bdd8aa6b5064834c154db1c3.dir
+    size: 17292
+    nfiles: 8
   outs:
   - path: artifacts/baseline
-    md5: 6ec65befd22a615e6edc151d1d583f6c.dir
-    size: 1979246481
+    md5: fe6e987fd8aacbced1acec894a413239.dir
+    size: 1979117886
     nfiles: 36
   - path: metrics/metrics.txt
-    md5: 5d2cbcee9616bb78acd3234628c46c3a
+    md5: 6e25ca798e6c2a7ba7939f40ba0428ea
     size: 67
