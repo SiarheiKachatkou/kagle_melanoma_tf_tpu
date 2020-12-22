@@ -1,4 +1,4 @@
 val_avg_tta_le_auc:
     nan
 val_avg_tta_auc:
-    0.9301546794033767
+    0.9047484570274685
