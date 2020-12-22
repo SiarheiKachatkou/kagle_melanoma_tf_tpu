@@ -8,5 +8,5 @@ pip3 install scikit-learn
 pip3 install dvc
 pip3 install 'dvc[gdrive]'
 sudo apt install libgl1-mesa-glx -y
-pip install -r tools/requirements.txt
+pip3 install -r tools/requirements.txt
 #pip3 install tensorflow-addons
