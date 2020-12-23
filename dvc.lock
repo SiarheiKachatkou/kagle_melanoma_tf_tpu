@@ -20,28 +20,4 @@ baseline:
   - path: dataset
     md5: 2ba700b7cdd4ea4075c25639fa825fed.dir
     size: 34543
-    nfiles: 8
-  - path: debug_tools
-    md5: 2e2bce907de89d6d55cbc05c9b5658f2.dir
-    size: 8782
-    nfiles: 7
-  - path: model
-    md5: e7b42c94068abefdc26754b456b05371.dir
-    size: 22473
-    nfiles: 14
-  - path: submission
-    md5: 25ff5dd819f3fb7583fdc5de0167dc40.dir
-    size: 13947
-    nfiles: 5
-  - path: tools
-    md5: b6d553dc1ac9fcebdf439ddb01a894d0.dir
-    size: 16974
-    nfiles: 7
-  outs:
-  - path: artifacts/baseline
-    md5: 079d64b11ece65c987e7b8cd66a5a58c.dir
-    size: 207388190
-    nfiles: 36
-  - path: metrics/metrics.txt
-    md5: 30974b6a4264420101be33121706a6d5
-    size: 67
+    nfiles: 1

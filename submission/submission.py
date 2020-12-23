@@ -1,14 +1,12 @@
 import numpy as np
 import pandas as pd
 import gc
+from dataset.dataset_utils import remove_str
 
 import tensorflow as tf
 AUTO = tf.data.experimental.AUTOTUNE
-def return_2_values(dataset):
-    def two(a1,a2,*args):
-        return a1,a2
-    ds=dataset.map(two,num_parallel_calls=AUTO)
-    return ds
+
+
 
 def make_submission_dataframe(test_dataset, model,repeats=1):
 
@@ -27,7 +25,7 @@ def make_submission_dataframe(test_dataset, model,repeats=1):
         labs.append(label.numpy())
 
     test_dataset=test_dataset.repeat(repeats)
-    preds=model.predict(test_dataset, verbose=True)
+    preds=model.predict(remove_str(test_dataset), verbose=True)
     preds=preds.astype(np.float)
 
     if preds.shape[-1]==2:

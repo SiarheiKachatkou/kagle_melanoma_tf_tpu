@@ -3,7 +3,7 @@ from config.consts import path_microscope_images
 from augmentations.augmentations_geom import transform_geometricaly
 
 
-microscope_images = tf.io.gfile.glob(str(path_microscope_images/ '*.png'))
+microscope_images = tf.io.gfile.glob(str(path_microscope_images+'/*.png'))
 microscope_images_tf=tf.convert_to_tensor(microscope_images)
 
 def _augm_color_microscope(microscope_img):

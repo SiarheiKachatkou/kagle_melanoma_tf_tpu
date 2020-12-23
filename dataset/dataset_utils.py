@@ -189,3 +189,11 @@ def get_test_dataset_with_labels_tta(test_filenames,config):
     return _get_dataset(test_filenames, is_wo_labels=False, augm_fn=partial(augment_tta,config=config)
                         ,batch_size=config.batch_size_inference,
                         is_deterministic=True, config=config)
+
+
+def remove_str(dataset):
+    def del_str(d, label):
+        del d['image_name']
+        return d,label
+    dataset=dataset.map(del_str,num_parallel_calls=_num_parallel_calls())
+    return dataset
