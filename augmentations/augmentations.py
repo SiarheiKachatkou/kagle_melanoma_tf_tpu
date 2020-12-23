@@ -112,6 +112,7 @@ def augment_train(input_dict, labels, config):
     image=_augment_color(image)
     image = hair_aug_tf(image, config)
     image = microscope_aug_tf(image, config)
+    image = cutout(image,config.image_height,config.cut_out_prob)
     image = _normalize(image)
     image = transform_geometricaly(image, DIM=config.image_height)
     input_dict['image']=image
