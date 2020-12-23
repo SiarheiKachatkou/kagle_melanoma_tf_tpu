@@ -12,7 +12,7 @@ class SaveLastCallback(tf.keras.callbacks.Callback):
         self._save_last_epochs=save_last_epochs
 
     def _get_filepath(self, epoch):
-        return f'{self._dir_path}/model{self._fold}_{epoch}.h5'
+        return f'{self._dir_path}/../trained_models/model{self._fold}_{epoch}.h5'
 
     def get_filepaths(self):
         filepaths=[]

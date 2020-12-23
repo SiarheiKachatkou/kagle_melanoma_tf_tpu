@@ -43,7 +43,10 @@ if is_debug:
 for fold in range(CONFIG.nfolds):
 
     print(f'fold={fold}')
-    model_file_path=f'{CONFIG.work_dir}/model{fold}.h5'
+    model_dir_path=f'{CONFIG.work_dir}/../trained_models/'
+    if not os.path.exists(model_dir_path):
+        os.makedirs(model_dir_path)
+    model_file_path=os.path.join(model_dir_path,f'model{fold}.h5')
 
     callbacks=[lr_callback]
     if CONFIG.save_last_epochs != 0:
