@@ -35,7 +35,7 @@ epochs_fine_tune = 10
 epochs_full = 1 if is_debug else 30
 
 
-BATCH_SIZE = 36 if is_debug else 64
+BATCH_SIZE = 36 if is_debug else 512
 BATCH_SIZE_INCREASE_FOR_INFERENCE = 4
 
 
