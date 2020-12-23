@@ -1,23 +1,46 @@
 baseline:
-  cmd: export LD_LIBRARY_PATH=/usr/local/cuda/lib64 && export PYTHONPATH=/mnt/850G/GIT/kagle_melanoma_tf_tpu
-    && /home/sergey/anaconda3/envs/tensorflow_2/bin/python3 tools/main.py --work_dir=artifacts/baseline
-    --backbone=B0 --dropout_rate=0.1 --lr_max=1 --lr_exp_decay=0.8 --focal_loss_gamma=4
-    --focal_loss_alpha=0.8 --hair_prob=0.1 --microscope_prob=0.01 --lr_warm_up_epochs=5
-    --image_height=256
+  cmd: export LD_LIBRARY_PATH=/usr/local/cuda/lib64 && export PYTHONPATH=$PWD && python3
+    tools/main.py --work_dir=artifacts/baseline --backbone=B0 --dropout_rate=0.1 --lr_max=1
+    --lr_exp_decay=0.8 --focal_loss_gamma=4 --focal_loss_alpha=0.8 --hair_prob=0.1
+    --microscope_prob=0.01 --lr_warm_up_epochs=5 --image_height=256
   deps:
   - path: augmentations
-    md5: f039e2266577f7495d7095c80fb5066c.dir
-    size: 25361
+    md5: 8f33b36252aa3ffb80b35fb60ab41e4e.dir
+    size: 25395
     nfiles: 9
   - path: config
-    md5: 33d62a4ff1ff33d111530ce6875898af.dir
-    size: 13760
+    md5: 98c7a6a6c14079dabb73177f27eaa87e.dir
+    size: 14323
     nfiles: 6
   - path: data
-    md5: 50f323f19a4e9a0f6e5e879a82eec0cf.dir
-    size: 2805009500
-    nfiles: 108
-  - path: dataset
-    md5: 2ba700b7cdd4ea4075c25639fa825fed.dir
-    size: 34543
+    md5: 6ffbaaad7b4ac6e1afabed19a80b2560.dir
+    size: 0
     nfiles: 1
+  - path: dataset
+    md5: c560f67dbdd2fb12cb2acd72ecac45a7.dir
+    size: 35243
+    nfiles: 8
+  - path: debug_tools
+    md5: 2e2bce907de89d6d55cbc05c9b5658f2.dir
+    size: 8782
+    nfiles: 7
+  - path: model
+    md5: 8238007e4a33ec7705f366104d457c89.dir
+    size: 22461
+    nfiles: 14
+  - path: submission
+    md5: 79963b03dbe1fd8cef0ef9c457577adb.dir
+    size: 13625
+    nfiles: 5
+  - path: tools
+    md5: e9b84d1cbfd9f9e0e91833322f308228.dir
+    size: 18551
+    nfiles: 9
+  outs:
+  - path: artifacts/baseline
+    md5: 96bf797c5945f8bd62a8dc883da9d2d7.dir
+    size: 9776007
+    nfiles: 32
+  - path: metrics/metrics.txt
+    md5: 4d61d425ae1ff4a34d86dc03a720d72c
+    size: 66
