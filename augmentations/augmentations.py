@@ -54,7 +54,7 @@ def cut_mix(batch,labels, *args, config, prob=0.5):
     symbolic_shape = K.shape(images)
     batch_size = symbolic_shape[0]
     if (prob==0) or (batch_size!=config.batch_size):
-        return (images,labels,*args)
+        return batch,labels
 
     images_augm = []
     labels_augm = []
