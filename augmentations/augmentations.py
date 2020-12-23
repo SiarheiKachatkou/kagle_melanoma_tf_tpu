@@ -49,8 +49,8 @@ def _augment_color(image):
     return image
 
 
-def cut_mix(images,labels,*args, config, prob=0.5):
-
+def cut_mix(batch,labels, *args, config, prob=0.5):
+    images = batch['image']
     symbolic_shape = K.shape(images)
     batch_size = symbolic_shape[0]
     if (prob==0) or (batch_size!=config.batch_size):
@@ -98,7 +98,8 @@ def cut_mix(images,labels,*args, config, prob=0.5):
     images = tf.reshape(images, (len(images), config.image_height, config.image_height, 3))
     labels = tf.reshape(labels, (len(labels),))
 
-    return (images,labels,*args)
+    batch['image']=images
+    return batch,labels
 
 
 def _normalize(image8u):
