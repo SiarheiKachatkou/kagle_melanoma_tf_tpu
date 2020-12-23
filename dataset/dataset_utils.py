@@ -146,6 +146,9 @@ def get_training_dataset(training_fileimages, training_fileimages_old, config, r
         dataset=oversample(dataset,config)
     augm_fn=partial(augment_train,config=config)
     dataset = _augm_dataset(dataset,augm_fn,config.batch_size)
+    if config.cut_mix_prob!=0:
+        cut_mix_fn = partial(cut_mix, prob=config.cut_mix_prob)
+        dataset = _augm_batched_dataset(dataset, cut_mix_fn)
     return dataset
 
 def get_validation_dataset_tta(val_filenames, config, cut_mix_prob=0):
