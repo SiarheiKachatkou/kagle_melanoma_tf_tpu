@@ -26,7 +26,7 @@ args=parser.parse_args()
 if is_local:
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
     if args.gpus is None:
-        os.environ["CUDA_VISIBLE_DEVICES"] = "2"#"1,2"  # "0" #
+        os.environ["CUDA_VISIBLE_DEVICES"] = "1,2"#"1,2"  # "0" #
     else:
         os.environ["CUDA_VISIBLE_DEVICES"] = args.gpus
 
@@ -47,7 +47,7 @@ config=namedtuple('config',['lr_max','lr_start','lr_fine_tune','stepsize', 'lr_w
                             'save_last_epochs',
                             'oversample_mult',
                             'focal_loss_gamma','focal_loss_alpha',
-                            'hair_prob','microscope_prob',
+                            'hair_prob','microscope_prob','cut_out_prob','cut_mix_prob',
                             'batch_size','batch_size_inference',
                             'image_height',
                             'epochs_full','epochs_fine_tune', 'fine_tune_last'
@@ -78,7 +78,7 @@ CONFIG=config(lr_max=args.lr_max*1e-4, lr_start=1e-6, stepsize=3,lr_fine_tune=3e
               save_last_epochs=0,
               oversample_mult=args.oversample_mult,
               focal_loss_gamma=focal_loss_gamma, focal_loss_alpha=focal_loss_alpha,
-              hair_prob=hair_prob, microscope_prob=microscope_prob,
+              hair_prob=hair_prob, microscope_prob=microscope_prob,cut_out_prob=0.1,cut_mix_prob=0.05,
               batch_size=BATCH_SIZE, batch_size_inference=BATCH_SIZE * BATCH_SIZE_INCREASE_FOR_INFERENCE,
               image_height=image_height,
               epochs_full=epochs_full,epochs_fine_tune=epochs_fine_tune, fine_tune_last=-1

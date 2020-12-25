@@ -1,4 +1,8 @@
 val_avg_tta_le_auc:
     nan
 val_avg_tta_auc:
+<<<<<<< HEAD
     0.9306449123777083
+=======
+    0.9029449715441472
+>>>>>>> main

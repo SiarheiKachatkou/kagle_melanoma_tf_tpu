@@ -88,6 +88,9 @@ def _ignore_order(dataset,is_deterministic):
         ignore_order)  # uses data as soon as it streams in, rather than in its original order
     return dataset
 
+def buff_size():
+    return  256 if is_local else 1024 * 8
+
 
 def load_dataset(filenames, is_wo_labels, is_deterministic, config):
     # Read from TFRecords. For optimal performance, reading from multiple files at once and
@@ -99,7 +102,7 @@ def load_dataset(filenames, is_wo_labels, is_deterministic, config):
     the_read_tfrecord=partial(the_read_tfrecord,image_size=[config.image_height,config.image_height])
     dataset = dataset.map(the_read_tfrecord, num_parallel_calls=_num_parallel_calls())
     if (not is_wo_labels) and (not is_deterministic):
-        dataset = dataset.shuffle(1024*8)
+        dataset = dataset.shuffle(buff_size())
         
     return dataset
 
@@ -138,11 +141,14 @@ def get_training_dataset(training_fileimages, training_fileimages_old, config, r
         dataset.concatenate(dataset_old)
 
     dataset = dataset.repeat(repeats)
-    dataset=dataset.shuffle(1024*8)
+    dataset=dataset.shuffle(buff_size())
     if config.oversample_mult!=1:
         dataset=oversample(dataset,config)
     augm_fn=partial(augment_train,config=config)
     dataset = _augm_dataset(dataset,augm_fn,config.batch_size)
+    if config.cut_mix_prob!=0:
+        cut_mix_fn = partial(cut_mix, config=config, prob=config.cut_mix_prob)
+        dataset = _augm_batched_dataset(dataset, cut_mix_fn)
     return dataset
 
 def get_validation_dataset_tta(val_filenames, config, cut_mix_prob=0):

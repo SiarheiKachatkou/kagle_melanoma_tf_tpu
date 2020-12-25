@@ -3,12 +3,6 @@ import tensorflow.keras.backend as K
 import math
 from config.consts import *
 
-ROT_ = 180.0
-SHR_ = 2.0
-HZOOM_ = 8.0
-WZOOM_ = 8.0
-HSHIFT_ = 8.0
-WSHIFT_ = 8.0
 
 def get_mat(rotation, shear, height_zoom, width_zoom, height_shift, width_shift):
     # returns 3x3 transformmatrix which transforms indicies
@@ -54,6 +48,14 @@ def transform_geometricaly(image, DIM=256):
     # output - image randomly rotated, sheared, zoomed, and shifted
 
     image = tf.image.random_flip_left_right(image)
+
+    ROT_ = 180.0
+    height=image.shape[1]
+    SHR_ = 2.0*height/128
+    HZOOM_ = 8.0
+    WZOOM_ = 8.0
+    HSHIFT_ = 8.0*height/128
+    WSHIFT_ = 8.0*height/128
 
     XDIM = DIM % 2  # fix for size 331
     rot = ROT_ * tf.random.normal([1], seed=op_seed, dtype='float32')

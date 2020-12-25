@@ -49,12 +49,12 @@ def _augment_color(image):
     return image
 
 
-def cut_mix(images,labels,*args, config, prob=0.5):
-
+def cut_mix(batch,labels, *args, config, prob=0.5):
+    images = batch['image']
     symbolic_shape = K.shape(images)
     batch_size = symbolic_shape[0]
     if (prob==0) or (batch_size!=config.batch_size):
-        return (images,labels,*args)
+        return batch,labels
 
     images_augm = []
     labels_augm = []
@@ -98,7 +98,8 @@ def cut_mix(images,labels,*args, config, prob=0.5):
     images = tf.reshape(images, (len(images), config.image_height, config.image_height, 3))
     labels = tf.reshape(labels, (len(labels),))
 
-    return (images,labels,*args)
+    batch['image']=images
+    return batch,labels
 
 
 def _normalize(image8u):
@@ -112,7 +113,10 @@ def augment_train(input_dict, labels, config):
     image=_augment_color(image)
     image = hair_aug_tf(image, config)
     image = microscope_aug_tf(image, config)
+
     image = _normalize(image)
+    image = cutout(image, config.image_height, config.cut_out_prob)
+
     image = transform_geometricaly(image, DIM=config.image_height)
     input_dict['image']=image
     return input_dict, labels
