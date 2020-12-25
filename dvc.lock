@@ -2,45 +2,45 @@ baseline:
   cmd: export LD_LIBRARY_PATH=/usr/local/cuda/lib64 && export PYTHONPATH=$PWD && python3
     tools/main.py --work_dir=artifacts/baseline --backbone=B6 --dropout_rate=0.1 --lr_max=5
     --lr_exp_decay=0.5 --focal_loss_gamma=4 --focal_loss_alpha=0.8 --hair_prob=0.01
-    --microscope_prob=0.01 --lr_warm_up_epochs=5 --image_height=384
+    --microscope_prob=0.01 --lr_warm_up_epochs=5 --image_height=256
   deps:
   - path: augmentations
-    md5: 3316000bcbbea441242a34a996cc64c9.dir
-    size: 25119
+    md5: 3377f97a77fb621c1870cec0f3dea8a6.dir
+    size: 25395
     nfiles: 9
   - path: config
-    md5: 1dad73b3630045d6a203c7df58b34406.dir
-    size: 14022
+    md5: c11c070c0706e33ca33254d158f4ee94.dir
+    size: 14333
     nfiles: 6
   - path: data
     md5: 6ffbaaad7b4ac6e1afabed19a80b2560.dir
     size: 0
     nfiles: 1
   - path: dataset
-    md5: ea686571cd03201c7d518414d8d48803.dir
-    size: 34799
+    md5: 51cb2503686b38cd7388abb147a9e1ef.dir
+    size: 35243
     nfiles: 8
   - path: debug_tools
     md5: 2e2bce907de89d6d55cbc05c9b5658f2.dir
     size: 8782
     nfiles: 7
   - path: model
-    md5: 682b15d4163fc48dbdc06694a85532dc.dir
-    size: 22425
+    md5: 55e6822e17027ceadf885b2114d9d4f9.dir
+    size: 22466
     nfiles: 14
   - path: submission
-    md5: 97b076c26a9da238b1f5c55215114478.dir
+    md5: 9a7be9c45c4e321eba9338a210e19444.dir
     size: 13625
     nfiles: 5
   - path: tools
-    md5: e9b84d1cbfd9f9e0e91833322f308228.dir
-    size: 18551
-    nfiles: 9
+    md5: 2c27f627879dedf706ae9938cf039006.dir
+    size: 17976
+    nfiles: 8
   outs:
   - path: artifacts/baseline
-    md5: 81dff1db51b2cb5026029c2fe4e4b1ea.dir
-    size: 1979225624
-    nfiles: 36
+    md5: 7f51e655ff6d7e8c561c14bd654242a9.dir
+    size: 9957092
+    nfiles: 32
   - path: metrics/metrics.txt
-    md5: 7078cb6f72763bf5ab65b9c2e144c68e
+    md5: 267bdc3ad0c719777e4ef6905fe9010b
     size: 67
