@@ -5,19 +5,19 @@ baseline:
     --microscope_prob=0.01 --lr_warm_up_epochs=5 --image_height=256
   deps:
   - path: augmentations
-    md5: 2ec58565d86e84d75e450a9f90aa1d73.dir
+    md5: 3377f97a77fb621c1870cec0f3dea8a6.dir
     size: 25395
     nfiles: 9
   - path: config
-    md5: 849a22dbc6e932d5a79b1e491f99c506.dir
-    size: 14342
+    md5: 6e1a35665c378015d074b6c89910ac43.dir
+    size: 14356
     nfiles: 6
   - path: data
     md5: 6ffbaaad7b4ac6e1afabed19a80b2560.dir
     size: 0
     nfiles: 1
   - path: dataset
-    md5: af953a8ff00c9779d30878ac3e32f7fd.dir
+    md5: 51cb2503686b38cd7388abb147a9e1ef.dir
     size: 35243
     nfiles: 8
   - path: debug_tools
@@ -25,11 +25,11 @@ baseline:
     size: 8782
     nfiles: 7
   - path: model
-    md5: 7de108c5e1b98808d562d3c450ef51db.dir
+    md5: b9f30ceb565e1894d74d1061e20618fc.dir
     size: 22461
     nfiles: 14
   - path: submission
-    md5: 5b77cb0c48bb0fa1228f4fe4a4e3f5bf.dir
+    md5: 9a7be9c45c4e321eba9338a210e19444.dir
     size: 13625
     nfiles: 5
   - path: tools
@@ -38,9 +38,9 @@ baseline:
     nfiles: 9
   outs:
   - path: artifacts/baseline
-    md5: 97231ddadb6a370c93f679d9d69afc08.dir
-    size: 9813456
+    md5: 114d6530ae1b9479625fab895dc3c8d0.dir
+    size: 9823143
     nfiles: 32
   - path: metrics/metrics.txt
-    md5: 97d75aacf5d4bf74f98dc4e0c8bc25a2
+    md5: 1456a7e696ff1acbe2927c5c66a71dea
     size: 67
