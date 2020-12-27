@@ -19,6 +19,8 @@ git clone -b B0_384 https://github.com/SiarheiKachatkou/kagle_melanoma_tf_tpu.gi
 cd kagle_melanoma_tf_tpu &&
 tools/install.sh &&
 dvc repro baseline
+
+
 sudo python3 main.py --backbone=B6 --dropout_rate=0 --lr_max=3 --lr_exp_decay=0.8 --focal_loss_gamma=2 --focal_loss_alpha=0.5 --hair_prob=0 --microscope_prob=0 --lr_warm_up_epochs=5 --image_height=384
 tools/install.sh &&
 dvc repro baseline
