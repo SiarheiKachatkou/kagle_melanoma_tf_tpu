@@ -54,7 +54,7 @@ else:
                           'old': 'gs://kaggle_melanoma_isic/old-768-tfrecord/train*.tfrec'}
         }
     else:
-        DATASETS ={384:{'new':'gs://kaggle_melanoma_isic/isic2020-384-colornormed-tfrecord/train*.tfrec','old':''},
+        DATASETS ={384:{'new':'gs://kaggle_melanoma_isic/isic2020-384-colornormed-tfrecord/train*.tfrec','old':'gs://kaggle_melanoma_isic/384x384_old/train*.tfrec'},
                    256:{'new':'gs://kaggle_melanoma_isic/256x256_triple/train*.tfrec','old':''},
                    512:{'new':'gs://kaggle_melanoma_isic/512x512_triple/train*.tfrec','old':''},
                    768:{'new':'gs://kaggle_melanoma_isic/768x768_triple/train*.tfrec','old':''}}
