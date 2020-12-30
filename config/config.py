@@ -31,7 +31,7 @@ if is_local:
         os.environ["CUDA_VISIBLE_DEVICES"] = args.gpus
 
 
-epochs_fine_tune = 1e-6
+epochs_fine_tune = 0
 epochs_full = 1 if is_debug else epochs_fine_tune+12
 
 
@@ -55,7 +55,7 @@ config=namedtuple('config',['lr_max','lr_start','lr_fine_tune','stepsize', 'lr_w
 
 model = args.backbone if not is_debug else 'B0'
 
-penalty = 0
+penalty = 1e-6
 dropout_rate=args.dropout_rate
 focal_loss_alpha=args.focal_loss_alpha
 focal_loss_gamma=args.focal_loss_gamma
