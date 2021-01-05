@@ -55,7 +55,7 @@ config=namedtuple('config',['lr_max','lr_start','lr_fine_tune','stepsize', 'lr_w
 
 model = args.backbone if not is_debug else 'B0'
 
-penalty = 1e-4
+penalty = 1e-2
 dropout_rate=args.dropout_rate
 focal_loss_alpha=args.focal_loss_alpha
 focal_loss_gamma=args.focal_loss_gamma

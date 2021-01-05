@@ -9,8 +9,8 @@ baseline:
     size: 25395
     nfiles: 9
   - path: config
-    md5: 250aa200937081b2991f0d8c05e7f281.dir
-    size: 15003
+    md5: 314eea9cd71da3dd6562924788ab1907.dir
+    size: 15012
     nfiles: 6
   - path: data
     md5: 6ffbaaad7b4ac6e1afabed19a80b2560.dir
@@ -38,9 +38,9 @@ baseline:
     nfiles: 9
   outs:
   - path: artifacts/baseline
-    md5: 6238e2da5decb5388ebdd09830d3c581.dir
-    size: 9771942
+    md5: 10fea7d7c334dd273d1bbe83d5494369.dir
+    size: 9683263
     nfiles: 32
   - path: metrics/metrics.txt
-    md5: d59702389e5d1f571ba1dbec069a2e32
-    size: 67
+    md5: 52ddd55d80c51302a1116c5f0d0a0257
+    size: 66
