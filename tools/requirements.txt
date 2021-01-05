@@ -1,1 +1,2 @@
 git+git://github.com/SiarheiKachatkou/keras_applications_fix.git#egg=keras_applications
+opencv-python
