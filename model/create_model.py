@@ -70,10 +70,6 @@ class BinaryFocalLoss():
 def compile_model(model, metrics, cfg, optimizer):
     loss = tf.keras.losses.SparseCategoricalCrossentropy()#BinaryCrossentropy()#BinaryFocalLoss(gamma=cfg.focal_loss_gamma,alpha=cfg.focal_loss_alpha, batch_size=cfg.batch_size)#label_smoothing=0.05)
 
-
-    if use_amp:
-        optimizer = tf.train.experimental.enable_mixed_precision_graph_rewrite(optimizer)
-
     model.compile(
         optimizer=optimizer,
         loss=loss,

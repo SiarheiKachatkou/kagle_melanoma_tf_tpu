@@ -7,15 +7,12 @@ from dataset.dataset_utils import *
 print("Tensorflow version " + tf.__version__)
 
 if use_amp:
-    #tf.keras.mixed_precision.set_global_policy('mixed_float16')
-    '''
     from tensorflow.keras.mixed_precision import experimental as mixed_precision
     if not is_local:
         policy = mixed_precision.Policy('mixed_bfloat16')
     else:
         policy = mixed_precision.Policy('mixed_float16')
     mixed_precision.set_policy(policy)
-    '''
 
 if use_xla:
     tf.config.optimizer.set_jit(True)
