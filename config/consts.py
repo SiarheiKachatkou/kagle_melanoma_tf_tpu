@@ -11,7 +11,7 @@ use_tpu_2 = False
 is_local = True
 is_kaggle = False
 is_debug = False
-do_validate = True
+do_validate = False
 
 
 use_amp=False
