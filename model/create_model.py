@@ -5,6 +5,7 @@ import os
 import tempfile
 import tensorflow.keras.backend as K
 import multiprocessing as mp
+from config.consts import use_amp
 from model.sparceauc import SparceAUC
 
 
