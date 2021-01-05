@@ -15,7 +15,7 @@ do_validate = True
 
 
 use_amp=True
-use_xla=True
+use_xla=False
 
 if (not is_local) and (not is_kaggle):
     tpu3 = "grpc://10.240.1.2:8470"

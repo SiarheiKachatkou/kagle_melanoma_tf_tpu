@@ -55,7 +55,7 @@ for fold in range(CONFIG.nfolds):
 
     scope = get_scope()
     with scope:
-        metrics = [SparceAUC(name="auc"),tf.keras.losses.SparseCategoricalCrossentropy(name='loss_no_reg',reduction=tf.keras.losses.Reduction.SUM)] if CONFIG.use_metrics else None
+        metrics = [SparceAUC(name="auc"),tf.keras.metrics.BinaryCrossentropy(name='loss_no_reg')] if CONFIG.use_metrics else None
 
 
         opt = tf.keras.optimizers.Adam(learning_rate=CONFIG.lr_start)

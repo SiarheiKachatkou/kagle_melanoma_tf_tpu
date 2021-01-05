@@ -1,46 +1,46 @@
 baseline:
   cmd: export LD_LIBRARY_PATH=/usr/local/cuda/lib64 && export PYTHONPATH=$PWD && python3
-    tools/main.py --work_dir=artifacts/baseline --backbone=B6 --dropout_rate=0.1 --lr_max=5
+    tools/main.py --work_dir=artifacts/baseline --backbone=B0 --dropout_rate=0.1 --lr_max=5
     --lr_exp_decay=0.5 --focal_loss_gamma=4 --focal_loss_alpha=0.8 --hair_prob=0.01
-    --microscope_prob=0.01 --lr_warm_up_epochs=5 --image_height=384
+    --microscope_prob=0.01 --lr_warm_up_epochs=5 --image_height=256
   deps:
   - path: augmentations
-    md5: f5d13efc59e8dc1a7e7d2c6a5d7ddb6e.dir
-    size: 25395
+    md5: 30602d3bc38501c40d5d95c35bc6c5ae.dir
+    size: 25427
     nfiles: 9
   - path: config
-    md5: 78fcb0f7f342960fb4d3e3e3790cc0e9.dir
-    size: 14772
+    md5: f7eb2ebc39c17a135ef18decfe50b391.dir
+    size: 15028
     nfiles: 6
   - path: data
-    md5: 6ffbaaad7b4ac6e1afabed19a80b2560.dir
-    size: 0
-    nfiles: 1
+    md5: e54be2c23044ffeb0179687b079c75d5.dir
+    size: 13081052783
+    nfiles: 204
   - path: dataset
-    md5: 48fb51ccca135229bacd1899cb86ac95.dir
-    size: 35243
+    md5: 3630bd28a2ad476c49c6e8cc235479ea.dir
+    size: 35267
     nfiles: 8
   - path: debug_tools
     md5: 2e2bce907de89d6d55cbc05c9b5658f2.dir
     size: 8782
     nfiles: 7
   - path: model
-    md5: 5f5ef6c54404a8a57279d9d7f9db0775.dir
-    size: 22461
+    md5: ca663cf6cfa87eb541e82685cce32d91.dir
+    size: 22509
     nfiles: 14
   - path: submission
-    md5: 7e9251c7f4a7a9aeb4b3d0bbda041dd5.dir
-    size: 13908
+    md5: 56ba31c41dd7fe51637c2cf6a027138e.dir
+    size: 13924
     nfiles: 6
   - path: tools
-    md5: c8e3e3725f8c5c95c13ebeb911d47117.dir
-    size: 18172
+    md5: 1dd5eb76c74c15b8f463df198c40ebee.dir
+    size: 18236
     nfiles: 9
   outs:
   - path: artifacts/baseline
-    md5: 4e9443ea2c9dddb28bdcb121d272bdaa.dir
-    size: 9593458
+    md5: 359791e0ec3724d4e765ab2b7bdbd91e.dir
+    size: 8948041
     nfiles: 32
   - path: metrics/metrics.txt
-    md5: 390f22cf9a32748c48ff680df2f13bb9
+    md5: 3c4544504d4df65149c9652786cb3570
     size: 67
