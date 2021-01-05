@@ -26,7 +26,7 @@ args=parser.parse_args()
 if is_local:
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
     if args.gpus is None:
-        os.environ["CUDA_VISIBLE_DEVICES"] = "1,2"#"1,2"  # "0" #
+        os.environ["CUDA_VISIBLE_DEVICES"] = "1"#"1,2"  # "0" #
     else:
         os.environ["CUDA_VISIBLE_DEVICES"] = args.gpus
 
@@ -35,8 +35,8 @@ epochs_fine_tune = 0
 epochs_full = 1 if is_debug else epochs_fine_tune+12
 
 
-BATCH_SIZE = 36 if is_debug else 64#400
-BATCH_SIZE_INCREASE_FOR_INFERENCE = 4
+BATCH_SIZE = 36 if is_debug else 32#64#400
+BATCH_SIZE_INCREASE_FOR_INFERENCE = 1
 
 
 TRAIN_STEPS = 1 if is_debug else None
