@@ -94,7 +94,7 @@ for fold in range(CONFIG.nfolds):
             print("FINAL VAL AUC MEAN-5: ", np.mean(final_auc))
             if CONFIG.use_metrics:
                 display_training_curves(history.history['auc'][1:], history.history['val_auc'][1:], 'auc', 211)
-            display_training_curves(history.history['loss'][1:], history.history['val_loss'][1:], 'loss', 212)
+            display_training_curves(history.history['loss_no_reg'][1:], history.history['val_loss_no_reg'][1:], 'loss', 212)
             plt.savefig(os.path.join(CONFIG.work_dir, f'loss{fold}.png'))
 
         model=load_model(model_file_path)
