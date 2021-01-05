@@ -14,6 +14,10 @@ if use_amp:
         policy = mixed_precision.Policy('mixed_float16')
     mixed_precision.set_policy(policy)
 
+if use_xla:
+    tf.config.optimizer.set_jit(True)
+    print('Accelerated Linear Algebra enabled')
+
 def get_scope():
     if not is_debug:
         tpu_key='TPU_NAME'
