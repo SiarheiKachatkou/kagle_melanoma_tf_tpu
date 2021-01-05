@@ -55,7 +55,7 @@ for fold in range(CONFIG.nfolds):
 
     scope = get_scope()
     with scope:
-        metrics = [SparceAUC(name="auc")] if CONFIG.use_metrics else None
+        metrics = [SparceAUC(name="auc"),tf.keras.losses.SparseCategoricalCrossentropy(name='loss_no_reg')] if CONFIG.use_metrics else None
 
 
         opt = tf.keras.optimizers.Adam(learning_rate=CONFIG.lr_start)
@@ -79,8 +79,8 @@ for fold in range(CONFIG.nfolds):
         model = set_backbone_trainable(model, metrics, optimizer=opt, flag=True, cfg=CONFIG, fine_tune_last=CONFIG.fine_tune_last)
 
         save_callback_best = ModelCheckpoint(
-            filepath=model_file_path, monitor='val_auc', verbose=1, save_best_only=True,
-            mode='max', save_freq='epoch')
+            filepath=model_file_path, monitor='val_loss_no_reg', verbose=1, save_best_only=True,
+            mode='min', save_freq='epoch')
 
         callbacks.append(save_callback_best)
         history = model.fit(remove_str(training_dataset),
