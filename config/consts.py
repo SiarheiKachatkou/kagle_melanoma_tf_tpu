@@ -29,6 +29,8 @@ if is_local:
 
 root=Path(os.path.split(__file__)[0])/'..'
 
+test_files_num=2
+
 if is_local:
     DATASETS = {
                 128: {'new': root/'data/128x128/train*.tfrec', 'old': ''},
@@ -76,4 +78,3 @@ path_microscope_images = str(root/"data/melanoma_microscope") if is_local else (
 
 test_data_path=root/'data/test_data'
 
-metrics_path=root/'metrics/metrics.txt'

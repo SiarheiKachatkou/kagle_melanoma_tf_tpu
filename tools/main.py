@@ -9,9 +9,9 @@ import config.config
 from matplotlib import pyplot as plt
 from model.lr import get_lrfn, get_cycling_lrfn, get_lrfn_fine_tune
 from dataset.display_utils import display_training_curves, plot_lr
-from config.config import CONFIG, TRAIN_STEPS
+from config.config import CONFIG, TRAIN_STEPS,  metrics_path
 from dataset.dataset_utils import *
-from config.consts import DATASETS, metrics_path
+from config.consts import DATASETS
 from submission import submission
 import shutil
 from model.create_model import BinaryFocalLoss
@@ -33,12 +33,14 @@ lrfn = eval(CONFIG.lr_fn)
 plot_lr(lrfn,CONFIG.epochs_full,CONFIG.work_dir)
 lr_callback = tf.keras.callbacks.LearningRateScheduler(lrfn, verbose=True)
 
-train_filenames_folds, val_filenames_folds=get_train_val_filenames(DATASETS[CONFIG.image_height]['new'],CONFIG.nfolds)
+train_filenames_folds, val_filenames_folds, test_val_filenames = get_train_val_filenames(DATASETS[CONFIG.image_height]['new'],CONFIG.nfolds)
 test_filenames=get_test_filenames(DATASETS[CONFIG.image_height]['new'])
 if is_debug:
     test_filenames = [test_filenames[0]]
-    train_filenames_folds=[[f[0]] for f in train_filenames_folds]
-    val_filenames_folds=[[f[0]] for f in val_filenames_folds]
+    train_filenames_folds=[[f[0:2]] for f in train_filenames_folds]
+    val_filenames_folds=[[f[0:2]] for f in val_filenames_folds]
+
+preds_fold_avg=[]
 
 for fold in range(CONFIG.nfolds):
 
@@ -56,7 +58,6 @@ for fold in range(CONFIG.nfolds):
     scope = get_scope()
     with scope:
         metrics = [SparceAUC(name="auc"),tf.keras.metrics.SparseCategoricalCrossentropy(name='loss_no_reg')] if CONFIG.use_metrics else None
-
 
         opt = tf.keras.optimizers.Adam(learning_rate=CONFIG.lr_start)
 
@@ -79,8 +80,8 @@ for fold in range(CONFIG.nfolds):
         model = set_backbone_trainable(model, metrics, optimizer=opt, flag=True, cfg=CONFIG, fine_tune_last=CONFIG.fine_tune_last)
 
         save_callback_best = ModelCheckpoint(
-            filepath=model_file_path, monitor='val_loss_no_reg', verbose=1, save_best_only=True,
-            mode='min', save_freq='epoch')
+            filepath=model_file_path, monitor='val_auc', verbose=1, save_best_only=True,
+            mode='max', save_freq='epoch')
 
         callbacks.append(save_callback_best)
         history = model.fit(remove_str(training_dataset),
@@ -98,6 +99,9 @@ for fold in range(CONFIG.nfolds):
             plt.savefig(os.path.join(CONFIG.work_dir, f'loss{fold}.png'))
 
         model=load_model(model_file_path)
+
+        subms=submission.make_submission_dataframe(get_validation_dataset_tta(test_val_filenames,CONFIG), model, repeats=CONFIG.ttas)
+        preds_fold_avg.append(submission.avg_submissions(subms))
 
         validation_dataset = get_validation_dataset(val_filenames_folds[fold],CONFIG)
         validation_dataset_tta = get_validation_dataset_tta(val_filenames_folds[fold],CONFIG)
@@ -133,9 +137,10 @@ for fold in range(CONFIG.nfolds):
     gc.collect()
 
 val_avg_tta_le_auc, val_avg_tta_auc = submit.main(CONFIG.nfolds,CONFIG.work_dir)
+test_avg_tta_auc = submit.calc_auc(submission.avg_submissions(preds_fold_avg))
 
 metric_dir=os.path.dirname(metrics_path)
 if not os.path.exists(metric_dir):
     os.mkdir(metric_dir)
 with open(metrics_path,'wt') as file:
-    file.write(f'val_avg_tta_le_auc:\n    {val_avg_tta_le_auc}\nval_avg_tta_auc:\n    {val_avg_tta_auc}')
+    file.write(f'val_avg_tta_le_auc:\n    {val_avg_tta_le_auc}\nval_avg_tta_auc:\n    {val_avg_tta_auc}\ntest_avg_tta_auc:\n    {test_avg_tta_auc}')

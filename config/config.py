@@ -3,7 +3,7 @@ from collections import namedtuple
 import os
 import argparse
 from config.consts import is_local, is_debug
-
+from pathlib import Path
 
 parser=argparse.ArgumentParser()
 parser.add_argument('--backbone',type=str)
@@ -16,6 +16,8 @@ parser.add_argument('--lr_warm_up_epochs',type=int)
 parser.add_argument('--gpus',type=str,default=None)
 parser.add_argument('--image_height',type=int)
 parser.add_argument('--work_dir',type=str)
+parser.add_argument('--batch_size',type=int)
+parser.add_argument('--stage',type=str)
 
 parser.add_argument('--focal_loss_gamma',type=float,default=4)
 parser.add_argument('--focal_loss_alpha',type=float,default=0.5)
@@ -35,7 +37,7 @@ epochs_fine_tune = 0
 epochs_full = 1 if is_debug else epochs_fine_tune+12
 
 
-BATCH_SIZE = 36 if is_debug else 32#400
+BATCH_SIZE = 36 if is_debug else args.batch_size#400
 BATCH_SIZE_INCREASE_FOR_INFERENCE = 4
 
 
@@ -90,3 +92,10 @@ CONFIG=config(lr_max=args.lr_max*1e-4, lr_start=1e-6, stepsize=3,lr_fine_tune=3e
 #pretrained_model = tf.keras.applications.ResNet50(weights='imagenet', include_top=False, input_shape=[*IMAGE_SIZE, 3])
 #pretrained_model = tf.keras.applications.MobileNet(weights='imagenet', include_top=False, input_shape=[*IMAGE_SIZE, 3])
 # EfficientNet can be loaded through efficientnet.tfkeras library (https://github.com/qubvel/efficientnet)
+
+root=Path(os.path.split(__file__)[0])/'..'
+metrics_path=root/'metrics'
+if args.stage=='baseline':
+    metrics_path/='metrics.txt'
+else:
+    metrics_path /= f'metrics_{args.stage}.txt'
