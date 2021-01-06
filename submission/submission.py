@@ -56,18 +56,40 @@ def make_submission_dataframe(test_dataset, model,repeats=1):
     
     return df_submissions
 
-def avg_submissions(subms_list):
+def aggregate_submissions(subms_list, mode='AVG'):
+    assert mode in ['AVG','AVGZ','MAX','MIN','STD']
+
     subms=[s.sort_values(by='image_name') for s in subms_list]
-    target=subms[0]['target'].values.astype(np.float)
+    targets=[subms[0]['target'].values.astype(np.float)]
     image_names=subms[0]['image_name']
     for i in range(1,len(subms)):
         df=subms[i]
         df_names=df['image_name']
         e=np.equal(image_names.values,df_names.values)
         assert all(e), print(f'ERROR: you are trying summing different image_names dataframe {image_names} {df_names} {e}')
-        target+=df['target'].values.astype(np.float)
-    
-    target=target/len(subms)
+        targets.append(df['target'].values.astype(np.float))
+    targets=np.array(targets)
+    fn=None
+
+    if mode=='AVG':
+        fn=np.mean
+    elif mode=='MIN':
+        fn = np.min
+    elif mode=='MAX':
+        fn = np.min
+    elif mode=='STD':
+        fn=np.std
+    elif mode=='AVGZ':
+        def fn(a, axis=None):
+            eps=1e-3
+            a-=np.expand_dims(np.mean(a,axis=1),axis=-1)
+            a /= (np.expand_dims(np.std(a, axis=1),axis=-1)+eps)
+            a=np.mean(a,axis=0)
+            return a
+
+
+    target=fn(targets,axis=0)
+
     df=subms[0]
     df['target']=target
     return df
@@ -80,10 +102,10 @@ def make_submissions_all_kind(test_dataset, test_dataset_tta, models, ttas=3):
     for i in range(len(models)):
         single_model_tta[i].extend(make_submission_dataframe(test_dataset_tta, models[i],repeats=ttas))
         
-    single_model_tta=[avg_submissions(s_list) for s_list in single_model_tta]
+    single_model_tta=[aggregate_submissions(s_list) for s_list in single_model_tta]
     
-    all_model = avg_submissions(single_model)
-    all_model_tta=avg_submissions(single_model_tta)
+    all_model = aggregate_submissions(single_model)
+    all_model_tta=aggregate_submissions(single_model_tta)
     return single_model[0],single_model_tta[0],all_model,all_model_tta
     
     
