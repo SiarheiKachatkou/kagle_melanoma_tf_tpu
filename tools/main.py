@@ -15,7 +15,7 @@ from config.consts import DATASETS
 from submission import submission
 import shutil
 from model.create_model import BinaryFocalLoss
-from model.SaveLastCallback import SaveLastCallback
+from model.SaveBestNCallback import SaveBestNCallback
 from model.create_model import create_model, set_backbone_trainable, load_model
 from config.runtime import get_scope
 from model.sparceauc import SparceAUC
@@ -51,9 +51,11 @@ for fold in range(CONFIG.nfolds):
     model_file_path=os.path.join(model_dir_path,f'model{fold}.h5')
 
     callbacks=[lr_callback]
+    validation_dataset_tta = get_validation_dataset_tta(val_filenames_folds[fold], CONFIG)
     if CONFIG.save_last_epochs != 0:
-        save_callback_last = SaveLastCallback(CONFIG.work_dir, fold, CONFIG.epochs_full, CONFIG.save_last_epochs)
-        callbacks.append(save_callback_last)
+        save_callback_best_n = SaveBestNCallback(CONFIG.work_dir, fold, CONFIG.save_last_epochs, metric_name='val_auc', mode='max',
+                                               val_ttas=CONFIG.val_ttas, val_dataset=validation_dataset_tta)
+        callbacks.append(save_callback_best_n)
 
     scope = get_scope()
     with scope:
@@ -104,7 +106,7 @@ for fold in range(CONFIG.nfolds):
         preds_fold_avg.append(submission.avg_submissions(subms))
 
         validation_dataset = get_validation_dataset(val_filenames_folds[fold],CONFIG)
-        validation_dataset_tta = get_validation_dataset_tta(val_filenames_folds[fold],CONFIG)
+
         submission.calc_and_save_submissions(CONFIG, model, f'val_{fold}', validation_dataset, validation_dataset_tta,
                                              CONFIG.ttas)
         del validation_dataset
@@ -118,7 +120,7 @@ for fold in range(CONFIG.nfolds):
 
         if CONFIG.save_last_epochs!=0:
             models=[]
-            filepaths=save_callback_last.get_filepaths()
+            filepaths=save_callback_best.get_filepaths()
             for filepath in filepaths:
                 m=load_model(filepath)
                 m.trainable=False

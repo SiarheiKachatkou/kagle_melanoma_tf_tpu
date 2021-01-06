@@ -15,7 +15,7 @@ from submission import submission
 import shutil
 import pandas as pd
 from model.create_model import BinaryFocalLoss
-from model.SaveLastCallback import SaveLastCallback
+from model.SaveLastCallback import SaveBestNCallback
 from model.create_model import create_model, set_backbone_trainable
 from config.runtime import get_scope
 from model.history import join_history
@@ -49,10 +49,10 @@ for fold in range(CONFIG.nfolds):
     save_callback_best = tf.keras.callbacks.ModelCheckpoint(
         model_file_path, monitor='val_loss', verbose=0, save_best_only=True,
         mode='min', save_freq='epoch')
-    save_callback_last=SaveLastCallback(CONFIG.work_dir, fold, EPOCHS_FULL, CONFIG.save_last_epochs)
+    save_callback_last=SaveBestNCallback(CONFIG.work_dir, fold, EPOCHS_FULL, CONFIG.save_last_epochs)
 
-    save_callback=SaveLastCallback(CONFIG.work_dir,fold=fold, epochs=EPOCHS_FULL,
-                                   save_last_epochs=CONFIG.save_last_epochs)
+    save_callback=SaveBestNCallback(CONFIG.work_dir, fold=fold, epochs=EPOCHS_FULL,
+                                    save_last_epochs=CONFIG.save_last_epochs)
 
     callbacks=[lr_callback,save_callback_best,save_callback_last]
 

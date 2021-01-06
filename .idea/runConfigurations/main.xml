@@ -14,7 +14,7 @@
     <option name="ADD_SOURCE_ROOTS" value="true" />
     <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
     <option name="SCRIPT_NAME" value="$PROJECT_DIR$/tools/main.py" />
-    <option name="PARAMETERS" value="--backbone=B0 --dropout_rate=0.01 --lr_max=0.01 --lr_exp_decay=0.5 --focal_loss_gamma=4 --focal_loss_alpha=0.8 --hair_prob=0.1 --microscope_prob=0.01 --lr_warm_up_epochs=5 --image_height=128 --work_dir=artifacts/baseline" />
+    <option name="PARAMETERS" value="--backbone=B0 --dropout_rate=0.01 --lr_max=0.01 --lr_exp_decay=0.5 --focal_loss_gamma=4 --focal_loss_alpha=0.8 --hair_prob=0.1 --microscope_prob=0.01 --lr_warm_up_epochs=5 --image_height=128 --work_dir=artifacts/baseline --batch_size=32 --stage=dbg --save_last_epochs=2 --gpus=0" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="false" />

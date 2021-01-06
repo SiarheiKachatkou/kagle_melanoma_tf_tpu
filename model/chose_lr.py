@@ -13,7 +13,7 @@ from dataset.dataset_utils import *
 from submission import submission
 import shutil
 from model.create_model import BinaryFocalLoss
-from model.SaveLastCallback import SaveLastCallback
+from model.SaveLastCallback import SaveBestNCallback
 from model.create_model import create_model, set_backbone_trainable
 
 
