@@ -9,9 +9,9 @@ baseline:
     size: 35643
     nfiles: 13
   - path: config
-    md5: 734319eac72892d4217170c9c7972611.dir
-    size: 20915
-    nfiles: 9
+    md5: 314eea9cd71da3dd6562924788ab1907.dir
+    size: 15012
+    nfiles: 6
   - path: data
     md5: e54be2c23044ffeb0179687b079c75d5.dir
     size: 13081052783
@@ -38,12 +38,12 @@ baseline:
     nfiles: 10
   outs:
   - path: artifacts/baseline
-    md5: 351fb93996ec8504ab487a7ceb24d6c5.dir
-    size: 9876512
+    md5: 10fea7d7c334dd273d1bbe83d5494369.dir
+    size: 9683263
     nfiles: 32
   - path: metrics/metrics.txt
-    md5: 667ba878db1a93f3c7cdb5ce9bc96c28
-    size: 108
+    md5: 52ddd55d80c51302a1116c5f0d0a0257
+    size: 66
 b0:
   cmd: export LD_LIBRARY_PATH=/usr/local/cuda-10.2/lib64 && export PYTHONPATH=/mnt/850G/GIT/kagle_melanoma_tf_tpu
     && /home/sergey/anaconda3/envs/tensorflow_2/bin/python3 tools/main.py --work_dir=artifacts/b0
