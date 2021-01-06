@@ -10,11 +10,11 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 use_tpu_2 = False
 is_local = True
 is_kaggle = False
-is_debug = True
+is_debug = False
 do_validate = True
 
 
-use_amp=False
+use_amp=True
 use_xla=False
 
 if (not is_local) and (not is_kaggle):

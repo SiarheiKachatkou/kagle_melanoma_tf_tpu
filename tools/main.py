@@ -52,10 +52,10 @@ for fold in range(CONFIG.nfolds):
 
     callbacks=[lr_callback]
     validation_dataset_tta = get_validation_dataset_tta(val_filenames_folds[fold], CONFIG)
-    if CONFIG.save_last_epochs != 0:
-        save_callback_best_n = SaveBestNCallback(CONFIG.work_dir, fold, CONFIG.save_last_epochs, metric_name='val_auc', mode='max',
-                                               val_ttas=CONFIG.val_ttas, val_dataset=validation_dataset_tta)
-        callbacks.append(save_callback_best_n)
+
+    save_callback_best_n = SaveBestNCallback(CONFIG.work_dir, fold, CONFIG.save_best_n, metric_name='val_auc', mode='max',
+                                           val_ttas=CONFIG.val_ttas, val_dataset=validation_dataset_tta)
+    callbacks.append(save_callback_best_n)
 
     scope = get_scope()
     with scope:
@@ -81,11 +81,6 @@ for fold in range(CONFIG.nfolds):
 
         model = set_backbone_trainable(model, metrics, optimizer=opt, flag=True, cfg=CONFIG, fine_tune_last=CONFIG.fine_tune_last)
 
-        save_callback_best = ModelCheckpoint(
-            filepath=model_file_path, monitor='val_auc', verbose=1, save_best_only=True,
-            mode='max', save_freq='epoch')
-
-        callbacks.append(save_callback_best)
         history = model.fit(remove_str(training_dataset),
                             validation_data=remove_str(validation_dataset)  if do_validate else None,
                             steps_per_epoch=TRAIN_STEPS, initial_epoch=CONFIG.epochs_fine_tune, epochs=CONFIG.epochs_full, callbacks=callbacks)
@@ -118,18 +113,18 @@ for fold in range(CONFIG.nfolds):
         del test_dataset
         del test_dataset_tta
 
-        if CONFIG.save_last_epochs!=0:
-            models=[]
-            filepaths=save_callback_best.get_filepaths()
-            for filepath in filepaths:
-                m=load_model(filepath)
-                m.trainable=False
-                models.append(m)
-            submission.calc_and_save_submissions(CONFIG, models, f'val_le_{fold}', validation_dataset,
-                                                 validation_dataset_tta,
-                                                 CONFIG.ttas)
-            submission.calc_and_save_submissions(CONFIG, models, f'test_le_{fold}', test_dataset,
-                                                 test_dataset_tta, CONFIG.ttas)
+
+        models=[]
+        filepaths=save_callback_best_n.get_filepaths()
+        for filepath in filepaths:
+            m=load_model(filepath)
+            m.trainable=False
+            models.append(m)
+        submission.calc_and_save_submissions(CONFIG, models, f'val_le_{fold}', validation_dataset,
+                                             validation_dataset_tta,
+                                             CONFIG.ttas)
+        submission.calc_and_save_submissions(CONFIG, models, f'test_le_{fold}', test_dataset,
+                                             test_dataset_tta, CONFIG.ttas)
 
     if (not is_local) and (not is_kaggle):
         if fold!=0:

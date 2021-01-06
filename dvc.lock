@@ -45,11 +45,11 @@ baseline:
     md5: 667ba878db1a93f3c7cdb5ce9bc96c28
     size: 108
 b0:
-  cmd: export LD_LIBRARY_PATH=/usr/local/cuda-10.2/lib64 && export PYTHONPATH=/mnt/850G/GIT/kagle_melanoma_tf_tpu
-    && /home/sergey/anaconda3/envs/tensorflow_2/bin/python3 tools/main.py --work_dir=artifacts/b0
+  cmd: export LD_LIBRARY_PATH=/usr/local/cuda-10.2/lib64 && export PYTHONPATH=$PWD
+    && python3 tools/main.py --work_dir=artifacts/b0
     --backbone=B0 --dropout_rate=0.01 --lr_max=10 --lr_exp_decay=0.5 --focal_loss_gamma=4
     --focal_loss_alpha=0.8 --hair_prob=0.1 --microscope_prob=0.01 --lr_warm_up_epochs=5
-    --image_height=128 --batch_size=128 --stage=b0
+    --image_height=128 --batch_size=32 --stage=b0 --gpus=0
   deps:
   - path: augmentations
     md5: 4f380667632218a8ca8c899b2cbca61d.dir

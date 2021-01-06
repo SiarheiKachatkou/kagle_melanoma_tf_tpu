@@ -19,7 +19,7 @@ parser.add_argument('--work_dir',type=str)
 parser.add_argument('--batch_size',type=int)
 parser.add_argument('--stage',type=str)
 
-parser.add_argument('--save_last_epochs',type=int,default=0)
+parser.add_argument('--save_best_n',type=int,default=1)
 parser.add_argument('--focal_loss_gamma',type=float,default=4)
 parser.add_argument('--focal_loss_alpha',type=float,default=0.5)
 parser.add_argument('--oversample_mult',type=int,default=1)
@@ -47,7 +47,7 @@ TRAIN_STEPS = 1 if is_debug else None
 config=namedtuple('config',['lr_max','lr_start','lr_fine_tune','stepsize', 'lr_warm_up_epochs','lr_min','lr_exp_decay','lr_fn',
                             'nfolds','l2_penalty',
                             'model_fn_str','work_dir', 'gs_work_dir','ttas','use_metrics','dropout_rate',
-                            'save_last_epochs',
+                            'save_best_n',
                             'oversample_mult',
                             'focal_loss_gamma','focal_loss_alpha',
                             'hair_prob','microscope_prob','cut_out_prob','cut_mix_prob',
@@ -59,7 +59,7 @@ config=namedtuple('config',['lr_max','lr_start','lr_fine_tune','stepsize', 'lr_w
 
 model = args.backbone if not is_debug else 'B0'
 
-penalty = 1e-4
+penalty = 0
 dropout_rate=args.dropout_rate
 focal_loss_alpha=args.focal_loss_alpha
 focal_loss_gamma=args.focal_loss_gamma
@@ -80,7 +80,7 @@ CONFIG=config(lr_max=args.lr_max*1e-4, lr_start=1e-6, stepsize=3,lr_fine_tune=3e
               ttas=ttas,
               val_ttas=4,
               use_metrics=True, dropout_rate=dropout_rate,
-              save_last_epochs=args.save_last_epochs,
+              save_best_n=args.save_best_n,
               oversample_mult=args.oversample_mult,
               focal_loss_gamma=focal_loss_gamma, focal_loss_alpha=focal_loss_alpha,
               hair_prob=hair_prob, microscope_prob=microscope_prob,cut_out_prob=0.1,cut_mix_prob=0.05,

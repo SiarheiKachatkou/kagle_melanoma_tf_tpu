@@ -75,6 +75,7 @@ class SaveBestNCallback(tf.keras.callbacks.Callback):
         else:
             dfs=make_submission_dataframe(self._val_dataset,self.model,self._val_ttas)
             metric=calc_auc(avg_submissions(dfs))
+        print(f"\nval metric = {metric}\n")
         newCkpt=CkptWithMetric(self._get_filepath(epoch),metric,self._mode)
 
         if self._best_ckpts.append(newCkpt):
