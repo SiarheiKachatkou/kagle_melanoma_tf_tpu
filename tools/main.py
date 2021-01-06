@@ -101,7 +101,7 @@ for fold in range(CONFIG.nfolds):
         model=load_model(model_file_path)
 
         subms=submission.make_submission_dataframe(get_validation_dataset_tta(test_val_filenames,CONFIG), model, repeats=CONFIG.ttas)
-        preds_fold_avg.append(submission.avg_submissions(subms))
+        preds_fold_avg.append(submission.aggregate_submissions(subms))
 
         validation_dataset = get_validation_dataset(val_filenames_folds[fold],CONFIG)
         validation_dataset_tta = get_validation_dataset_tta(val_filenames_folds[fold],CONFIG)
@@ -137,7 +137,7 @@ for fold in range(CONFIG.nfolds):
     gc.collect()
 
 val_avg_tta_le_auc, val_avg_tta_auc = submit.main(CONFIG.nfolds,CONFIG.work_dir)
-test_avg_tta_auc = submit.calc_auc(submission.avg_submissions(preds_fold_avg))
+test_avg_tta_auc = submit.calc_auc(submission.aggregate_submissions(preds_fold_avg))
 
 metric_dir=os.path.dirname(metrics_path)
 if not os.path.exists(metric_dir):
