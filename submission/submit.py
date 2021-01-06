@@ -67,7 +67,7 @@ def main(nfolds, work_dir):
                     save_submission(sub, os.path.join(work_dir, 'kaggle_' + name))
                     subs.append(sub)
             if subs:
-                avg_sub = submission.avg_submissions(subs)
+                avg_sub = submission.aggregate_submissions(subs)
                 auc_avg_sub=calc_auc(avg_sub)
                 save_submission(avg_sub, os.path.join(work_dir, 'kaggle_' + f'test_{le}_{m_type}.csv'))
             else:

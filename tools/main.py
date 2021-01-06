@@ -66,7 +66,7 @@ for fold in range(CONFIG.nfolds):
         model = create_model(CONFIG, metrics, optimizer=opt, backbone_trainable=False)
 
         model.summary()
-        train_filenames_old = tf.io.gfile.glob(DATASETS[CONFIG.image_height]['old'])
+        train_filenames_old = tf.io.gfile.glob(str(DATASETS[CONFIG.image_height]['old']))
         training_dataset = get_training_dataset(train_filenames_folds[fold], train_filenames_old, CONFIG)
         if TRAIN_STEPS is None:
             TRAIN_STEPS=(count_data_items(train_filenames_folds[fold])+count_data_items(train_filenames_old))//CONFIG.batch_size
@@ -84,14 +84,23 @@ for fold in range(CONFIG.nfolds):
         history = model.fit(remove_str(training_dataset),
                             validation_data=remove_str(validation_dataset)  if do_validate else None,
                             steps_per_epoch=TRAIN_STEPS, initial_epoch=CONFIG.epochs_fine_tune, epochs=CONFIG.epochs_full, callbacks=callbacks)
-        history=join_history(history_fine_tune,history)
+        history = join_history(history_fine_tune, history)
+        if train_filenames_old:
+            training_dataset = get_training_dataset(train_filenames_folds[fold], training_fileimages_old=[], config=CONFIG)
+            history_total = model.fit(remove_str(training_dataset),
+                                validation_data=remove_str(validation_dataset) if do_validate else None,
+                                steps_per_epoch=TRAIN_STEPS, initial_epoch=CONFIG.epochs_full,
+                                epochs=CONFIG.epochs_total, callbacks=callbacks)
+            history = join_history(history, history_total)
+
         print(history.history)
 
         if do_validate:
             final_auc = history.history["val_auc"][-5:]
             print("FINAL VAL AUC MEAN-5: ", np.mean(final_auc))
             if CONFIG.use_metrics:
-                display_training_curves(history.history['auc'][1:], history.history['val_auc'][1:], 'auc', 211)
+                val_tta_auc=save_callback_best_n.get_history()
+                display_training_curves(history.history['auc'][1:], history.history['val_auc'][1:], 'auc', 211,validation_tta=val_tta_auc[1:])
             display_training_curves(history.history['loss_no_reg'][1:], history.history['val_loss_no_reg'][1:], 'loss', 212)
             plt.savefig(os.path.join(CONFIG.work_dir, f'loss{fold}.png'))
 
@@ -104,14 +113,10 @@ for fold in range(CONFIG.nfolds):
 
         submission.calc_and_save_submissions(CONFIG, model, f'val_{fold}', validation_dataset, validation_dataset_tta,
                                              CONFIG.ttas)
-        del validation_dataset
-        del validation_dataset_tta
 
         test_dataset = get_test_dataset(test_filenames,CONFIG)
         test_dataset_tta = get_test_dataset_tta(test_filenames,CONFIG)
         submission.calc_and_save_submissions(CONFIG, model, f'test_{fold}', test_dataset, test_dataset_tta, CONFIG.ttas)
-        del test_dataset
-        del test_dataset_tta
 
 
         models=[]
@@ -130,6 +135,11 @@ for fold in range(CONFIG.nfolds):
         if fold!=0:
             subprocess.check_call(['gsutil', 'rm', '-r', CONFIG.gs_work_dir])
         subprocess.check_call(['gsutil', '-m', 'cp', '-r', CONFIG.work_dir,CONFIG.gs_work_dir])
+
+    del validation_dataset
+    del validation_dataset_tta
+    del test_dataset
+    del test_dataset_tta
 
     gc.collect()
 

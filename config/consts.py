@@ -33,7 +33,7 @@ test_files_num=2
 
 if is_local:
     DATASETS = {
-                128: {'new': root/'data/128x128/train*.tfrec', 'old': ''},
+                128: {'new': root/'data/128x128/train*.tfrec', 'old': root/'data/128x128_old/train*.tfrec'},
                 256: {'new': root/'data/256x256_triple/train*.tfrec', 'old': ''},
                 #128: {'new': 'data/128/train*.tfrec', 'old': ''},
                 #384: {'new': 'data/isic2020-384-colornormed-tfrecord/train*.tfrec', 'old': ''},

@@ -1,6 +1,6 @@
 import os
 import tensorflow as tf
-from submission.submission import make_submission_dataframe, avg_submissions
+from submission.submission import make_submission_dataframe, aggregate_submissions
 from submission.submit import calc_auc
 
 class CkptWithMetric():
@@ -54,12 +54,13 @@ class SaveBestNCallback(tf.keras.callbacks.Callback):
         self._best_ckpts=FixedLengthList(save_best_n)
         self._val_ttas=val_ttas
         self._val_dataset=val_dataset
+        self._metric_history=[]
 
     def _get_filepath(self, epoch):
         return f'{self._dir_path}/../trained_models/model{self._fold}_{epoch}.h5'
 
     def get_filepaths(self):
-        filepaths=[f.filepath for f in self._best_ckpts]
+        filepaths=[f.filepath for f in self._best_ckpts._objs]
         return filepaths
 
     def set_model(self, model):
@@ -74,12 +75,16 @@ class SaveBestNCallback(tf.keras.callbacks.Callback):
                 metric=logs[self._metric_name]
         else:
             dfs=make_submission_dataframe(self._val_dataset,self.model,self._val_ttas)
-            metric=calc_auc(avg_submissions(dfs))
+            metric=calc_auc(aggregate_submissions(dfs))
         print(f"\nval metric = {metric}\n")
+        self._metric_history.append(metric)
         newCkpt=CkptWithMetric(self._get_filepath(epoch),metric,self._mode)
 
         if self._best_ckpts.append(newCkpt):
             self.model.save(newCkpt.filepath)
+
+    def get_history(self):
+        return self._metric_history
 
 
 

@@ -35,8 +35,8 @@ if is_local:
 
 
 epochs_fine_tune = 0
-epochs_full = 3 if is_debug else epochs_fine_tune+12
-
+epochs_full = 3 if is_debug else epochs_fine_tune+8
+epochs_total = epochs_full + 3
 
 BATCH_SIZE = 36 if is_debug else args.batch_size
 BATCH_SIZE_INCREASE_FOR_INFERENCE = 4
@@ -53,7 +53,7 @@ config=namedtuple('config',['lr_max','lr_start','lr_fine_tune','stepsize', 'lr_w
                             'hair_prob','microscope_prob','cut_out_prob','cut_mix_prob',
                             'batch_size','batch_size_inference',
                             'image_height',
-                            'epochs_full','epochs_fine_tune', 'fine_tune_last',
+                            'epochs_full','epochs_fine_tune', 'epochs_total', 'fine_tune_last',
                             'val_ttas'
                             ])
 
@@ -86,7 +86,7 @@ CONFIG=config(lr_max=args.lr_max*1e-4, lr_start=1e-6, stepsize=3,lr_fine_tune=3e
               hair_prob=hair_prob, microscope_prob=microscope_prob,cut_out_prob=0.1,cut_mix_prob=0.05,
               batch_size=BATCH_SIZE, batch_size_inference=BATCH_SIZE * BATCH_SIZE_INCREASE_FOR_INFERENCE,
               image_height=image_height,
-              epochs_full=epochs_full,epochs_fine_tune=epochs_fine_tune, fine_tune_last=-1
+              epochs_full=epochs_full,epochs_fine_tune=epochs_fine_tune, fine_tune_last=-1, epochs_total=epochs_total
               )
 
 #pretrained_model = tf.keras.applications.MobileNetV2(input_shape=[*IMAGE_SIZE, 3], include_top=False)

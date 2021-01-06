@@ -112,7 +112,7 @@ def display_9_images_with_predictions(images, predictions, labels):
     plt.show()
 
 
-def display_training_curves(training, validation, title, subplot):
+def display_training_curves(training, validation, title, subplot, validation_tta=None):
     if subplot % 10 == 1:  # set up the subplots on the first call
         plt.subplots(figsize=(10, 10), facecolor='#F0F0F0')
         # plt.tight_layout()
@@ -120,11 +120,16 @@ def display_training_curves(training, validation, title, subplot):
     ax.set_facecolor('#F8F8F8')
     ax.plot(training)
     ax.plot(validation)
+    if validation_tta is not None:
+        ax.plot(validation_tta)
     ax.set_title('model ' + title)
     ax.set_ylabel(title)
     # ax.set_ylim(0.28,1.05)
     ax.set_xlabel('epoch')
-    ax.legend(['train', 'valid.'])
+    legend=['train', 'valid']
+    if validation_tta is not None:
+        legend.append('valid_tta')
+    ax.legend(legend)
 
 
 def plot_lr(lrfn,epochs_full,work_dir):
