@@ -48,7 +48,6 @@ for fold in range(CONFIG.nfolds):
     model_dir_path=f'{CONFIG.work_dir}/../trained_models/'
     if not os.path.exists(model_dir_path):
         os.makedirs(model_dir_path)
-    model_file_path=os.path.join(model_dir_path,f'model{fold}.h5')
 
     callbacks=[lr_callback]
     validation_dataset_tta = get_validation_dataset_tta(val_filenames_folds[fold], CONFIG)
@@ -104,7 +103,8 @@ for fold in range(CONFIG.nfolds):
             display_training_curves(history.history['loss_no_reg'][1:], history.history['val_loss_no_reg'][1:], 'loss', 212)
             plt.savefig(os.path.join(CONFIG.work_dir, f'loss{fold}.png'))
 
-        model=load_model(model_file_path)
+        model_file_paths = save_callback_best_n.get_filepaths()
+        model=load_model(model_file_paths[0])
 
         subms=submission.make_submission_dataframe(get_validation_dataset_tta(test_val_filenames,CONFIG), model, repeats=CONFIG.ttas)
         preds_fold_avg.append(submission.aggregate_submissions(subms))
@@ -120,8 +120,7 @@ for fold in range(CONFIG.nfolds):
 
 
         models=[]
-        filepaths=save_callback_best_n.get_filepaths()
-        for filepath in filepaths:
+        for filepath in model_file_paths:
             m=load_model(filepath)
             m.trainable=False
             models.append(m)

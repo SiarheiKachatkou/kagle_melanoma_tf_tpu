@@ -46,48 +46,48 @@ baseline:
     size: 108
 b0:
   cmd: export LD_LIBRARY_PATH=/usr/local/cuda-10.2/lib64 && export PYTHONPATH=$PWD
-    && python3 tools/main.py --work_dir=artifacts/b0
-    --backbone=B0 --dropout_rate=0.01 --lr_max=10 --lr_exp_decay=0.5 --focal_loss_gamma=4
-    --focal_loss_alpha=0.8 --hair_prob=0.1 --microscope_prob=0.01 --lr_warm_up_epochs=5
-    --image_height=128 --batch_size=32 --stage=b0 --gpus=0
+    && python3 tools/main.py --work_dir=artifacts/b0 --backbone=B0 --dropout_rate=0.01
+    --lr_max=10 --lr_exp_decay=0.5 --focal_loss_gamma=4 --focal_loss_alpha=0.8 --hair_prob=0.1
+    --microscope_prob=0.01 --lr_warm_up_epochs=5 --image_height=128 --batch_size=128
+    --stage=b0 --save_best_n=3
   deps:
   - path: augmentations
     md5: 4f380667632218a8ca8c899b2cbca61d.dir
     size: 35643
     nfiles: 13
   - path: config
-    md5: 894f1fae275b3bdd9f90debdf93b0b8a.dir
-    size: 21412
+    md5: a881b13344f509739998ab29d2eb26a2.dir
+    size: 21774
     nfiles: 9
   - path: data
-    md5: e54be2c23044ffeb0179687b079c75d5.dir
-    size: 13081052783
-    nfiles: 204
+    md5: 4ec5d239fa5ee1490cee8f67ce79fa4b.dir
+    size: 12474834467
+    nfiles: 235
   - path: dataset
-    md5: f6e9ff3a1421822521d25205ff7d5075.dir
-    size: 47747
+    md5: 7de9bd1b5363f51f83795d8f7b3a110d.dir
+    size: 48013
     nfiles: 11
   - path: debug_tools
     md5: 2e2bce907de89d6d55cbc05c9b5658f2.dir
     size: 8782
     nfiles: 7
   - path: model
-    md5: 4a46d86f991bceadea266818138d628b.dir
-    size: 32365
-    nfiles: 20
+    md5: d6c7a9bdfea9c0ddd4bde6cf7e81337b.dir
+    size: 34704
+    nfiles: 19
   - path: submission
-    md5: 7259228f04b4572a57acc56a49cdfc0c.dir
-    size: 20194
+    md5: 5704cbc104a0f9e15ddb2a13025207d8.dir
+    size: 21417
     nfiles: 8
   - path: tools
-    md5: 0511ffdb14c86948d5e84ba240f9d1cb.dir
-    size: 18620
+    md5: 7684f94312e7d5d18c0966714f8b2218.dir
+    size: 19061
     nfiles: 9
   outs:
   - path: artifacts/b0
-    md5: 68016e181e248151dd327b4b6ff5111c.dir
-    size: 9862473
-    nfiles: 32
+    md5: f9181becd645cc60ad538a5bb337c6c7.dir
+    size: 19468752
+    nfiles: 58
   - path: metrics/metrics_b0.txt
-    md5: c1127e6eaccdced440f96e0b978441fb
-    size: 108
+    md5: 99997bef1c91dab0cba5d588f9b01b80
+    size: 122

@@ -1,0 +1,6 @@
+val_avg_tta_le_auc:
+    0.902321645586922
+val_avg_tta_auc:
+    0.8018672362315376
+test_avg_tta_auc:
+    0.7717917032076325
