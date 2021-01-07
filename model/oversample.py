@@ -16,9 +16,9 @@ def get_num_of_repetition_for_example(training_example):
     return tf.cast(num_to_repeat, tf.int64)
 
 def oversample(dataset,config):
-    if config.oversample_mult:
+    if config.oversample_mult!=1:
         dataset = dataset.flat_map(
-            lambda image, label, image_name: tf.data.Dataset.from_tensors((image, label, image_name)).repeat(
-                get_num_of_repetition_for_example((image, label))))
+            lambda input_data, label: tf.data.Dataset.from_tensors((input_data, label)).repeat(
+                get_num_of_repetition_for_example((input_data, label))))
 
     return dataset
