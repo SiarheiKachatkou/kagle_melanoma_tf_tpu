@@ -8,7 +8,7 @@ from config.consts import *
 from efficientnet.keras import preprocess_input
 # COARSE DROPOUT
 
-def cutout(image, image_height=256, prob = 0.75, holes_count = 8, hole_size = 0.2):
+def cutout(image, image_height=256, prob = 0.75, holes_count = 8, hole_size = 0.3, pixel_level=True):
     # input image - is one image of size [image_height,image_height,3] not a batch of [b,image_height,image_height,3]
     # output - image with CT squares of side size SZ*image_height removed
     
@@ -16,20 +16,26 @@ def cutout(image, image_height=256, prob = 0.75, holes_count = 8, hole_size = 0.
     P = tf.cast(tf.random.uniform([],0,1) < prob, tf.int32)
     if (P==0)|(holes_count == 0)|(hole_size == 0):
         return image
-    
+
+    max_size=int(hole_size * image_height)
+
     for k in range(holes_count):
         # CHOOSE RANDOM LOCATION
         x = tf.cast( tf.random.uniform([],0,image_height ),tf.int32)
         y = tf.cast( tf.random.uniform([],0,image_height ),tf.int32)
         # COMPUTE SQUARE
-        WIDTH = tf.cast(hole_size * image_height, tf.int32)
-        ya = tf.math.maximum(0,y-WIDTH//2)
-        yb = tf.math.minimum(image_height,y+WIDTH//2)
+        WIDTH = tf.random.uniform([],1,max_size, dtype=tf.int32)
+        HEIGHT = tf.random.uniform([], 1, max_size, dtype=tf.int32)
+        ya = tf.math.maximum(0,y-HEIGHT//2)
+        yb = tf.math.minimum(image_height,y+HEIGHT//2)
         xa = tf.math.maximum(0,x-WIDTH//2)
         xb = tf.math.minimum(image_height,x+WIDTH//2)
         # DROPOUT IMAGE
         one = image[ya:yb,0:xa,:]
-        two = tf.ones([yb-ya,xb-xa,3])*tf.random.uniform((),minval=-1, maxval=1.0)
+        if pixel_level:
+            two = tf.random.uniform([yb - ya, xb - xa, 3], minval=-1, maxval=1.0)
+        else:
+            two = tf.ones([yb-ya,xb-xa,3])*tf.random.uniform((),minval=-1, maxval=1.0)
         three = image[ya:yb,xb:image_height,:]
         middle = tf.concat([one,two,three],axis=1)
         image = tf.concat([image[0:ya,:,:],middle,image[yb:image_height,:,:]],axis=0)
