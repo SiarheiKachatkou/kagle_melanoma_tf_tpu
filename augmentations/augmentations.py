@@ -59,52 +59,50 @@ def cut_mix(batch,labels, *args, config, prob=0.5):
     images = batch['image']
     symbolic_shape = K.shape(images)
     batch_size = symbolic_shape[0]
-    if (prob==0) or (batch_size!=config.batch_size):
-        return batch,labels
 
     images_augm = []
     labels_augm = []
 
+    if (batch_size == config.batch_size):
+        for i in range(config.batch_size):
 
-    for i in range(config.batch_size):
+            img, lab = images[i],labels[i]
 
-        img, lab = images[i],labels[i]
+            cut_area_percent=tf.random.uniform((),0,1.0)
+            if tf.random.uniform((), 0, 1.0)>prob:
+                cut_area_percent=0.0
 
-        cut_area_percent=tf.random.uniform((),0,1.0)
-        if tf.random.uniform((), 0, 1.0)>prob:
-            cut_area_percent=0.0
-
-        cut_area=cut_area_percent*config.image_height*config.image_height
-        cut_size=tf.cast(tf.sqrt(cut_area),tf.int32)
-
-        dx=tf.cast((config.image_height-cut_size),tf.float32)
-        x = tf.cast(tf.random.uniform((),0,1)*dx,tf.int32)
-        xmax=tf.minimum(config.image_height,x+cut_size)
-        dy=tf.cast((config.image_height - cut_size),tf.float32)
-        y = tf.cast(tf.random.uniform((), 0, 1) * dy, tf.int32)
-        ymax = tf.minimum(config.image_height, y + cut_size)
-        donor_idx = tf.cast( tf.random.uniform([],0,config.batch_size),tf.int32)
-        donor=images[donor_idx]
-
-        one = img[y:ymax, 0:x, :]
-        two = donor[y:ymax,x:xmax]
-        three = img[y:ymax, xmax:]
-        middle = tf.concat([one, two, three], axis=1)
-        mixed = tf.concat([img[0:y, :, :], middle, img[ymax:]], axis=0)
-        mixed = tf.reshape(mixed, (config.image_height, config.image_height, 3))
-
-        label_mixed=lab*(1-cut_area_percent)+labels[donor_idx]*cut_area_percent
-        images_augm.append(mixed)
-        labels_augm.append(label_mixed)
+            cut_area=cut_area_percent*config.image_height*config.image_height
+            cut_size=tf.cast(tf.sqrt(cut_area),tf.int32)
 
 
+            dx=tf.cast((config.image_height-cut_size),tf.float32)
+            x = tf.cast(tf.random.uniform((),0,1)*dx,tf.int32)
+            xmax=tf.minimum(config.image_height,x+cut_size)
+            dy=tf.cast((config.image_height - cut_size),tf.float32)
+            y = tf.cast(tf.random.uniform((), 0, 1) * dy, tf.int32)
+            ymax = tf.minimum(config.image_height, y + cut_size)
+            donor_idx = tf.cast( tf.random.uniform([],0,config.batch_size),tf.int32)
+            donor=images[donor_idx]
 
-    images=tf.stack(images_augm,axis=0)
-    labels = tf.stack(labels_augm, axis=0)
-    images = tf.reshape(images, (len(images), config.image_height, config.image_height, 3))
-    labels = tf.reshape(labels, (len(labels),))
+            one = img[y:ymax, 0:x, :]
+            two = donor[y:ymax,x:xmax]
+            three = img[y:ymax, xmax:]
+            middle = tf.concat([one, two, three], axis=1)
+            mixed = tf.concat([img[0:y, :, :], middle, img[ymax:]], axis=0)
+            mixed = tf.reshape(mixed, (config.image_height, config.image_height, 3))
 
-    batch['image']=images
+            label_mixed=lab*(1-cut_area_percent)+labels[donor_idx]*cut_area_percent
+            images_augm.append(mixed)
+
+            labels_augm.append(label_mixed)
+
+        images=tf.stack(images_augm,axis=0)
+        labels = tf.stack(labels_augm, axis=0)
+        images = tf.reshape(images, (len(images), config.image_height, config.image_height, 3))
+        labels = tf.reshape(labels, (len(labels),))
+        batch['image']=images
+
     return batch,labels
 
 
