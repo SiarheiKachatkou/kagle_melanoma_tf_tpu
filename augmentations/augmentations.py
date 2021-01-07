@@ -13,7 +13,7 @@ def cutout(image, image_height=256, prob = 0.75, holes_count = 8, hole_size = 0.
     # output - image with CT squares of side size SZ*image_height removed
     
     # DO DROPOUT WITH PROBABILITY DEFINED ABOVE
-    P = tf.cast(tf.random.uniform([],0,1, seed=op_seed) > prob, tf.int32)
+    P = tf.cast(tf.random.uniform([],0,1, seed=op_seed) < prob, tf.int32)
     if (P==0)|(holes_count == 0)|(hole_size == 0):
         return image
     
