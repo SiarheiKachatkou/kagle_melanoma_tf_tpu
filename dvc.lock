@@ -48,7 +48,7 @@ b0:
   cmd: export LD_LIBRARY_PATH=/usr/local/cuda-10.2/lib64 && export PYTHONPATH=$PWD
     && python3 tools/main.py --work_dir=artifacts/b0 --backbone=B0 --dropout_rate=0.01
     --lr_max=10 --lr_exp_decay=0.5 --focal_loss_gamma=4 --focal_loss_alpha=0.8 --hair_prob=0.1
-    --microscope_prob=0.01 --lr_warm_up_epochs=5 --image_height=128 --batch_size=128
+    --microscope_prob=0.01 --lr_warm_up_epochs=5 --image_height=128 --batch_size=256
     --stage=b0 --save_best_n=3
   deps:
   - path: augmentations
@@ -56,8 +56,8 @@ b0:
     size: 35643
     nfiles: 13
   - path: config
-    md5: a881b13344f509739998ab29d2eb26a2.dir
-    size: 21774
+    md5: edb7167ed828e255a54e5f2e30a21845.dir
+    size: 21775
     nfiles: 9
   - path: data
     md5: 4ec5d239fa5ee1490cee8f67ce79fa4b.dir
@@ -85,9 +85,9 @@ b0:
     nfiles: 9
   outs:
   - path: artifacts/b0
-    md5: 36d5dc81c1f10f5268a46bfa5718004c.dir
-    size: 19652545
+    md5: 3afb8cde2c0d527e2ae58d131db4606f.dir
+    size: 19803639
     nfiles: 58
   - path: metrics/metrics_b0.txt
-    md5: 440610a00298bf9ed27d62b2e5363fbe
+    md5: 3d9a54533a74c5fdee3f7c2e3df06469
     size: 123
