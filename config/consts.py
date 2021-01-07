@@ -67,7 +67,6 @@ CLASSES = ['health','melanoma']
 
 
 seed=10000
-op_seed=0 if is_debug else None
 tf.random.set_seed(seed)
 tf.compat.v1.random.set_random_seed(seed)
 np.random.seed(seed)

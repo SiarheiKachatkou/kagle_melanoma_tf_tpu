@@ -58,12 +58,12 @@ def transform_geometricaly(image, DIM=256):
     WSHIFT_ = 8.0*height/128
 
     XDIM = DIM % 2  # fix for size 331
-    rot = ROT_ * tf.random.normal([1], seed=op_seed, dtype='float32')
-    shr = SHR_ * tf.random.normal([1], seed=op_seed, dtype='float32')
-    h_zoom = 1.0 + tf.random.normal([1], seed=op_seed, dtype='float32') / HZOOM_
-    w_zoom = 1.0 + tf.random.normal([1], seed=op_seed, dtype='float32') / WZOOM_
-    h_shift = HSHIFT_ * tf.random.normal([1], seed=op_seed, dtype='float32')
-    w_shift = WSHIFT_ * tf.random.normal([1], seed=op_seed, dtype='float32')
+    rot = ROT_ * tf.random.normal([1]  , dtype='float32')
+    shr = SHR_ * tf.random.normal([1]  , dtype='float32')
+    h_zoom = 1.0 + tf.random.normal([1]  , dtype='float32') / HZOOM_
+    w_zoom = 1.0 + tf.random.normal([1]  , dtype='float32') / WZOOM_
+    h_shift = HSHIFT_ * tf.random.normal([1]  , dtype='float32')
+    w_shift = WSHIFT_ * tf.random.normal([1]  , dtype='float32')
 
     # GET TRANSFORMATION MATRIX
     m = get_mat(rot, shr, h_zoom, w_zoom, h_shift, w_shift)
