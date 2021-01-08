@@ -50,7 +50,7 @@ for fold in range(CONFIG.nfolds):
         os.makedirs(model_dir_path)
 
     callbacks=[lr_callback]
-    validation_dataset_tta = get_validation_dataset_tta(val_filenames_folds[fold], CONFIG)
+    validation_dataset_tta = get_validation_dataset(val_filenames_folds[fold], CONFIG)
 
     save_callback_best_n = SaveBestNCallback(CONFIG.work_dir, fold, CONFIG.save_best_n, metric_name='val_auc', mode='max',
                                            val_ttas=CONFIG.val_ttas, val_dataset=validation_dataset_tta)
