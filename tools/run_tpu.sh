@@ -15,7 +15,7 @@ ctpu up --project=${PROJECT_ID} \
 
 exit 0
 
-git clone -b mixup_cutout_cutmix https://github.com/SiarheiKachatkou/kagle_melanoma_tf_tpu.git &&
+git clone -b val_tta_tpu_fix https://github.com/SiarheiKachatkou/kagle_melanoma_tf_tpu.git &&
 cd kagle_melanoma_tf_tpu &&
 tools/install.sh &&
 dvc repro baseline

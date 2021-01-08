@@ -83,7 +83,7 @@ CONFIG=config(lr_max=args.lr_max*1e-4, lr_start=1e-6, stepsize=3,lr_fine_tune=3e
               save_best_n=args.save_best_n,
               oversample_mult=args.oversample_mult,
               focal_loss_gamma=focal_loss_gamma, focal_loss_alpha=focal_loss_alpha,
-              hair_prob=hair_prob, microscope_prob=microscope_prob,cut_out_prob=0.1,cut_mix_prob=0.1,
+              hair_prob=hair_prob, microscope_prob=microscope_prob,cut_out_prob=0,cut_mix_prob=0,
               batch_size=BATCH_SIZE, batch_size_inference=BATCH_SIZE * BATCH_SIZE_INCREASE_FOR_INFERENCE,
               image_height=image_height,
               epochs_full=epochs_full,epochs_fine_tune=epochs_fine_tune, fine_tune_last=-1, epochs_total=epochs_total
