@@ -50,14 +50,17 @@ for fold in range(CONFIG.nfolds):
         os.makedirs(model_dir_path)
 
     callbacks=[lr_callback]
-    validation_dataset_tta = get_validation_dataset(val_filenames_folds[fold], CONFIG)
-
-    save_callback_best_n = SaveBestNCallback(CONFIG.work_dir, fold, CONFIG.save_best_n, metric_name='val_auc', mode='max',
-                                           val_ttas=CONFIG.val_ttas, val_dataset=validation_dataset_tta)
-    callbacks.append(save_callback_best_n)
 
     scope = get_scope()
     with scope:
+
+        validation_dataset_tta = get_validation_dataset_tta(val_filenames_folds[fold], CONFIG)
+
+        save_callback_best_n = SaveBestNCallback(CONFIG.work_dir, fold, CONFIG.save_best_n, metric_name='val_auc',
+                                                 mode='max',
+                                                 val_ttas=CONFIG.val_ttas, val_dataset=validation_dataset_tta)
+        callbacks.append(save_callback_best_n)
+
         metrics = [SparceAUC(name="auc"),tf.keras.metrics.SparseCategoricalCrossentropy(name='loss_no_reg')] if CONFIG.use_metrics else None
 
         opt = tf.keras.optimizers.Adam(learning_rate=CONFIG.lr_start)
