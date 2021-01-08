@@ -78,7 +78,7 @@ CONFIG=config(lr_max=args.lr_max*1e-4, lr_start=1e-6, stepsize=3,lr_fine_tune=3e
               gs_work_dir=f'gs://kochetkov_kaggle_melanoma/{str(datetime.datetime.now())[:20]}_{args.work_dir}',
               model_fn_str=f"efficientnet.tfkeras.EfficientNet{model}(weights='imagenet', include_top=False)",
               ttas=ttas,
-              val_ttas=1,
+              val_ttas=2,
               use_metrics=True, dropout_rate=dropout_rate,
               save_best_n=args.save_best_n,
               oversample_mult=args.oversample_mult,

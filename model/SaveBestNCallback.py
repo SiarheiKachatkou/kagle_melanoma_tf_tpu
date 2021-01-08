@@ -75,6 +75,8 @@ class SaveBestNCallback(tf.keras.callbacks.Callback):
                 metric=logs[self._metric_name]
         else:
             dfs=make_submission_dataframe(self._val_dataset,self.model,self._val_ttas)
+            if not isinstance(dfs,list):
+                dfs=[dfs]
             metric=calc_auc(aggregate_submissions(dfs))
         print(f"\nval metric = {metric}\n")
         self._metric_history.append(metric)
