@@ -21,6 +21,7 @@ from config.runtime import get_scope
 from model.sparceauc import SparceAUC
 from submission import submit
 from model.history import join_history
+from debug_tools.save_interpretaions import save_interpretations
 
 if not os.path.exists(CONFIG.work_dir):
     os.makedirs(CONFIG.work_dir)
@@ -132,6 +133,8 @@ for fold in range(CONFIG.nfolds):
                                              CONFIG.ttas)
         submission.calc_and_save_submissions(CONFIG, models, f'test_le_{fold}', test_dataset,
                                              test_dataset_tta, CONFIG.ttas)
+
+        save_interpretations(model,test_dataset_tta,os.path.join(CONFIG.work_dir, f'interpretation_{fold}'))
 
     if (not is_local) and (not is_kaggle):
         if fold!=0:
