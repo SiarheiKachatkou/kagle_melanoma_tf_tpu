@@ -12,11 +12,11 @@ def save_interpretations(model,test_dataset,dst_dir):
     if not os.path.exists(dst_dir):
         os.mkdir(dst_dir)
     N=9
-    subplot = 631
+    subplot = [6,3,1]
 
     def loss_fn(images, labels):
         outputs = model(images)
-        losses = [model.loss([o], [l]) for o, l in zip(outputs, labels)]
+        losses = [model.loss([l],[o]) for o, l in zip(outputs, labels)]
         losses = tf.concat(losses, axis=0)
         return losses
 

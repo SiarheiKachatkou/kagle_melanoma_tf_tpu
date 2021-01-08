@@ -41,11 +41,18 @@ def title_from_label_and_target(label, correct_label):
 
 
 def display_one_image(image, title, subplot, red=False):
-    plt.subplot(subplot)
+    if isinstance(subplot,str):
+        plt.subplot(subplot)
+    else:
+        plt.subplot(*subplot)
+
     plt.axis('off')
     plt.imshow(image)
     plt.title(title, fontsize=16, color='red' if red else 'black')
-    return subplot + 1
+    if isinstance(subplot,str):
+        return subplot + 1
+    else:
+        return [subplot[0],subplot[1],subplot[2]+1]
 
 
 def get_high_low_loss_images(dataset, N, loss_fn, max_batches):
@@ -55,8 +62,10 @@ def get_high_low_loss_images(dataset, N, loss_fn, max_batches):
     chosen_losses = []
     batch_count=0
     #TODO use model.predict(dataset) is is much faster
-    for images, labels in tqdm(dataset,total=len(dataset)):
-        losses=loss_fn(images,labels)
+    for batch, labels in dataset:
+
+        losses=loss_fn(batch,labels)
+        images = batch['image']
         numpy_images = images.numpy()
         numpy_labels = labels.numpy()
         numpy_losses = losses.numpy()

@@ -38,8 +38,8 @@ train_filenames_folds, val_filenames_folds, test_val_filenames = get_train_val_f
 test_filenames=get_test_filenames(DATASETS[CONFIG.image_height]['new'])
 if is_debug:
     test_filenames = [test_filenames[0]]
-    train_filenames_folds=[[f[0:2]] for f in train_filenames_folds]
-    val_filenames_folds=[[f[0:2]] for f in val_filenames_folds]
+    train_filenames_folds=[[f[0]] for f in train_filenames_folds]
+    val_filenames_folds=[[f[0]] for f in val_filenames_folds]
 
 preds_fold_avg=[]
 
