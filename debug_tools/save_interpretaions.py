@@ -6,6 +6,7 @@ import numpy as np
 import copy
 from dataset.dict_list import DictList
 from model.create_model import load_model
+from datetime import datetime
 
 from dataset.display_utils import get_high_low_loss_images, display_one_image
 
@@ -18,7 +19,8 @@ def calc_occlustion_map(output_modifier_fn, model, batch, offset, steps, average
     dh = max(1, h // steps)
     dw = max(1, w // steps)
 
-    batch_list=DictList()
+    start=datetime.now()
+    batch_list=[]
     for x in range(0, w, dw):
         for y in range(0, h, dh):
             for _ in range(average_samples):
@@ -30,13 +32,22 @@ def calc_occlustion_map(output_modifier_fn, model, batch, offset, steps, average
                 pixels = np.reshape(pixels, patch.shape)
                 image_copy[y:y + dh, x:x + dw] = pixels
                 batch_copy['image'] = image_copy
-                batch_list.extend(_batch_to_tensor(batch_copy))
+                batch_list.append(batch_copy)
 
+    batch_list=DictList(batch_list)
+
+
+    finish = datetime.now()
+    print(f'build batch_list ={finish-start}')
+
+    start=finish
     dataset=tf.data.Dataset.from_tensor_slices(batch_list.dict)
     dataset=dataset.batch(CONFIG.batch_size_inference)
     predictions=model.predict(dataset)
+    finish = datetime.now()
+    print(f'predict  ={finish - start}')
 
-
+    start=finish
     occl_list = [offset - output_modifier_fn(p) for p in predictions]
 
     occlusion_map=[]
@@ -53,6 +64,8 @@ def calc_occlustion_map(output_modifier_fn, model, batch, offset, steps, average
 
     occlusion_map = np.array(occlusion_map).astype(np.float32)
     occlusion_map = cv2.resize(occlusion_map, (w, h))
+    finish=datetime.now()
+    print(f'reconstruct map  ={finish - start}')
     return occlusion_map
 
 def calc_occlusion_map_multisace(output_modifier_fn, model, batch, steps_list=(10,5,3), average_samples=10):
@@ -89,9 +102,10 @@ def save_interpretations(model,test_dataset,dst_dir, average_samples=10, steps_l
         losses = tf.concat(losses, axis=0)
         return losses
 
+    start=datetime.now()
     (high_loss_images, high_loss_labels, high_loss_loss), (low_loss_images, low_loss_labels, low_loss_loss) = get_high_low_loss_images(test_dataset, N, loss_fn, max_batches=None)
-
-    print('finished get_high_low_loss_images')
+    finish=datetime.now()
+    print(f'finished get_high_low_loss_images {finish-start}')
     plt.figure(figsize=(13, 13))
 
     batches=high_loss_images+low_loss_images
@@ -134,5 +148,5 @@ if __name__=="__main__":
     validation_dataset_tta = get_test_dataset(['/mnt/850G/GIT/kagle_melanoma_tf_tpu/data/128x128/train00-2071.tfrec'], CONFIG)
 
     def stm():
-        save_interpretations(model, validation_dataset_tta, CONFIG.work_dir, average_samples=3, N=2)
+        save_interpretations(model, validation_dataset_tta, CONFIG.work_dir, average_samples=10, steps_list=(10,),N=1)
     print(timeit.timeit(stm,number=1))

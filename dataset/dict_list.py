@@ -7,9 +7,20 @@ def batch_to_numpy(batch):
     return batch_numpy
 
 class DictList():
-    def __init__(self):
+    def __init__(self, dict_list=None):
         self._dict={}
-        pass
+        if dict_list is not None:
+            self._stack_first_axis(dict_list)
+
+
+    def _stack_first_axis(self,dict_list):
+        keys=dict_list[0].keys()
+
+        for k in keys:
+            arrays=[]
+            for d in dict_list:
+                arrays.append(d[k])
+            self._dict[k]=np.stack(arrays,axis=0)
 
     @property
     def dict(self):
