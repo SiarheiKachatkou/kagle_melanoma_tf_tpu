@@ -148,5 +148,5 @@ if __name__=="__main__":
     validation_dataset_tta = get_test_dataset(['/mnt/850G/GIT/kagle_melanoma_tf_tpu/data/128x128/train00-2071.tfrec'], CONFIG)
 
     def stm():
-        save_interpretations(model, validation_dataset_tta, CONFIG.work_dir, average_samples=10, steps_list=(10,),N=1)
+        save_interpretations(model, validation_dataset_tta, CONFIG.work_dir, average_samples=10, steps_list=(10,),N=3)
     print(timeit.timeit(stm,number=1))
