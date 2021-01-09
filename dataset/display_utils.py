@@ -4,6 +4,7 @@ import numpy as np
 from config.consts import CLASSES
 import cv2
 import os
+from dataset.dict_list import DictList
 from tqdm import tqdm
 from augmentations.augmentations import cut_mix
 
@@ -53,32 +54,6 @@ def display_one_image(image, title, subplot, red=False):
         return subplot + 1
     else:
         return [subplot[0],subplot[1],subplot[2]+1]
-
-def batch_to_numpy(batch):
-    batch_numpy={}
-    for k, v in batch:
-        batch_numpy[k]=v.numpy().astype(np.float)
-    return batch_numpy
-
-
-class DictList():
-    def __init__(self):
-        self._dict={}
-        pass
-
-    def extend(self, other_dict):
-        for k,v in other_dict.items():
-            if k in self._dict:
-                self._dict[k]=np.concatenate([self._dict[k],v],axis=0)
-            else:
-                self._dict[k] = v
-
-    def __getitem__(self, item):
-        item_dict={}
-        for k in self._dict:
-                item_dict[k] = self._dict[k][item]
-        return item_dict
-
 
 
 def get_high_low_loss_images(dataset, N, loss_fn, max_batches):

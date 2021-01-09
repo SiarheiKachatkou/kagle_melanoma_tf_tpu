@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import cv2
 import numpy as np
 import copy
+from dataset.dict_list import DictList
 from model.create_model import load_model
 
 from dataset.display_utils import get_high_low_loss_images, display_one_image
@@ -16,11 +17,10 @@ def calc_occlustion_map(output_modifier_fn, model, batch, offset, steps, average
     h, w = image.shape[:2]
     dh = max(1, h // steps)
     dw = max(1, w // steps)
-    occlusion_map = []
+
+    batch_list=DictList()
     for x in range(0, w, dw):
-        row = []
         for y in range(0, h, dh):
-            occl = 0
             for _ in range(average_samples):
                 batch_copy = batch.copy()
                 image_copy = copy.deepcopy(image)
@@ -30,9 +30,25 @@ def calc_occlustion_map(output_modifier_fn, model, batch, offset, steps, average
                 pixels = np.reshape(pixels, patch.shape)
                 image_copy[y:y + dh, x:x + dw] = pixels
                 batch_copy['image'] = image_copy
-                occl += output_modifier_fn(model(_batch_to_tensor(batch_copy))) - offset
-            occl /= average_samples
-            row.append(occl)
+                batch_list.extend(_batch_to_tensor(batch_copy))
+
+    dataset=tf.data.Dataset.from_tensor_slices(batch_list.dict)
+    dataset=dataset.batch(CONFIG.batch_size_inference)
+    predictions=model.predict(dataset)
+
+
+    occl_list = [offset - output_modifier_fn(p) for p in predictions]
+
+    occlusion_map=[]
+    idx=0
+    for x in range(0, w, dw):
+        row=[]
+        for y in range(0, h, dh):
+            occl = 0
+            for _ in range(average_samples):
+                occl+=occl_list[idx]
+                idx+=1
+            row.append(occl/average_samples)
         occlusion_map.append(np.array(row))
 
     occlusion_map = np.array(occlusion_map).astype(np.float32)
@@ -41,7 +57,7 @@ def calc_occlustion_map(output_modifier_fn, model, batch, offset, steps, average
 
 def calc_occlusion_map_multisace(output_modifier_fn, model, batch, steps_list=(10,5,3), average_samples=10):
 
-    offset=output_modifier_fn(model(_batch_to_tensor(batch)))
+    offset=output_modifier_fn(model(_batch_to_tensor(batch)).numpy()[0])
 
     occlusion_map=0
     for steps in steps_list:
@@ -83,7 +99,7 @@ def save_interpretations(model,test_dataset,dst_dir, average_samples=10, steps_l
     losses = high_loss_loss + low_loss_loss
 
     def output_fn(output):
-        return output[:,1].numpy()[0]
+        return output[1]
 
     saliency_maps = [calc_occlusion_map_multisace(output_fn, model, batch,average_samples=average_samples, steps_list=steps_list) for batch in batches]
 
