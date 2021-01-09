@@ -35,7 +35,7 @@ if is_local:
 
 
 epochs_fine_tune = 0
-epochs_full = 1 if is_debug else epochs_fine_tune+2 #12
+epochs_full = 1 if is_debug else epochs_fine_tune+12
 epochs_total = epochs_full + 0
 
 BATCH_SIZE = 36 if is_debug else args.batch_size
@@ -77,14 +77,14 @@ CONFIG=config(lr_max=args.lr_max*1e-4, lr_start=1e-6, stepsize=3,lr_fine_tune=3e
               lr_min=1e-6, lr_exp_decay=args.lr_exp_decay, lr_fn='get_lrfn_fine_tune(CONFIG)',  #get_cycling_lrfn(CONFIG) #
               nfolds=4, l2_penalty=penalty, work_dir=args.work_dir,
               gs_work_dir=f'gs://kochetkov_kaggle_melanoma/{str(datetime.datetime.now())[:20]}_{args.work_dir}',
-              model_fn_str=f"efficientnet.tfkeras.EfficientNet{model}(weights='imagenet', include_top=False)",
+              model_fn_str='tf.keras.applications.ResNet101(weights="imagenet", include_top=False)',#f"efficientnet.tfkeras.EfficientNet{model}(weights='imagenet', include_top=False)",#f"tf.keras.applications.EfficientNet{model}(weights='imagenet', include_top=False)",#
               ttas=ttas,
               val_ttas=3,
               use_metrics=True, dropout_rate=dropout_rate,
               save_best_n=args.save_best_n,
               oversample_mult=args.oversample_mult,
               focal_loss_gamma=focal_loss_gamma, focal_loss_alpha=focal_loss_alpha,
-              hair_prob=hair_prob, microscope_prob=microscope_prob,cut_out_prob=0.1,cut_mix_prob=0.1,
+              hair_prob=hair_prob, microscope_prob=microscope_prob,cut_out_prob=0.2,cut_mix_prob=0.2,
               batch_size=BATCH_SIZE, batch_size_inference=BATCH_SIZE * BATCH_SIZE_INCREASE_FOR_INFERENCE,
               image_height=image_height,
               epochs_full=epochs_full,epochs_fine_tune=epochs_fine_tune, fine_tune_last=-1, epochs_total=epochs_total,

@@ -13,7 +13,7 @@ from dataset.display_utils import get_high_low_loss_images, display_one_image
 def _batch_to_tensor(batch):
     return {k: tf.convert_to_tensor(np.expand_dims(v, axis=0)) for k, v in batch.items()}
 
-def calc_occlustion_map(output_modifier_fn, model, batch, offset, steps, average_samples=10):
+def calc_occlustion_map(output_modifier_fn, model, batch, offset, steps, config, average_samples=10):
     image = batch['image']
     h, w = image.shape[:2]
     dh = max(1, h // steps)
@@ -21,8 +21,8 @@ def calc_occlustion_map(output_modifier_fn, model, batch, offset, steps, average
 
     start=datetime.now()
     batch_list=[]
-    for x in range(0, w, dw):
-        for y in range(0, h, dh):
+    for y in range(0, h, dh):
+        for x in range(0, w, dw):
             for _ in range(average_samples):
                 batch_copy = batch.copy()
                 image_copy = copy.deepcopy(image)
@@ -34,7 +34,7 @@ def calc_occlustion_map(output_modifier_fn, model, batch, offset, steps, average
                 batch_copy['image'] = image_copy
                 batch_list.append(batch_copy)
 
-    batch_list=DictList(batch_list)
+    batch_list=DictList(batch_list)#[:2])
 
 
     finish = datetime.now()
@@ -42,20 +42,20 @@ def calc_occlustion_map(output_modifier_fn, model, batch, offset, steps, average
 
     start=finish
     dataset=tf.data.Dataset.from_tensor_slices(batch_list.dict)
-    dataset=dataset.batch(CONFIG.batch_size_inference)
+    dataset=dataset.batch(config.batch_size_inference)
     predictions=model.predict(dataset)
     print(predictions[:10])
     finish = datetime.now()
     print(f'predict  ={finish - start}')
 
     start=finish
-    occl_list = [output_modifier_fn(p)-offset for p in predictions]
+    occl_list = [offset - output_modifier_fn(p) for p in predictions]
 
     occlusion_map=[]
     idx=0
-    for x in range(0, w, dw):
+    for y in range(0, h, dh):
         row=[]
-        for y in range(0, h, dh):
+        for x in range(0, w, dw):
             occl = 0
             for _ in range(average_samples):
                 occl+=occl_list[idx]
@@ -69,13 +69,13 @@ def calc_occlustion_map(output_modifier_fn, model, batch, offset, steps, average
     print(f'reconstruct map  ={finish - start}')
     return occlusion_map
 
-def calc_occlusion_map_multisace(output_modifier_fn, model, batch, steps_list=(10,5,3), average_samples=10):
+def calc_occlusion_map_multisace(output_modifier_fn, model, batch, config, steps_list=(10,5,3), average_samples=10):
 
     offset=output_modifier_fn(model(_batch_to_tensor(batch)).numpy()[0])
 
     occlusion_map=0
     for steps in steps_list:
-        single_scal_saliency_map=calc_occlustion_map(output_modifier_fn, model, batch, offset, steps, average_samples)
+        single_scal_saliency_map=calc_occlustion_map(output_modifier_fn, model, batch, offset, steps, config,  average_samples)
         perturbation_area=1/(steps*steps)
         occlusion_map+=single_scal_saliency_map/perturbation_area
 
@@ -91,7 +91,7 @@ def normalize(img,to_gray=False):
     else:
         return rgb
 
-def save_interpretations(model,test_dataset,dst_dir, average_samples=10, steps_list=(3,), N=3):
+def save_interpretations(model,test_dataset,dst_dir, config, average_samples=10, steps_list=(3,), N=3):
     if not os.path.exists(dst_dir):
         os.makedirs(dst_dir)
 
@@ -116,7 +116,7 @@ def save_interpretations(model,test_dataset,dst_dir, average_samples=10, steps_l
     def output_fn(output):
         return output[1]
 
-    saliency_maps = [calc_occlusion_map_multisace(output_fn, model, batch,average_samples=average_samples, steps_list=steps_list) for batch in batches]
+    saliency_maps = [calc_occlusion_map_multisace(output_fn, model, batch,config, average_samples=average_samples, steps_list=steps_list) for batch in batches]
 
     red=True
     for i, batch in enumerate(batches):
@@ -145,9 +145,9 @@ if __name__=="__main__":
     from config.runtime import get_scope
     import timeit
 
-    model=load_model('/mnt/850G/GIT/kagle_melanoma_tf_tpu/artifacts/trained_models/model0.h5')
+    model=load_model('/mnt/850G/GIT/kagle_melanoma_tf_tpu/artifacts/trained_models/model0_0.h5')
     validation_dataset_tta = get_test_dataset(['/mnt/850G/GIT/kagle_melanoma_tf_tpu/data/128x128/train00-2071.tfrec'], CONFIG)
 
     def stm():
-        save_interpretations(model, validation_dataset_tta, CONFIG.work_dir, average_samples=1, steps_list=(10,),N=1)
+        save_interpretations(model, validation_dataset_tta, CONFIG.work_dir, CONFIG, average_samples=1, steps_list=(10,),N=1)
     print(timeit.timeit(stm,number=1))
