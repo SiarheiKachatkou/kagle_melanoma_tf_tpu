@@ -44,11 +44,12 @@ def calc_occlustion_map(output_modifier_fn, model, batch, offset, steps, average
     dataset=tf.data.Dataset.from_tensor_slices(batch_list.dict)
     dataset=dataset.batch(CONFIG.batch_size_inference)
     predictions=model.predict(dataset)
+    print(predictions[:10])
     finish = datetime.now()
     print(f'predict  ={finish - start}')
 
     start=finish
-    occl_list = [offset - output_modifier_fn(p) for p in predictions]
+    occl_list = [output_modifier_fn(p)-offset for p in predictions]
 
     occlusion_map=[]
     idx=0
