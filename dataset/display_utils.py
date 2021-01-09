@@ -54,44 +54,65 @@ def display_one_image(image, title, subplot, red=False):
     else:
         return [subplot[0],subplot[1],subplot[2]+1]
 
+def batch_to_numpy(batch):
+    batch_numpy={}
+    for k, v in batch:
+        batch_numpy[k]=v.numpy().astype(np.float)
+    return batch_numpy
+
+
+class DictList():
+    def __init__(self):
+        self._dict={}
+        pass
+
+    def extend(self, other_dict):
+        for k,v in other_dict.items():
+            if k in self._dict:
+                self._dict[k]=np.concatenate([self._dict[k],v],axis=0)
+            else:
+                self._dict[k] = v
+
+    def __getitem__(self, item):
+        item_dict={}
+        for k in self._dict:
+                item_dict[k] = self._dict[k][item]
+        return item_dict
+
+
 
 def get_high_low_loss_images(dataset, N, loss_fn, max_batches):
 
-    chosen_images = []
-    chosen_labels = []
-    chosen_losses = []
+    batches_list = DictList()
+    labels_list = []
+    losses_list = []
     batch_count=0
     #TODO use model.predict(dataset) is is much faster
     for batch, labels in dataset:
 
         losses=loss_fn(batch,labels)
-        images = batch['image']
-        numpy_images = images.numpy()
-        numpy_labels = labels.numpy()
-        numpy_losses = losses.numpy()
 
-        for lab, img, loss in zip(numpy_labels, numpy_images, numpy_losses):
-                chosen_losses.append(loss)
-                chosen_images.append(img)
-                chosen_labels.append(lab)
+        batches_list.extend(batch)
+        labels_list.extend(labels.numpy())
+        losses_list.extend(losses.numpy())
 
         batch_count+=1
         if max_batches is not None:
             if batch_count>max_batches:
                 break
-    args=np.argsort(chosen_losses)
+    args=np.argsort(losses_list)
 
-    low_loss_images = [chosen_images[i] for i in args[:N]]
-    low_loss_labels = [chosen_labels[i] for i in args[:N]]
-    low_loss_loss = [chosen_losses[i] for i in args[:N]]
+    low_loss_batches = [batches_list[i] for i in args[:N]]
+    low_loss_labels = [labels_list[i] for i in args[:N]]
+    low_loss_loss = [losses_list[i] for i in args[:N]]
 
     args=args[::-1]
 
-    high_loss_images=[chosen_images[i] for i in args[:N]]
-    high_loss_labels=[chosen_labels[i] for i in args[:N]]
-    high_loss_loss = [chosen_losses[i] for i in args[:N]]
+    high_loss_batches = [batches_list[i] for i in args[:N]]
+    high_loss_labels = [labels_list[i] for i in args[:N]]
+    high_loss_loss = [losses_list[i] for i in args[:N]]
 
-    return (high_loss_images, high_loss_labels, high_loss_loss), (low_loss_images,low_loss_labels, low_loss_loss)
+    return (high_loss_batches, high_loss_labels, high_loss_loss), (low_loss_batches,low_loss_labels, low_loss_loss)
 
 
 def display_9_images_from_dataset(dataset, show_zero_labels, loss_fn=None):

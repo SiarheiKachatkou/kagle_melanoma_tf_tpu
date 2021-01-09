@@ -134,7 +134,9 @@ for fold in range(CONFIG.nfolds):
         submission.calc_and_save_submissions(CONFIG, models, f'test_le_{fold}', test_dataset,
                                              test_dataset_tta, CONFIG.ttas)
 
-        save_interpretations(model,test_dataset_tta,os.path.join(CONFIG.work_dir, f'interpretation_{fold}'))
+    test_dataset = get_test_dataset(test_filenames, CONFIG)
+    model = load_model(model_file_paths[0])
+    save_interpretations(model,test_dataset,os.path.join(CONFIG.work_dir, f'interpretation_{fold}'))
 
     if (not is_local) and (not is_kaggle):
         if fold!=0:

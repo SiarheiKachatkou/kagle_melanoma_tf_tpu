@@ -29,13 +29,13 @@ args=parser.parse_args()
 if is_local:
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
     if args.gpus is None:
-        os.environ["CUDA_VISIBLE_DEVICES"] = '0'#'"1,2"#"1,2"  # "0" #
+        os.environ["CUDA_VISIBLE_DEVICES"] = "1,2"#"1,2"  # "0" #
     else:
         os.environ["CUDA_VISIBLE_DEVICES"] = args.gpus
 
 
 epochs_fine_tune = 0
-epochs_full = 1 if is_debug else epochs_fine_tune+12
+epochs_full = 1 if is_debug else epochs_fine_tune+2 #12
 epochs_total = epochs_full + 0
 
 BATCH_SIZE = 36 if is_debug else args.batch_size
@@ -54,7 +54,8 @@ config=namedtuple('config',['lr_max','lr_start','lr_fine_tune','stepsize', 'lr_w
                             'batch_size','batch_size_inference',
                             'image_height',
                             'epochs_full','epochs_fine_tune', 'epochs_total', 'fine_tune_last',
-                            'val_ttas'
+                            'val_ttas',
+                            'use_meta'
                             ])
 
 model = args.backbone if not is_debug else 'B0'
@@ -78,7 +79,7 @@ CONFIG=config(lr_max=args.lr_max*1e-4, lr_start=1e-6, stepsize=3,lr_fine_tune=3e
               gs_work_dir=f'gs://kochetkov_kaggle_melanoma/{str(datetime.datetime.now())[:20]}_{args.work_dir}',
               model_fn_str=f"efficientnet.tfkeras.EfficientNet{model}(weights='imagenet', include_top=False)",
               ttas=ttas,
-              val_ttas=0,
+              val_ttas=3,
               use_metrics=True, dropout_rate=dropout_rate,
               save_best_n=args.save_best_n,
               oversample_mult=args.oversample_mult,
@@ -86,7 +87,8 @@ CONFIG=config(lr_max=args.lr_max*1e-4, lr_start=1e-6, stepsize=3,lr_fine_tune=3e
               hair_prob=hair_prob, microscope_prob=microscope_prob,cut_out_prob=0.1,cut_mix_prob=0.1,
               batch_size=BATCH_SIZE, batch_size_inference=BATCH_SIZE * BATCH_SIZE_INCREASE_FOR_INFERENCE,
               image_height=image_height,
-              epochs_full=epochs_full,epochs_fine_tune=epochs_fine_tune, fine_tune_last=-1, epochs_total=epochs_total
+              epochs_full=epochs_full,epochs_fine_tune=epochs_fine_tune, fine_tune_last=-1, epochs_total=epochs_total,
+              use_meta=False
               )
 
 #pretrained_model = tf.keras.applications.MobileNetV2(input_shape=[*IMAGE_SIZE, 3], include_top=False)

@@ -10,5 +10,6 @@ pip3 install 'dvc[gdrive]'
 sudo apt install libgl1-mesa-glx -y
 pip3 install keras==2.3.0
 pip3 uninstall keras-applications -y
+pip3 install tf-keras-vis
 pip3 install -r tools/requirements.txt
 #pip3 install tensorflow-addons

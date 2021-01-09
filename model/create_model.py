@@ -112,8 +112,10 @@ def create_model(cfg,  metrics, optimizer, fine_tune_last=None, backbone_trainab
     meta_feature=tf.keras.layers.Dense(meta_hidden1, activation='relu')(meta_feature)
     meta_feature=tf.keras.layers.BatchNormalization()(meta_feature)
     meta_feature = tf.keras.layers.Dense(meta_hidden2, activation='relu')(meta_feature)
-    features=tf.concat([meta_feature,image_model_output],axis=1)
-    #features = image_model_output
+    if cfg.use_meta:
+        features=tf.concat([meta_feature,image_model_output],axis=1)
+    else:
+        features = image_model_output
 
     features = tf.keras.layers.Dropout(rate=cfg.dropout_rate)(features)
     output = tf.keras.layers.Dense(2, activation='softmax')(features)
