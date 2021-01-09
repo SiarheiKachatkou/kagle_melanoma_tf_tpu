@@ -11,26 +11,45 @@ from dataset.display_utils import get_high_low_loss_images, display_one_image
 def _batch_to_tensor(batch):
     return {k: tf.convert_to_tensor(np.expand_dims(v, axis=0)) for k, v in batch.items()}
 
-def calc_occlusion_map(output_modifier_fn, model, batch, steps=10, occlusion_color=1.0):
-    image=batch['image']
-    h,w=image.shape[:2]
-    dh = max(1, h//steps)
+def calc_occlustion_map(output_modifier_fn, model, batch, offset, steps, average_samples=10):
+    image = batch['image']
+    h, w = image.shape[:2]
+    dh = max(1, h // steps)
     dw = max(1, w // steps)
-    offset=output_modifier_fn(model(_batch_to_tensor(batch)))
-    occlusion_map=[]
-    for x in range(0,w,dw):
-        row=[]
-        for y in range(0,h,dh):
-            batch_copy=batch.copy()
-            image_copy=copy.deepcopy(image)
-            image_copy[y:y+dh,x:x+dw]=occlusion_color
-            batch_copy['image']=image_copy
-            occl=output_modifier_fn(model(_batch_to_tensor(batch_copy)))-offset
+    occlusion_map = []
+    for x in range(0, w, dw):
+        row = []
+        for y in range(0, h, dh):
+            occl = 0
+            for _ in range(average_samples):
+                batch_copy = batch.copy()
+                image_copy = copy.deepcopy(image)
+                patch = image_copy[y:y + dh, x:x + dw]
+                pixels = np.reshape(patch, (-1, 3))
+                np.random.shuffle(pixels)
+                pixels = np.reshape(pixels, patch.shape)
+                image_copy[y:y + dh, x:x + dw] = pixels
+                batch_copy['image'] = image_copy
+                occl += output_modifier_fn(model(_batch_to_tensor(batch_copy))) - offset
+            occl /= average_samples
             row.append(occl)
         occlusion_map.append(np.array(row))
 
-    occlusion_map=np.array(occlusion_map).astype(np.float32)
-    occlusion_map=cv2.resize(occlusion_map,(w,h))
+    occlusion_map = np.array(occlusion_map).astype(np.float32)
+    occlusion_map = cv2.resize(occlusion_map, (w, h))
+    return occlusion_map
+
+def calc_occlusion_map_multisace(output_modifier_fn, model, batch, steps_list=(10,5,3), average_samples=10):
+
+    offset=output_modifier_fn(model(_batch_to_tensor(batch)))
+
+    occlusion_map=0
+    for steps in steps_list:
+        single_scal_saliency_map=calc_occlustion_map(output_modifier_fn, model, batch, offset, steps, average_samples)
+        perturbation_area=1/(steps*steps)
+        occlusion_map+=single_scal_saliency_map/perturbation_area
+
+    occlusion_map/=len(steps_list)
     return occlusion_map
 
 
@@ -42,11 +61,11 @@ def normalize(img,to_gray=False):
     else:
         return rgb
 
-def save_interpretations(model,test_dataset,dst_dir):
+def save_interpretations(model,test_dataset,dst_dir, average_samples=10, steps_list=(3,), N=3):
     if not os.path.exists(dst_dir):
         os.makedirs(dst_dir)
-    N=3
-    subplot = [2,3,1]
+
+    subplot = [2,N,1]
 
     def loss_fn(images, labels):
         outputs = model(images)
@@ -56,7 +75,7 @@ def save_interpretations(model,test_dataset,dst_dir):
 
     (high_loss_images, high_loss_labels, high_loss_loss), (low_loss_images, low_loss_labels, low_loss_loss) = get_high_low_loss_images(test_dataset, N, loss_fn, max_batches=None)
 
-
+    print('finished get_high_low_loss_images')
     plt.figure(figsize=(13, 13))
 
     batches=high_loss_images+low_loss_images
@@ -66,8 +85,7 @@ def save_interpretations(model,test_dataset,dst_dir):
     def output_fn(output):
         return output[:,1].numpy()[0]
 
-    saliency_maps = [calc_occlusion_map(output_fn, model, batch,
-                            steps=10) for batch in batches]
+    saliency_maps = [calc_occlusion_map_multisace(output_fn, model, batch,average_samples=average_samples, steps_list=steps_list) for batch in batches]
 
     red=True
     for i, batch in enumerate(batches):
@@ -94,10 +112,11 @@ if __name__=="__main__":
     from dataset.dataset_utils import *
     from config.config import CONFIG
     from config.runtime import get_scope
+    import timeit
 
-    scope=get_scope()
-    with scope:
-        model=load_model('/mnt/850G/GIT/kagle_melanoma_tf_tpu/artifacts/trained_models/model0.h5')
-        validation_dataset_tta = get_test_dataset(['/mnt/850G/GIT/kagle_melanoma_tf_tpu/data/128x128/train00-2071.tfrec'], CONFIG)
+    model=load_model('/mnt/850G/GIT/kagle_melanoma_tf_tpu/artifacts/trained_models/model0.h5')
+    validation_dataset_tta = get_test_dataset(['/mnt/850G/GIT/kagle_melanoma_tf_tpu/data/128x128/train00-2071.tfrec'], CONFIG)
 
-        save_interpretations(model, validation_dataset_tta, CONFIG.work_dir)
+    def stm():
+        save_interpretations(model, validation_dataset_tta, CONFIG.work_dir, average_samples=3, N=2)
+    print(timeit.timeit(stm,number=1))
