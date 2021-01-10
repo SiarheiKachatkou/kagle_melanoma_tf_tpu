@@ -36,14 +36,14 @@ if is_local:
 
 
 epochs_fine_tune = 0
-epochs_full = 1 if is_debug else epochs_fine_tune+12
+epochs_full = 1 #if is_debug else epochs_fine_tune+12
 epochs_total = epochs_full + 0
 
 BATCH_SIZE = 36 if is_debug else args.batch_size
 BATCH_SIZE_INCREASE_FOR_INFERENCE = 4
 
 
-TRAIN_STEPS = 1 if is_debug else None
+TRAIN_STEPS = 1#1 if is_debug else None
 
 config=namedtuple('config',['lr_max','lr_start','lr_fine_tune','stepsize', 'lr_warm_up_epochs','lr_min','lr_exp_decay','lr_fn',
                             'nfolds','l2_penalty',

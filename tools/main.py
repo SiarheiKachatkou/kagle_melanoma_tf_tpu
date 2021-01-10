@@ -107,46 +107,55 @@ for fold in range(CONFIG.nfolds):
             display_training_curves(history.history['loss_no_reg'][1:], history.history['val_loss_no_reg'][1:], 'loss', 212)
             plt.savefig(os.path.join(CONFIG.work_dir, f'loss{fold}.png'))
 
+        print('reload model ...')
         model_file_paths = save_callback_best_n.get_filepaths()
         model=load_model(model_file_paths[0])
 
+        print('predict test_val ...')
         subms=submission.make_submission_dataframe(get_validation_dataset_tta(test_val_filenames,CONFIG), model, repeats=CONFIG.ttas)
         preds_fold_avg.append(submission.aggregate_submissions(subms))
 
-        validation_dataset = get_validation_dataset(val_filenames_folds[fold],CONFIG)
+        print('reload models ...')
+        models = []
+        for filepath in model_file_paths:
+            m = load_model(filepath)
+            m.trainable = False
+            models.append(m)
 
+        print('predict val ...')
+        validation_dataset = get_validation_dataset(val_filenames_folds[fold],CONFIG)
         submission.calc_and_save_submissions(CONFIG, model, f'val_{fold}', validation_dataset, validation_dataset_tta,
                                              CONFIG.ttas)
 
-        test_dataset = get_test_dataset(test_filenames,CONFIG)
-        test_dataset_tta = get_test_dataset_tta(test_filenames,CONFIG)
-        submission.calc_and_save_submissions(CONFIG, model, f'test_{fold}', test_dataset, test_dataset_tta, CONFIG.ttas)
-
-
-        models=[]
-        for filepath in model_file_paths:
-            m=load_model(filepath)
-            m.trainable=False
-            models.append(m)
-        submission.calc_and_save_submissions(CONFIG, models, f'val_le_{fold}', validation_dataset,
-                                             validation_dataset_tta,
-                                             CONFIG.ttas)
         submission.calc_and_save_submissions(CONFIG, models, f'test_le_{fold}', test_dataset,
                                              test_dataset_tta, CONFIG.ttas)
 
-    test_dataset = get_test_dataset(test_filenames, CONFIG)
+        del validation_dataset
+        del validation_dataset_tta
+
+        print('predict test ...')
+        test_dataset = get_test_dataset(test_filenames,CONFIG)
+        test_dataset_tta = get_test_dataset_tta(test_filenames,CONFIG)
+
+        submission.calc_and_save_submissions(CONFIG, model, f'test_{fold}', test_dataset, test_dataset_tta, CONFIG.ttas)
+
+        submission.calc_and_save_submissions(CONFIG, models, f'val_le_{fold}', validation_dataset,
+                                             validation_dataset_tta,
+                                             CONFIG.ttas)
+
+        del models
+        del test_dataset
+        del test_dataset_tta
+        print(f'fold {fold} finished')
+
+    test_val_dataset = get_test_dataset(test_val_filenames, CONFIG)
     model = load_model(model_file_paths[0])
-    save_interpretations(model,test_dataset,os.path.join(CONFIG.work_dir, f'interpretation_{fold}'),CONFIG)
+    save_interpretations(model,test_val_dataset,os.path.join(CONFIG.work_dir, f'interpretation_{fold}'),CONFIG)
 
     if (not is_local) and (not is_kaggle):
         if fold!=0:
             subprocess.check_call(['gsutil', 'rm', '-r', CONFIG.gs_work_dir])
         subprocess.check_call(['gsutil', '-m', 'cp', '-r', CONFIG.work_dir,CONFIG.gs_work_dir])
-
-    del validation_dataset
-    del validation_dataset_tta
-    del test_dataset
-    del test_dataset_tta
 
     gc.collect()
 

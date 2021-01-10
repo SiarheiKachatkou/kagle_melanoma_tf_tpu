@@ -104,6 +104,7 @@ def save_interpretations(model,test_dataset,dst_dir, config, average_samples=10,
         return losses
 
     start=datetime.now()
+    print(f'start get_high_low_loss_images')
     (high_loss_images, high_loss_labels, high_loss_loss), (low_loss_images, low_loss_labels, low_loss_loss) = get_high_low_loss_images(test_dataset, N, loss_fn, max_batches=None)
     finish=datetime.now()
     print(f'finished get_high_low_loss_images {finish-start}')
@@ -145,8 +146,8 @@ if __name__=="__main__":
     from config.runtime import get_scope
     import timeit
 
-    model=load_model('/mnt/850G/GIT/kagle_melanoma_tf_tpu/artifacts/trained_models/model0_8.h5')
-    validation_dataset_tta = get_test_dataset(['/mnt/850G/GIT/kagle_melanoma_tf_tpu/data/256x256_triple/train00-2182.tfrec'], CONFIG)
+    model=load_model('/mnt/850G/GIT/kagle_melanoma_tf_tpu/artifacts/trained_models/model0_0.h5')
+    validation_dataset_tta = get_test_dataset(['/mnt/850G/GIT/kagle_melanoma_tf_tpu/data/256x256_triple/train00-2182.tfrec','/mnt/850G/GIT/kagle_melanoma_tf_tpu/data/256x256_triple/train01-2185.tfrec'], CONFIG)
 
     def stm():
         save_interpretations(model, validation_dataset_tta, CONFIG.work_dir, CONFIG)#, average_samples=1, steps_list=(10,),N=1)

@@ -5,7 +5,7 @@ def build_model_str(model_code):
     if model_code in effnets:
         return f"efficientnet.tfkeras.EfficientNet{model_code}(weights='imagenet', include_top=False)"
 
-    keras_apps=['ResBet50','ResNet101','Xception','MobileNetV2','MobileNet']
+    keras_apps=['ResNet50','ResNet101','Xception','MobileNetV2','MobileNet']
     if model_code in keras_apps:
         return f'tf.keras.applications.{model_code}(weights="imagenet", include_top=False)'
 

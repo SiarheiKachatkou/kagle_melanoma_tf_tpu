@@ -10,7 +10,7 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 use_tpu_2 = False
 is_local = True
 is_kaggle = False
-is_debug = True
+is_debug = False
 do_validate = True
 
 
@@ -29,7 +29,7 @@ if is_local:
 
 root=Path(os.path.split(__file__)[0])/'..'
 
-test_files_num=2
+test_files_num=1
 
 if is_local:
     DATASETS = {
