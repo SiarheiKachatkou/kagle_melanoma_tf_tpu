@@ -29,7 +29,7 @@ if is_local:
 
 root=Path(os.path.split(__file__)[0])/'..'
 
-test_files_num=2
+test_files_num=1
 
 if is_local:
     DATASETS = {

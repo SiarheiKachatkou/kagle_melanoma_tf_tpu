@@ -1,6 +1,7 @@
 import os
 import pickle
 import gc
+import resource
 import yaml
 import tensorflow as tf
 from tensorflow.keras.callbacks import ModelCheckpoint
@@ -21,6 +22,7 @@ from config.runtime import get_scope
 from model.sparceauc import SparceAUC
 from submission import submit
 from model.history import join_history
+from debug_tools.save_interpretaions import save_interpretations
 
 if not os.path.exists(CONFIG.work_dir):
     os.makedirs(CONFIG.work_dir)
@@ -37,8 +39,8 @@ train_filenames_folds, val_filenames_folds, test_val_filenames = get_train_val_f
 test_filenames=get_test_filenames(DATASETS[CONFIG.image_height]['new'])
 if is_debug:
     test_filenames = [test_filenames[0]]
-    train_filenames_folds=[[f[0:2]] for f in train_filenames_folds]
-    val_filenames_folds=[[f[0:2]] for f in val_filenames_folds]
+    train_filenames_folds=[[f[0]] for f in train_filenames_folds]
+    val_filenames_folds=[[f[0]] for f in val_filenames_folds]
 
 preds_fold_avg=[]
 
@@ -95,6 +97,11 @@ for fold in range(CONFIG.nfolds):
                                 epochs=CONFIG.epochs_total, callbacks=callbacks)
             history = join_history(history, history_total)
 
+        print(f'befor del train_dataset { resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}')
+        del training_dataset
+        gc.collect()
+        print(f'after del train_dataset {resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}')
+
         print(history.history)
 
         if do_validate:
@@ -106,42 +113,71 @@ for fold in range(CONFIG.nfolds):
             display_training_curves(history.history['loss_no_reg'][1:], history.history['val_loss_no_reg'][1:], 'loss', 212)
             plt.savefig(os.path.join(CONFIG.work_dir, f'loss{fold}.png'))
 
+
+        print('reload model ...')
         model_file_paths = save_callback_best_n.get_filepaths()
         model=load_model(model_file_paths[0])
+
+
+        print('predict test_val ...')
+        print(f'befor {resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}')
 
         subms=submission.make_submission_dataframe(get_validation_dataset_tta(test_val_filenames,CONFIG), model, repeats=CONFIG.ttas)
         preds_fold_avg.append(submission.aggregate_submissions(subms))
 
-        validation_dataset = get_validation_dataset(val_filenames_folds[fold],CONFIG)
+        gc.collect()
+        print(f'after {resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}')
 
+        print('reload models ...')
+        models = []
+        for filepath in model_file_paths:
+            m = load_model(filepath)
+            m.trainable = False
+            models.append(m)
+
+        print('predict val ...')
+        print(f'befor {resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}')
+        validation_dataset = get_validation_dataset(val_filenames_folds[fold],CONFIG)
         submission.calc_and_save_submissions(CONFIG, model, f'val_{fold}', validation_dataset, validation_dataset_tta,
                                              CONFIG.ttas)
-
-        test_dataset = get_test_dataset(test_filenames,CONFIG)
-        test_dataset_tta = get_test_dataset_tta(test_filenames,CONFIG)
-        submission.calc_and_save_submissions(CONFIG, model, f'test_{fold}', test_dataset, test_dataset_tta, CONFIG.ttas)
-
-
-        models=[]
-        for filepath in model_file_paths:
-            m=load_model(filepath)
-            m.trainable=False
-            models.append(m)
         submission.calc_and_save_submissions(CONFIG, models, f'val_le_{fold}', validation_dataset,
                                              validation_dataset_tta,
                                              CONFIG.ttas)
+        print(f'after {resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}')
+
+
+        del validation_dataset
+        del validation_dataset_tta
+        gc.collect()
+        print(f'after {resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}')
+
+        print('predict test ...')
+        test_dataset = get_test_dataset(test_filenames,CONFIG)
+        test_dataset_tta = get_test_dataset_tta(test_filenames,CONFIG)
+
+        submission.calc_and_save_submissions(CONFIG, model, f'test_{fold}', test_dataset, test_dataset_tta, CONFIG.ttas)
+
         submission.calc_and_save_submissions(CONFIG, models, f'test_le_{fold}', test_dataset,
                                              test_dataset_tta, CONFIG.ttas)
+
+        del models
+        del test_dataset
+        del test_dataset_tta
+        gc.collect()
+
+
+    print('save interpretations ...')
+    test_val_dataset = get_test_dataset(test_val_filenames, CONFIG)
+    save_interpretations(model, test_val_dataset, os.path.join(CONFIG.work_dir, f'interpretation_{fold}'), CONFIG)
+
+    print(f'fold {fold} finished')
+
+
 
     if (not is_local) and (not is_kaggle):
         if fold!=0:
             subprocess.check_call(['gsutil', 'rm', '-r', CONFIG.gs_work_dir])
         subprocess.check_call(['gsutil', '-m', 'cp', '-r', CONFIG.work_dir,CONFIG.gs_work_dir])
-
-    del validation_dataset
-    del validation_dataset_tta
-    del test_dataset
-    del test_dataset_tta
 
     gc.collect()
 

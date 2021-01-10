@@ -4,6 +4,7 @@ import numpy as np
 from config.consts import CLASSES
 import cv2
 import os
+from dataset.dict_list import DictList
 from tqdm import tqdm
 from augmentations.augmentations import cut_mix
 
@@ -40,40 +41,53 @@ def title_from_label_and_target(label, correct_label):
                                 CLASSES[correct_label] if not correct else ''), correct
 
 
-def display_one_flower(image, title, subplot, red=False):
-    plt.subplot(subplot)
+def display_one_image(image, title, subplot, red=False):
+    if isinstance(subplot,str):
+        plt.subplot(subplot)
+    else:
+        plt.subplot(*subplot)
+
     plt.axis('off')
     plt.imshow(image)
     plt.title(title, fontsize=16, color='red' if red else 'black')
-    return subplot + 1
+    if isinstance(subplot,str):
+        return subplot + 1
+    else:
+        return [subplot[0],subplot[1],subplot[2]+1]
 
 
-def get_high_loss_images(dataset, N, loss_fn, max_batches):
+def get_high_low_loss_images(dataset, N, loss_fn, max_batches):
 
-    chosen_images = []
-    chosen_labels = []
-    chosen_losses = []
+    batches_list = DictList()
+    labels_list = []
+    losses_list = []
     batch_count=0
-    for images, labels in tqdm(dataset,total=max_batches):
-        losses=loss_fn(images,labels)
-        numpy_images = images.numpy()
-        numpy_labels = labels.numpy()
-        numpy_losses = losses.numpy()
+    #TODO use model.predict(dataset) is is much faster
+    for batch, labels in tqdm(dataset):
 
-        for lab, img, loss in zip(numpy_labels, numpy_images, numpy_losses):
-                chosen_losses.append(loss)
-                chosen_images.append(img)
-                chosen_labels.append(lab)
+        losses_numpy=loss_fn(batch,labels)
+
+        batches_list.extend(batch)
+        labels_list.extend(labels.numpy())
+        losses_list.extend(losses_numpy)
 
         batch_count+=1
-        if batch_count>max_batches:
-            break
-    args=np.argsort(chosen_losses)
+        if max_batches is not None:
+            if batch_count>max_batches:
+                break
+    args=np.argsort(losses_list)
+
+    low_loss_batches = [batches_list[i] for i in args[:N]]
+    low_loss_labels = [labels_list[i] for i in args[:N]]
+    low_loss_loss = [losses_list[i] for i in args[:N]]
+
     args=args[::-1]
-    args=args[:N]
-    chosen_images=[chosen_images[i] for i in args]
-    chosen_labels=[chosen_labels[i] for i in args]
-    return chosen_images, chosen_labels
+
+    high_loss_batches = [batches_list[i] for i in args[:N]]
+    high_loss_labels = [labels_list[i] for i in args[:N]]
+    high_loss_loss = [losses_list[i] for i in args[:N]]
+
+    return (high_loss_batches, high_loss_labels, high_loss_loss), (low_loss_batches,low_loss_labels, low_loss_loss)
 
 
 def display_9_images_from_dataset(dataset, show_zero_labels, loss_fn=None):
@@ -83,13 +97,13 @@ def display_9_images_from_dataset(dataset, show_zero_labels, loss_fn=None):
     if loss_fn is None:
         images, labels = dataset_to_numpy_util(dataset, 9, show_zero_labels)
     else:
-        images, labels = get_high_loss_images(dataset, 9, loss_fn, max_batches=10)
+        images, labels = get_high_low_loss_images(dataset, 9, loss_fn, max_batches=10)
 
     print(labels)
     for i, image in enumerate(images):
         image = cv2.normalize(image,None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
         title = str(labels[i])
-        subplot = display_one_flower(image, title, subplot)
+        subplot = display_one_image(image, title, subplot)
         if i >= 8:
             break
 
@@ -103,7 +117,7 @@ def display_9_images_with_predictions(images, predictions, labels):
     plt.figure(figsize=(13, 13))
     for i, image in enumerate(images):
         title, correct = title_from_label_and_target(predictions[i], labels[i])
-        subplot = display_one_flower(image, title, subplot, not correct)
+        subplot = display_one_image(image, title, subplot, not correct)
         if i >= 8:
             break;
 

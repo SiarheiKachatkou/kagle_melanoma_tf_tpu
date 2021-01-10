@@ -3,6 +3,7 @@ from collections import namedtuple
 import os
 import argparse
 from config.consts import is_local, is_debug
+from config.model_str_builder import build_model_str
 from pathlib import Path
 
 parser=argparse.ArgumentParser()
@@ -29,20 +30,20 @@ args=parser.parse_args()
 if is_local:
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
     if args.gpus is None:
-        os.environ["CUDA_VISIBLE_DEVICES"] = '0'#'"1,2"#"1,2"  # "0" #
+        os.environ["CUDA_VISIBLE_DEVICES"] = "1,2"#"1,2"  # "0" #
     else:
         os.environ["CUDA_VISIBLE_DEVICES"] = args.gpus
 
 
 epochs_fine_tune = 0
-epochs_full = 1 if is_debug else epochs_fine_tune+12
+epochs_full = 1 #if is_debug else epochs_fine_tune+12
 epochs_total = epochs_full + 0
 
 BATCH_SIZE = 36 if is_debug else args.batch_size
 BATCH_SIZE_INCREASE_FOR_INFERENCE = 4
 
 
-TRAIN_STEPS = 1 if is_debug else None
+TRAIN_STEPS = 1#1 if is_debug else None
 
 config=namedtuple('config',['lr_max','lr_start','lr_fine_tune','stepsize', 'lr_warm_up_epochs','lr_min','lr_exp_decay','lr_fn',
                             'nfolds','l2_penalty',
@@ -55,7 +56,8 @@ config=namedtuple('config',['lr_max','lr_start','lr_fine_tune','stepsize', 'lr_w
                             'image_height',
                             'epochs_full','epochs_fine_tune', 'epochs_total', 'fine_tune_last',
                             'val_ttas',
-                            'stage'
+                            'stage',
+                            'use_meta'
                             ])
 
 model = args.backbone if not is_debug else 'B0'
@@ -77,26 +79,20 @@ CONFIG=config(lr_max=args.lr_max*1e-4, lr_start=1e-6, stepsize=3,lr_fine_tune=3e
               lr_min=1e-6, lr_exp_decay=args.lr_exp_decay, lr_fn='get_lrfn_fine_tune(CONFIG)',  #get_cycling_lrfn(CONFIG) #
               nfolds=4, l2_penalty=penalty, work_dir=args.work_dir,
               gs_work_dir=f'gs://kochetkov_kaggle_melanoma/{str(datetime.datetime.now())[:20]}_{args.work_dir}',
-              model_fn_str=f"efficientnet.tfkeras.EfficientNet{model}(weights='imagenet', include_top=False)",
+              model_fn_str=build_model_str(model),
               ttas=ttas,
-              val_ttas=4,
+              val_ttas=3,
               use_metrics=True, dropout_rate=dropout_rate,
               save_best_n=args.save_best_n,
               oversample_mult=args.oversample_mult,
               focal_loss_gamma=focal_loss_gamma, focal_loss_alpha=focal_loss_alpha,
-              hair_prob=hair_prob, microscope_prob=microscope_prob,cut_out_prob=0.1,cut_mix_prob=0.1,
+              hair_prob=hair_prob, microscope_prob=microscope_prob,cut_out_prob=0.2,cut_mix_prob=0.2,
               batch_size=BATCH_SIZE, batch_size_inference=BATCH_SIZE * BATCH_SIZE_INCREASE_FOR_INFERENCE,
               image_height=image_height,
               epochs_full=epochs_full,epochs_fine_tune=epochs_fine_tune, fine_tune_last=-1, epochs_total=epochs_total,
-              stage=args.stage
+              stage=args.stage,
+              use_meta=False
               )
-
-#pretrained_model = tf.keras.applications.MobileNetV2(input_shape=[*IMAGE_SIZE, 3], include_top=False)
-#pretrained_model = tf.keras.applications.Xception(input_shape=[*IMAGE_SIZE, 3], include_top=False)
-#pretrained_model = tf.keras.applications.VGG16(weights='imagenet', include_top=False ,input_shape=[*IMAGE_SIZE, 3])
-#pretrained_model = tf.keras.applications.ResNet50(weights='imagenet', include_top=False, input_shape=[*IMAGE_SIZE, 3])
-#pretrained_model = tf.keras.applications.MobileNet(weights='imagenet', include_top=False, input_shape=[*IMAGE_SIZE, 3])
-# EfficientNet can be loaded through efficientnet.tfkeras library (https://github.com/qubvel/efficientnet)
 
 root=Path(os.path.split(__file__)[0])/'..'
 metrics_path=root/'metrics'
