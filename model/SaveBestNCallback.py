@@ -45,9 +45,11 @@ class SaveBestNCallback(tf.keras.callbacks.Callback):
     def __init__(self, dir_path, fold, save_best_n, metric_name, mode, val_ttas=0, val_dataset=None):
 
         super().__init__()
+        assert mode in ['min', 'max']
+        assert save_best_n>0
         self._metric_name=metric_name
         self._mode=mode
-        assert mode in ['min','max']
+
         self._dir_path=dir_path
         self._fold=fold
         self._save_best_n=save_best_n
@@ -57,7 +59,7 @@ class SaveBestNCallback(tf.keras.callbacks.Callback):
         self._metric_history=[]
 
     def _get_filepath(self, epoch):
-        return f'{self._dir_path}/../trained_models/model{self._fold}_{epoch}.h5'
+        return f'{self._dir_path}/model{self._fold}_{epoch}.h5'
 
     def get_filepaths(self):
         filepaths=[f.filepath for f in self._best_ckpts._objs]
