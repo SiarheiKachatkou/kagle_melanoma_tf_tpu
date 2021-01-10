@@ -67,6 +67,8 @@ def get_high_low_loss_images(dataset, N, loss_fn, max_batches):
 
         losses=loss_fn(batch,labels)
 
+        print(losses)
+
         batches_list.extend(batch)
         labels_list.extend(labels.numpy())
         losses_list.extend(losses.numpy())
