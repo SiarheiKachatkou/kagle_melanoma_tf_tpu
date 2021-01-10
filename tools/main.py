@@ -1,6 +1,7 @@
 import os
 import pickle
 import gc
+import resource
 import yaml
 import tensorflow as tf
 from tensorflow.keras.callbacks import ModelCheckpoint
@@ -96,6 +97,11 @@ for fold in range(CONFIG.nfolds):
                                 epochs=CONFIG.epochs_total, callbacks=callbacks)
             history = join_history(history, history_total)
 
+        print(f'befor del train_dataset { resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}')
+        del training_dataset
+        gc.collect()
+        print(f'after del train_dataset {resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}')
+
         print(history.history)
 
         if do_validate:
@@ -107,13 +113,19 @@ for fold in range(CONFIG.nfolds):
             display_training_curves(history.history['loss_no_reg'][1:], history.history['val_loss_no_reg'][1:], 'loss', 212)
             plt.savefig(os.path.join(CONFIG.work_dir, f'loss{fold}.png'))
 
+
         print('reload model ...')
         model_file_paths = save_callback_best_n.get_filepaths()
         model=load_model(model_file_paths[0])
 
         print('predict test_val ...')
+        print(f'befor {resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}')
+
         subms=submission.make_submission_dataframe(get_validation_dataset_tta(test_val_filenames,CONFIG), model, repeats=CONFIG.ttas)
         preds_fold_avg.append(submission.aggregate_submissions(subms))
+
+        gc.collect()
+        print(f'after {resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}')
 
         print('reload models ...')
         models = []
@@ -123,15 +135,20 @@ for fold in range(CONFIG.nfolds):
             models.append(m)
 
         print('predict val ...')
+        print(f'befor {resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}')
         validation_dataset = get_validation_dataset(val_filenames_folds[fold],CONFIG)
         submission.calc_and_save_submissions(CONFIG, model, f'val_{fold}', validation_dataset, validation_dataset_tta,
                                              CONFIG.ttas)
+        submission.calc_and_save_submissions(CONFIG, models, f'val_le_{fold}', validation_dataset,
+                                             validation_dataset_tta,
+                                             CONFIG.ttas)
+        print(f'after {resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}')
 
-        submission.calc_and_save_submissions(CONFIG, models, f'test_le_{fold}', test_dataset,
-                                             test_dataset_tta, CONFIG.ttas)
 
         del validation_dataset
         del validation_dataset_tta
+        gc.collect()
+        print(f'after {resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}')
 
         print('predict test ...')
         test_dataset = get_test_dataset(test_filenames,CONFIG)
@@ -139,13 +156,13 @@ for fold in range(CONFIG.nfolds):
 
         submission.calc_and_save_submissions(CONFIG, model, f'test_{fold}', test_dataset, test_dataset_tta, CONFIG.ttas)
 
-        submission.calc_and_save_submissions(CONFIG, models, f'val_le_{fold}', validation_dataset,
-                                             validation_dataset_tta,
-                                             CONFIG.ttas)
+        submission.calc_and_save_submissions(CONFIG, models, f'test_le_{fold}', test_dataset,
+                                             test_dataset_tta, CONFIG.ttas)
 
         del models
         del test_dataset
         del test_dataset_tta
+        gc.collect()
         print(f'fold {fold} finished')
 
     test_val_dataset = get_test_dataset(test_val_filenames, CONFIG)
