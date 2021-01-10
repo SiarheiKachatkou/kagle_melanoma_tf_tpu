@@ -3,6 +3,7 @@ from collections import namedtuple
 import os
 import argparse
 from config.consts import is_local, is_debug
+from config.model_str_builder import build_model_str
 from pathlib import Path
 
 parser=argparse.ArgumentParser()
@@ -77,7 +78,7 @@ CONFIG=config(lr_max=args.lr_max*1e-4, lr_start=1e-6, stepsize=3,lr_fine_tune=3e
               lr_min=1e-6, lr_exp_decay=args.lr_exp_decay, lr_fn='get_lrfn_fine_tune(CONFIG)',  #get_cycling_lrfn(CONFIG) #
               nfolds=4, l2_penalty=penalty, work_dir=args.work_dir,
               gs_work_dir=f'gs://kochetkov_kaggle_melanoma/{str(datetime.datetime.now())[:20]}_{args.work_dir}',
-              model_fn_str='tf.keras.applications.ResNet101(weights="imagenet", include_top=False)',#f"efficientnet.tfkeras.EfficientNet{model}(weights='imagenet', include_top=False)",#f"tf.keras.applications.EfficientNet{model}(weights='imagenet', include_top=False)",#
+              model_fn_str=build_model_str(model),
               ttas=ttas,
               val_ttas=3,
               use_metrics=True, dropout_rate=dropout_rate,
@@ -90,13 +91,6 @@ CONFIG=config(lr_max=args.lr_max*1e-4, lr_start=1e-6, stepsize=3,lr_fine_tune=3e
               epochs_full=epochs_full,epochs_fine_tune=epochs_fine_tune, fine_tune_last=-1, epochs_total=epochs_total,
               use_meta=False
               )
-
-#pretrained_model = tf.keras.applications.MobileNetV2(input_shape=[*IMAGE_SIZE, 3], include_top=False)
-#pretrained_model = tf.keras.applications.Xception(input_shape=[*IMAGE_SIZE, 3], include_top=False)
-#pretrained_model = tf.keras.applications.VGG16(weights='imagenet', include_top=False ,input_shape=[*IMAGE_SIZE, 3])
-#pretrained_model = tf.keras.applications.ResNet50(weights='imagenet', include_top=False, input_shape=[*IMAGE_SIZE, 3])
-#pretrained_model = tf.keras.applications.MobileNet(weights='imagenet', include_top=False, input_shape=[*IMAGE_SIZE, 3])
-# EfficientNet can be loaded through efficientnet.tfkeras library (https://github.com/qubvel/efficientnet)
 
 root=Path(os.path.split(__file__)[0])/'..'
 metrics_path=root/'metrics'

@@ -44,7 +44,7 @@ def calc_occlustion_map(output_modifier_fn, model, batch, offset, steps, config,
     dataset=tf.data.Dataset.from_tensor_slices(batch_list.dict)
     dataset=dataset.batch(config.batch_size_inference)
     predictions=model.predict(dataset)
-    print(predictions[:10])
+    #print(predictions[:10])
     finish = datetime.now()
     print(f'predict  ={finish - start}')
 
@@ -145,9 +145,9 @@ if __name__=="__main__":
     from config.runtime import get_scope
     import timeit
 
-    model=load_model('/mnt/850G/GIT/kagle_melanoma_tf_tpu/artifacts/trained_models/model0_0.h5')
-    validation_dataset_tta = get_test_dataset(['/mnt/850G/GIT/kagle_melanoma_tf_tpu/data/128x128/train00-2071.tfrec'], CONFIG)
+    model=load_model('/mnt/850G/GIT/kagle_melanoma_tf_tpu/artifacts/trained_models/model0_8.h5')
+    validation_dataset_tta = get_test_dataset(['/mnt/850G/GIT/kagle_melanoma_tf_tpu/data/256x256_triple/train00-2182.tfrec'], CONFIG)
 
     def stm():
-        save_interpretations(model, validation_dataset_tta, CONFIG.work_dir, CONFIG, average_samples=1, steps_list=(10,),N=1)
+        save_interpretations(model, validation_dataset_tta, CONFIG.work_dir, CONFIG)#, average_samples=1, steps_list=(10,),N=1)
     print(timeit.timeit(stm,number=1))
