@@ -118,7 +118,7 @@ for fold in range(CONFIG.nfolds):
         model_file_paths = save_callback_best_n.get_filepaths()
         model=load_model(model_file_paths[0])
 
-        '''
+
         print('predict test_val ...')
         print(f'befor {resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}')
 
@@ -164,7 +164,7 @@ for fold in range(CONFIG.nfolds):
         del test_dataset
         del test_dataset_tta
         gc.collect()
-        '''
+
 
     print('save interpretations ...')
     test_val_dataset = get_test_dataset(test_val_filenames, CONFIG)

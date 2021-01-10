@@ -7,9 +7,9 @@ import copy
 from dataset.dict_list import DictList
 from model.create_model import load_model
 from datetime import datetime
-from dataset.dataset_utils import remove_str
 
-from dataset.display_utils import get_high_low_loss_images, display_one_image
+
+from dataset.display_utils import get_high_low_loss_images
 
 def _batch_to_tensor(batch):
     return {k: tf.convert_to_tensor(np.expand_dims(v, axis=0)) for k, v in batch.items()}
@@ -36,8 +36,7 @@ def calc_occlustion_map(output_modifier_fn, model, batch, offset, steps, config,
                 batch_copy['image'] = image_copy
                 batch_list.append(batch_copy)
 
-    batch_list=DictList(batch_list)#[:2])
-
+    batch_list=DictList(batch_list)
 
     finish = datetime.now()
     print(f'build batch_list ={finish-start}')
