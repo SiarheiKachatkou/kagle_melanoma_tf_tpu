@@ -165,9 +165,9 @@ for fold in range(CONFIG.nfolds):
         gc.collect()
         print(f'fold {fold} finished')
 
-    test_val_dataset = get_test_dataset(test_val_filenames, CONFIG)
-    model = load_model(model_file_paths[0])
-    save_interpretations(model,test_val_dataset,os.path.join(CONFIG.work_dir, f'interpretation_{fold}'),CONFIG)
+        test_val_dataset = get_test_dataset(test_val_filenames, CONFIG)
+        model = load_model(model_file_paths[0])
+        save_interpretations(model,test_val_dataset,os.path.join(CONFIG.work_dir, f'interpretation_{fold}'),CONFIG)
 
     if (not is_local) and (not is_kaggle):
         if fold!=0:

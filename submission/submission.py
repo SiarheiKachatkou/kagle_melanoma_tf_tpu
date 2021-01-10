@@ -25,12 +25,11 @@ def make_submission_dataframe(test_dataset, model,repeats=1):
         names.append(input_dict['image_name'].numpy().decode('utf-8'))
         labs.append(label.numpy())
 
-    print(f'befor preds {resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}')
+    print(f'make_submission_dataframe: befor preds {resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}')
     test_dataset=test_dataset.repeat(repeats)
-    print(f'    after test_dataset {resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}')
-    model.reset_states()
+
     preds=model.predict(remove_str(test_dataset), verbose=True)
-    print(f'after preds {resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}')
+    print(f'make_submission_dataframe: after preds {resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}')
     preds=preds.astype(np.float)
 
     if preds.shape[-1]==2:
@@ -50,7 +49,6 @@ def make_submission_dataframe(test_dataset, model,repeats=1):
         df_submission = df_submission.sort_values(by='image_name')
         return df_submission
     else:
-        print(f'befor else {resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}')
         df_submissions = []
         dataset_length=len(preds)//repeats
         for r in range(repeats):
@@ -59,8 +57,7 @@ def make_submission_dataframe(test_dataset, model,repeats=1):
             df_submission = pd.DataFrame(data, columns=['image_name', 'target', 'labels'])
             df_submission = df_submission.sort_values(by='image_name')
             df_submissions.append(df_submission)
-        print(f'after else {resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}')
-    
+
     return df_submissions
 
 def aggregate_submissions(subms_list, mode='AVG'):
