@@ -22,6 +22,7 @@ def calc_occlustion_map(output_modifier_fn, model, batch, offset, steps, config,
 
     start=datetime.now()
     batch_list=[]
+    del batch['image_name'] #TPU does not support string data type in datasets
     for y in range(0, h, dh):
         for x in range(0, w, dw):
             for _ in range(average_samples):
@@ -44,7 +45,7 @@ def calc_occlustion_map(output_modifier_fn, model, batch, offset, steps, config,
     start=finish
     dataset=tf.data.Dataset.from_tensor_slices(batch_list.dict)
     dataset=dataset.batch(config.batch_size_inference)
-    predictions=model.predict(remove_str(dataset))
+    predictions=model.predict(dataset)
     #print(predictions[:10])
     finish = datetime.now()
     print(f'predict  ={finish - start}')
