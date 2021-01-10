@@ -65,13 +65,11 @@ def get_high_low_loss_images(dataset, N, loss_fn, max_batches):
     #TODO use model.predict(dataset) is is much faster
     for batch, labels in tqdm(dataset):
 
-        losses=loss_fn(batch,labels)
-
-        print(losses)
+        losses_numpy=loss_fn(batch,labels)
 
         batches_list.extend(batch)
         labels_list.extend(labels.numpy())
-        losses_list.extend(losses.numpy())
+        losses_list.extend(losses_numpy)
 
         batch_count+=1
         if max_batches is not None:
