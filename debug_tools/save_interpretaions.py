@@ -100,7 +100,7 @@ def save_interpretations(model,test_dataset,dst_dir, config, average_samples=10,
     def loss_fn(images, labels):
         outputs = model(images)
         losses = [model.loss([l],[o]) for o, l in zip(outputs, labels)]
-        losses = tf.concat(losses, axis=0)
+        losses = tf.stack(losses, axis=0)
         return losses
 
     start=datetime.now()

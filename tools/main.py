@@ -118,6 +118,7 @@ for fold in range(CONFIG.nfolds):
         model_file_paths = save_callback_best_n.get_filepaths()
         model=load_model(model_file_paths[0])
 
+        '''
         print('predict test_val ...')
         print(f'befor {resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}')
 
@@ -163,11 +164,15 @@ for fold in range(CONFIG.nfolds):
         del test_dataset
         del test_dataset_tta
         gc.collect()
-        print(f'fold {fold} finished')
+        '''
 
-        test_val_dataset = get_test_dataset(test_val_filenames, CONFIG)
-        model = load_model(model_file_paths[0])
-        save_interpretations(model,test_val_dataset,os.path.join(CONFIG.work_dir, f'interpretation_{fold}'),CONFIG)
+    print('save interpretations ...')
+    test_val_dataset = get_test_dataset(test_val_filenames, CONFIG)
+    save_interpretations(model, test_val_dataset, os.path.join(CONFIG.work_dir, f'interpretation_{fold}'), CONFIG)
+
+    print(f'fold {fold} finished')
+
+
 
     if (not is_local) and (not is_kaggle):
         if fold!=0:
