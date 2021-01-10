@@ -43,7 +43,7 @@ def calc_occlustion_map(output_modifier_fn, model, batch, offset, steps, config,
     start=finish
     dataset=tf.data.Dataset.from_tensor_slices(batch_list.dict)
     dataset=dataset.batch(config.batch_size_inference)
-    predictions=model.predict(dataset)
+    predictions=model.predict(remove_str(dataset))
     #print(predictions[:10])
     finish = datetime.now()
     print(f'predict  ={finish - start}')
