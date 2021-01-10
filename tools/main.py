@@ -45,7 +45,7 @@ preds_fold_avg=[]
 for fold in range(CONFIG.nfolds):
 
     print(f'fold={fold}')
-    model_dir_path=f'{CONFIG.work_dir}/../trained_models/'
+    model_dir_path=f'{CONFIG.work_dir}/../trained_models_{CONFIG.stage}/'
     if not os.path.exists(model_dir_path):
         os.makedirs(model_dir_path)
 
