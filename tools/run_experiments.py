@@ -34,7 +34,7 @@ def job(input_tuple):
         cmd_string+=' --'+k+'='+str(v)
     cmd_string+=f' --stage={i} --work_dir=artifacts/{i}'
 
-    subprocess.call(cmd_string)
+    subprocess.run(cmd_string)
 
 if is_local:
     num_procs=3
