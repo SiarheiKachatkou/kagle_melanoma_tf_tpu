@@ -1,9 +1,7 @@
 import matplotlib.pyplot as plt
 import pandas as pd
-import os
-import yaml
 import numpy as np
-from debug_tools.plot_utils import parse_model_fn,parse_config,plot_pde
+from debug_tools.pde.plot_utils import parse_model_fn,parse_config,plot_pde
 
 
 prefix='artifacts/val_quality_13_'
