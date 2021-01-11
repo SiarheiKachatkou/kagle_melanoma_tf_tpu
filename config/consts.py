@@ -7,7 +7,7 @@ from pathlib import Path
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 
-use_tpu_2 = False
+use_tpu_2 = True
 is_local = False
 is_kaggle = False
 is_debug = False

@@ -6,12 +6,12 @@ from itertools import product
 import subprocess
 from config.consts import is_local
 
-hparams={'backbone':['B0','B1'], 'dropout_rate':[0.005,0.01], 'lr_max':[5],
-         'lr_exp_decay':[0.8],'hair_prob':[0,0.05, 0.1],
+hparams={'backbone':['B1'], 'dropout_rate':[0], 'lr_max':[5],
+         'lr_exp_decay':[0.8],'hair_prob':[0,0.05],
          'microscope_prob':[0,0.05],
          'lr_warm_up_epochs':[5],
          'image_height':[256], 'batch_size':[256], 'save_best_n':[1],
-         'cut_out_prob':[0,0.1,0.2,0.3],'cut_mix_prob':[0,0.1,0.2,0.3]}
+         'cut_out_prob':[0,0.15],'cut_mix_prob':[0,0.15]}
 
 keys=list(hparams.keys())
 val_list=[hparams[k] for k in keys]
