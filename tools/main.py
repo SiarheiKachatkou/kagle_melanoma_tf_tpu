@@ -1,7 +1,4 @@
 import os
-import pickle
-import gc
-import resource
 import yaml
 import tensorflow as tf
 from tensorflow.keras.callbacks import ModelCheckpoint
@@ -23,6 +20,7 @@ from model.sparceauc import SparceAUC
 from submission import submit
 from model.history import join_history
 from debug_tools.save_interpretaions import save_interpretations
+from debug_tools.mem_utils import ru
 
 if not os.path.exists(CONFIG.work_dir):
     os.makedirs(CONFIG.work_dir)
@@ -97,9 +95,7 @@ for fold in range(CONFIG.nfolds):
                                 epochs=CONFIG.epochs_total, callbacks=callbacks)
             history = join_history(history, history_total)
 
-        print(f'befor del train_dataset { resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}')
-
-        print(f'after del train_dataset {resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}')
+        print(f'after fold training ru={ru()} Mb')
 
         print(history.history)
 
@@ -112,42 +108,31 @@ for fold in range(CONFIG.nfolds):
             display_training_curves(history.history['loss_no_reg'][1:], history.history['val_loss_no_reg'][1:], 'loss', 212)
             plt.savefig(os.path.join(CONFIG.work_dir, f'loss{fold}.png'))
 
-
-        print('reload model ...')
         model_file_paths = save_callback_best_n.get_filepaths()
         model=load_model(model_file_paths[0])
 
-
-        print('predict test_val ...')
-        print(f'befor {resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}')
+        print(f'predict test_val ... ru={ru()} Mb')
 
         subms=submission.make_submission_dataframe(get_validation_dataset_tta(test_val_filenames,CONFIG), model, repeats=CONFIG.ttas)
         preds_fold_avg.append(submission.aggregate_submissions(subms))
 
-        print(f'after {resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}')
-
-        print('reload models ...')
+        print(f'reload models ... ru={ru()} Mb')
         models = []
         for filepath in model_file_paths:
             m = load_model(filepath)
             m.trainable = False
             models.append(m)
 
-        print('predict val ...')
-        print(f'befor {resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}')
+        print(f'predict val ...  ru={ru()} Mb')
+
         validation_dataset = get_validation_dataset(val_filenames_folds[fold],CONFIG)
         submission.calc_and_save_submissions(CONFIG, model, f'val_{fold}', validation_dataset, validation_dataset_tta,
                                              CONFIG.ttas)
         submission.calc_and_save_submissions(CONFIG, models, f'val_le_{fold}', validation_dataset,
                                              validation_dataset_tta,
                                              CONFIG.ttas)
-        print(f'after {resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}')
 
-
-
-        print(f'after {resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}')
-
-        print('predict test ...')
+        print(f'predict test ... ru={ru()} Mb')
         test_dataset = get_test_dataset(test_filenames,CONFIG)
         test_dataset_tta = get_test_dataset_tta(test_filenames,CONFIG)
 
@@ -157,13 +142,11 @@ for fold in range(CONFIG.nfolds):
                                              test_dataset_tta, CONFIG.ttas)
 
 
-
-
-    print('save interpretations ...')
+    print(f'save interpretations ... ru={ru()} Mb')
     test_val_dataset = get_test_dataset(test_val_filenames, CONFIG)
     save_interpretations(model, test_val_dataset, os.path.join(CONFIG.work_dir, f'interpretation_{fold}'), CONFIG)
 
-    print(f'fold {fold} finished')
+    print(f'fold {fold} finished  ru={ru()} Mb')
 
 
 
