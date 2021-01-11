@@ -3,6 +3,7 @@ import random
 import multiprocessing as mp
 from tqdm import tqdm
 from itertools import product
+import subprocess
 from config.consts import is_local
 
 hparams={'backbone':['B0','B1'], 'dropout_rate':[0.005,0.001], 'lr_max':[1, 0.1, 0.5], 'lr_exp_decay':[0.8,0.5],'hair_prob':[0,0.05, 0.1],'microscope_prob':[0,0.01],'lr_warm_up_epochs':[2,6,8],'image_height':[256], 'batch_size':[64], 'save_best_n':[1,2,4]}
@@ -11,7 +12,7 @@ keys=list(hparams.keys())
 val_list=[hparams[k] for k in keys]
 args=list(product(*val_list))
 random.shuffle(args)
-args=args[:3]
+args=args[:2]
 
 def get_gpu_available():
     worker_id=mp.current_process().name
@@ -24,12 +25,16 @@ def get_gpu_available():
 
 def job(input_tuple):
     i, args_list=input_tuple
-    cmd_string='python3 tools/main.py --gpus='+str(get_gpu_available())
+    cmd_string='python3 tools/main.py'
+
+    if is_local:
+        cmd_string+=' --gpus='+str(get_gpu_available())
+
     for k,v in zip(keys,args_list):
         cmd_string+=' --'+k+'='+str(v)
     cmd_string+=f' --stage={i} --work_dir=artifacts/{i}'
 
-    os.system(cmd_string)
+    subprocess.call(cmd_string)
 
 if is_local:
     num_procs=3

@@ -18,6 +18,9 @@ exit 0
 git clone https://github.com/SiarheiKachatkou/kagle_melanoma_tf_tpu.git &&
 cd kagle_melanoma_tf_tpu &&
 tools/install.sh &&
+export PYTHONPATH=$PWD &&
+python3 tools/run_experiments.py
+
 dvc repro resnet101
 
 
