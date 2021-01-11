@@ -24,7 +24,7 @@ def get_gpu_available():
 
 def job(input_tuple):
     i, args_list=input_tuple
-    cmd_string='python tools/main.py --gpus='+str(get_gpu_available())
+    cmd_string='python3 tools/main.py --gpus='+str(get_gpu_available())
     for k,v in zip(keys,args_list):
         cmd_string+=' --'+k+'='+str(v)
     cmd_string+=f' --stage={i} --work_dir=artifacts/{i}'

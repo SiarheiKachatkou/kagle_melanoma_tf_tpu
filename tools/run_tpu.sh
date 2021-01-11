@@ -15,7 +15,7 @@ ctpu up --project=${PROJECT_ID} \
 
 exit 0
 
-git clone -b save_interpretations https://github.com/SiarheiKachatkou/kagle_melanoma_tf_tpu.git &&
+git clone https://github.com/SiarheiKachatkou/kagle_melanoma_tf_tpu.git &&
 cd kagle_melanoma_tf_tpu &&
 tools/install.sh &&
 dvc repro resnet101
