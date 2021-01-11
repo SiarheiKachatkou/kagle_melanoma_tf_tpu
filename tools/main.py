@@ -98,8 +98,7 @@ for fold in range(CONFIG.nfolds):
             history = join_history(history, history_total)
 
         print(f'befor del train_dataset { resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}')
-        del training_dataset
-        gc.collect()
+
         print(f'after del train_dataset {resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}')
 
         print(history.history)
@@ -125,7 +124,6 @@ for fold in range(CONFIG.nfolds):
         subms=submission.make_submission_dataframe(get_validation_dataset_tta(test_val_filenames,CONFIG), model, repeats=CONFIG.ttas)
         preds_fold_avg.append(submission.aggregate_submissions(subms))
 
-        gc.collect()
         print(f'after {resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}')
 
         print('reload models ...')
@@ -146,9 +144,7 @@ for fold in range(CONFIG.nfolds):
         print(f'after {resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}')
 
 
-        del validation_dataset
-        del validation_dataset_tta
-        gc.collect()
+
         print(f'after {resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}')
 
         print('predict test ...')
@@ -160,10 +156,7 @@ for fold in range(CONFIG.nfolds):
         submission.calc_and_save_submissions(CONFIG, models, f'test_le_{fold}', test_dataset,
                                              test_dataset_tta, CONFIG.ttas)
 
-        del models
-        del test_dataset
-        del test_dataset_tta
-        gc.collect()
+
 
 
     print('save interpretations ...')
@@ -179,7 +172,7 @@ for fold in range(CONFIG.nfolds):
             subprocess.check_call(['gsutil', 'rm', '-r', CONFIG.gs_work_dir])
         subprocess.check_call(['gsutil', '-m', 'cp', '-r', CONFIG.work_dir,CONFIG.gs_work_dir])
 
-    gc.collect()
+
 
 val_avg_tta_le_auc, val_avg_tta_auc = submit.main(CONFIG.nfolds,CONFIG.work_dir)
 test_avg_tta_auc = submit.calc_auc(submission.aggregate_submissions(preds_fold_avg))
