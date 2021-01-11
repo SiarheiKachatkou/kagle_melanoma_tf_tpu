@@ -1,7 +1,4 @@
 import matplotlib.pyplot as plt
-import pandas as pd
-import os
-import yaml
 import numpy as np
 
 
@@ -40,17 +37,3 @@ def plot_pde(val,x_key,y_key):
     else:
         _plot_pde1(val, x_key, y_key)
 
-
-def parse_config(name, yaml_ignore_keys,  yaml_parsers_fns):
-    with open(os.path.join(name,'config.yaml'),'rt') as file:
-        config=yaml.load(file)
-    vals={}
-    for k,f in config.items():
-        if k in yaml_ignore_keys:
-            continue
-        f=yaml_parsers_fns[k] if k in yaml_parsers_fns else None
-        v=config[k]
-        if f is not None:
-            v=f(v)
-        vals[k]=v
-    return vals
