@@ -24,6 +24,9 @@ parser.add_argument('--save_best_n',type=int,default=1)
 parser.add_argument('--focal_loss_gamma',type=float,default=4)
 parser.add_argument('--focal_loss_alpha',type=float,default=0.5)
 parser.add_argument('--oversample_mult',type=int,default=1)
+parser.add_argument('--cut_out_prob',type=float,default=0.2)
+parser.add_argument('--cut_mix_prob',type=float,default=0.2)
+parser.add_argument('--val_ttas',type=int,default=1)
 
 args=parser.parse_args()
 
@@ -81,12 +84,13 @@ CONFIG=config(lr_max=args.lr_max*1e-4, lr_start=1e-6, stepsize=3,lr_fine_tune=3e
               gs_work_dir=f'gs://kochetkov_kaggle_melanoma/{str(datetime.datetime.now())[:20]}_{args.work_dir}',
               model_fn_str=build_model_str(model),
               ttas=ttas,
-              val_ttas=3,
+              val_ttas=args.val_ttas,
               use_metrics=True, dropout_rate=dropout_rate,
               save_best_n=args.save_best_n,
               oversample_mult=args.oversample_mult,
               focal_loss_gamma=focal_loss_gamma, focal_loss_alpha=focal_loss_alpha,
-              hair_prob=hair_prob, microscope_prob=microscope_prob,cut_out_prob=0.2,cut_mix_prob=0.2,
+              hair_prob=hair_prob, microscope_prob=microscope_prob,
+              cut_out_prob=args.cut_out_prob,cut_mix_prob=args.cut_mix_prob,
               batch_size=BATCH_SIZE, batch_size_inference=BATCH_SIZE * BATCH_SIZE_INCREASE_FOR_INFERENCE,
               image_height=image_height,
               epochs_full=epochs_full,epochs_fine_tune=epochs_fine_tune, fine_tune_last=-1, epochs_total=epochs_total,
