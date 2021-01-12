@@ -7,15 +7,14 @@ from debug_tools.pde.parse_log import parse_logs
 
 yaml_parsers_fns={'model_fn_str':parse_model_fn}
 yaml_ignore_keys={'gs_work_dir','work_dir','lr_fn'}
-target_key='val_avg_tta_auc'
-features = [('hair_prob','model_fn_str'),('microscope_prob','model_fn_str'),
-            ('lr_warm_up_epochs','lr_max'),
-            ('model_fn_str','dropout_rate')]
-features = ['hair_prob','microscope_prob',
-            'lr_warm_up_epochs','lr_max',
-            'dropout_rate']
+target_key='test_avg_tta_auc'
+
+
+features = [('cut_out_prob','cut_mix_prob'),('cut_out_prob','model_fn_str'),('cut_mix_prob','model_fn_str'),'model_fn_str','hair_prob','microscope_prob',
+            'dropout_rate','cut_out_prob','cut_mix_prob','image_height']
 
 df=parse_logs('metrics/metrics_*.txt','artifacts',yaml_ignore_keys,yaml_parsers_fns)
+
 
 rows=int(np.sqrt(len(features)))
 cols=len(features)//rows+1

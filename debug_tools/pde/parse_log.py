@@ -36,6 +36,11 @@ def parse_config(name, yaml_ignore_keys,  yaml_parsers_fns):
         v=config[k]
         if f is not None:
             v=f(v)
+        else:
+            try:
+                v=float(v)
+            except:
+                pass
         vals[k]=v
     return vals
 
@@ -56,7 +61,7 @@ def add_values_from_configs(val,yaml_ignore_keys, yaml_parsers_fns):
 def parse_logs(metric_path_pattern, artifacts_root, yaml_ignore_keys,yaml_parsers_fns):
     df=parse_metrics(metric_path_pattern)
     def _metric_name_to_artifact(metric_path):
-        r=re.findall('.*_([0-9]).txt',os.path.split(metric_path)[1])
+        r=re.findall('.*_([0-9]*).txt',os.path.split(metric_path)[1])
         return os.path.join(artifacts_root,r[0])
 
     df['name'] = df['name'].apply(_metric_name_to_artifact)
