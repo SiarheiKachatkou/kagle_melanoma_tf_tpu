@@ -75,6 +75,9 @@ def get_high_low_loss_images(dataset, N, loss_fn, max_batches):
         if max_batches is not None:
             if batch_count>max_batches:
                 break
+
+    zero_labels_inds=np.where(np.equal(labels_list,0))
+
     args=np.argsort(losses_list)
 
     low_loss_batches = [batches_list[i] for i in args[:N]]

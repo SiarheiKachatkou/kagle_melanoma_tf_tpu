@@ -143,7 +143,7 @@ for fold in range(CONFIG.nfolds):
 
 
     print(f'save interpretations ... ru={ru()} Mb')
-    test_val_dataset = get_test_dataset(test_val_filenames, CONFIG)
+    test_val_dataset = get_validation_dataset(test_val_filenames, CONFIG,is_augment=False)
     save_interpretations(model, test_val_dataset, os.path.join(CONFIG.work_dir, f'interpretation_{fold}'), CONFIG)
 
     print(f'fold {fold} finished  ru={ru()} Mb')

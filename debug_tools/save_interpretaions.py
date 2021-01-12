@@ -142,13 +142,13 @@ def save_interpretations(model,test_dataset,dst_dir, config, average_samples=10,
     plt.savefig(os.path.join(dst_dir,'high_low_loss.png'))
 
 if __name__=="__main__":
-    from dataset.dataset_utils import *
+    from dataset.dataset_utils import get_validation_dataset
     from config.config import CONFIG
     from config.runtime import get_scope
     import timeit
 
     model=load_model('/mnt/850G/GIT/kagle_melanoma_tf_tpu/artifacts/trained_models/model0_0.h5')
-    validation_dataset_tta = get_test_dataset(['/mnt/850G/GIT/kagle_melanoma_tf_tpu/data/256x256_triple/train00-2182.tfrec','/mnt/850G/GIT/kagle_melanoma_tf_tpu/data/256x256_triple/train01-2185.tfrec'], CONFIG)
+    validation_dataset_tta = get_validation_dataset(['/mnt/850G/GIT/kagle_melanoma_tf_tpu/data/256x256_triple/train00-2182.tfrec','/mnt/850G/GIT/kagle_melanoma_tf_tpu/data/256x256_triple/train01-2185.tfrec'], CONFIG, is_augment=False)
 
     def stm():
         save_interpretations(model, validation_dataset_tta, CONFIG.work_dir, CONFIG)#, average_samples=1, steps_list=(10,),N=1)
