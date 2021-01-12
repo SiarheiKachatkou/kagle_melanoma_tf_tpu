@@ -92,11 +92,46 @@ def normalize(img,to_gray=False):
     else:
         return rgb
 
+def _save_occlusion_show(N, high_loss_triplet, low_loss_triplet, config, model, average_samples,steps_list, dst_img_path):
+    subplot = [2, N, 1]
+    plt.figure(figsize=(13, 13))
+
+    (high_loss_images, high_loss_labels, high_loss_loss), (
+    low_loss_images, low_loss_labels, low_loss_loss) = high_loss_triplet, low_loss_triplet
+    batches = high_loss_images + low_loss_images
+    labels = high_loss_labels + low_loss_labels
+    losses = high_loss_loss + low_loss_loss
+
+    def output_fn(output):
+        return output[1]
+
+    saliency_maps = [calc_occlusion_map_multisace(output_fn, model, batch, config, average_samples=average_samples,
+                                                  steps_list=steps_list) for batch in batches]
+
+    red = True
+    for i, batch in enumerate(batches):
+
+        title = str(labels[i]) + ' ' + str(round(losses[i], 3))
+        if i >= N:
+            red = False
+
+        saliency_map = normalize(saliency_maps[i])
+        plt.subplot(*subplot)
+        plt.axis('off')
+        image = batch['image']
+        plt.imshow(normalize(image, to_gray=True))
+        plt.imshow(saliency_map, cmap='jet', alpha=0.2)
+        plt.title(title, fontsize=16, color='red' if red else 'black')
+        subplot[2] += 1
+
+    plt.subplots_adjust(wspace=0.1, hspace=0.1)
+
+    plt.savefig(dst_img_path)
+
 def save_interpretations(model,test_dataset,dst_dir, config, average_samples=10, steps_list=(3,), N=3):
     if not os.path.exists(dst_dir):
         os.makedirs(dst_dir)
 
-    subplot = [2,N,1]
 
     def loss_fn(images, labels):
         outputs = model(images)
@@ -106,40 +141,15 @@ def save_interpretations(model,test_dataset,dst_dir, config, average_samples=10,
 
     start=datetime.now()
     print(f'start get_high_low_loss_images')
-    (high_loss_images, high_loss_labels, high_loss_loss), (low_loss_images, low_loss_labels, low_loss_loss) = get_high_low_loss_images(test_dataset, N, loss_fn, max_batches=None)
+    high_loss_triplet,low_loss_triplet,zero_label_triplet,one_label_triplet = get_high_low_loss_images(test_dataset, N, loss_fn, max_batches=None)
     finish=datetime.now()
     print(f'finished get_high_low_loss_images {finish-start}')
-    plt.figure(figsize=(13, 13))
 
-    batches=high_loss_images+low_loss_images
-    labels=high_loss_labels+low_loss_labels
-    losses = high_loss_loss + low_loss_loss
+    _save_occlusion_show(N, high_loss_triplet, low_loss_triplet, config, model, average_samples,steps_list,
+                         os.path.join(dst_dir, 'high_low_loss.png'))
 
-    def output_fn(output):
-        return output[1]
-
-    saliency_maps = [calc_occlusion_map_multisace(output_fn, model, batch,config, average_samples=average_samples, steps_list=steps_list) for batch in batches]
-
-    red=True
-    for i, batch in enumerate(batches):
-
-        title = str(labels[i])+' '+str(round(losses[i],3))
-        if i>=N:
-            red=False
-
-        saliency_map = normalize(saliency_maps[i])
-        plt.subplot(*subplot)
-        plt.axis('off')
-        image=batch['image']
-        plt.imshow(normalize(image,to_gray=True))
-        plt.imshow(saliency_map, cmap='jet', alpha=0.2)
-        plt.title(title, fontsize=16, color='red' if red else 'black')
-        subplot[2]+=1
-
-
-    plt.subplots_adjust(wspace=0.1, hspace=0.1)
-
-    plt.savefig(os.path.join(dst_dir,'high_low_loss.png'))
+    _save_occlusion_show(N, zero_label_triplet,one_label_triplet, config, model, average_samples, steps_list,
+                         os.path.join(dst_dir, 'inerpret_std_images.png'))
 
 if __name__=="__main__":
     from dataset.dataset_utils import get_validation_dataset

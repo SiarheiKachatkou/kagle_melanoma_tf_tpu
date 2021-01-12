@@ -75,22 +75,21 @@ def get_high_low_loss_images(dataset, N, loss_fn, max_batches):
         if max_batches is not None:
             if batch_count>max_batches:
                 break
+    args = np.argsort(losses_list)
 
-    zero_labels_inds=np.where(np.equal(labels_list,0))
+    zero_labels_inds=np.where(np.equal(labels_list,0))[0][:N]
+    one_labels_inds = np.where(np.equal(labels_list, 1))[0][:N]
+    low_loss_inds=args[:N]
+    args = args[::-1]
+    high_loss_inds=args[:N]
 
-    args=np.argsort(losses_list)
+    def _inds_to_triplet(inds):
+        batches = [batches_list[i] for i in inds]
+        labels = [labels_list[i] for i in inds]
+        losses = [losses_list[i] for i in inds]
+        return (batches,labels,losses)
 
-    low_loss_batches = [batches_list[i] for i in args[:N]]
-    low_loss_labels = [labels_list[i] for i in args[:N]]
-    low_loss_loss = [losses_list[i] for i in args[:N]]
-
-    args=args[::-1]
-
-    high_loss_batches = [batches_list[i] for i in args[:N]]
-    high_loss_labels = [labels_list[i] for i in args[:N]]
-    high_loss_loss = [losses_list[i] for i in args[:N]]
-
-    return (high_loss_batches, high_loss_labels, high_loss_loss), (low_loss_batches,low_loss_labels, low_loss_loss)
+    return _inds_to_triplet(high_loss_inds), _inds_to_triplet(low_loss_inds),_inds_to_triplet(zero_labels_inds),_inds_to_triplet(one_labels_inds)
 
 
 def display_9_images_from_dataset(dataset, show_zero_labels, loss_fn=None):
