@@ -111,6 +111,10 @@ for fold in range(CONFIG.nfolds):
         model_file_paths = save_callback_best_n.get_filepaths()
         model=load_model(model_file_paths[0])
 
+        print(f'save interpretations ... ru={ru()} Mb')
+        test_val_dataset = get_validation_dataset(test_val_filenames, CONFIG, is_augment=False)
+        save_interpretations(model, test_val_dataset, os.path.join(CONFIG.work_dir, f'interpretation_{fold}'), CONFIG)
+
         print(f'predict test_val ... ru={ru()} Mb')
 
         subms=submission.make_submission_dataframe(get_validation_dataset_tta(test_val_filenames,CONFIG), model, repeats=CONFIG.ttas)
@@ -142,9 +146,6 @@ for fold in range(CONFIG.nfolds):
                                              test_dataset_tta, CONFIG.ttas)
 
 
-    print(f'save interpretations ... ru={ru()} Mb')
-    test_val_dataset = get_validation_dataset(test_val_filenames, CONFIG,is_augment=False)
-    save_interpretations(model, test_val_dataset, os.path.join(CONFIG.work_dir, f'interpretation_{fold}'), CONFIG)
 
     print(f'fold {fold} finished  ru={ru()} Mb')
 
