@@ -16,7 +16,7 @@ hparams={'backbone':['B6'], 'dropout_rate':[0], 'lr_max':[5],
 keys=list(hparams.keys())
 val_list=[hparams[k] for k in keys]
 args=list(product(*val_list))
-args=args[:1]
+#args=args[:1]
 
 def get_gpu_available():
     worker_id=mp.current_process().name

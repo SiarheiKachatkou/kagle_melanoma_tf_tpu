@@ -115,11 +115,6 @@ for fold in range(CONFIG.nfolds):
         test_val_dataset = get_validation_dataset(test_val_filenames, CONFIG, is_augment=False)
         save_interpretations(model, test_val_dataset, os.path.join(CONFIG.work_dir, f'interpretation_{fold}'), CONFIG)
 
-        print(f'predict test_val ... ru={ru()} Mb')
-
-        subms=submission.make_submission_dataframe(get_validation_dataset_tta(test_val_filenames,CONFIG), model, repeats=CONFIG.ttas)
-        preds_fold_avg.append(submission.aggregate_submissions(subms))
-
         print(f'reload models ... ru={ru()} Mb')
         models = []
         for filepath in model_file_paths:
@@ -149,7 +144,11 @@ for fold in range(CONFIG.nfolds):
 
     print(f'fold {fold} finished  ru={ru()} Mb')
 
+    print(f'predict test_val ... ru={ru()} Mb')
 
+    subms = submission.make_submission_dataframe(get_validation_dataset_tta(test_val_filenames, CONFIG), model,
+                                                 repeats=CONFIG.ttas)
+    preds_fold_avg.append(submission.aggregate_submissions(subms))
 
     if (not is_local) and (not is_kaggle):
         if fold!=0:
