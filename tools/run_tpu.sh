@@ -10,7 +10,7 @@ ctpu up --project=${PROJECT_ID} \
  --tf-version=2.2 \
  --tpu-size=v${TPU}-8 \
  --name=tpu-melanoma-${TPU} \
- --machine-type=n1-standard-8
+ --machine-type=n1-standard-16
  #--preemptible
 
 exit 0

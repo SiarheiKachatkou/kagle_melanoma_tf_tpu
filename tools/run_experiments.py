@@ -6,11 +6,11 @@ from itertools import product
 import subprocess
 from config.consts import is_local
 
-hparams={'backbone':['B3'], 'dropout_rate':[0], 'lr_max':[5],
+hparams={'backbone':['B0'], 'dropout_rate':[0], 'lr_max':[5],
          'lr_exp_decay':[0.8],'hair_prob':[0,0.05],
          'microscope_prob':[0],
          'lr_warm_up_epochs':[5],
-         'image_height':[384], 'batch_size':[128], 'save_best_n':[1],
+         'image_height':[256], 'batch_size':[128], 'save_best_n':[1],
          'cut_out_prob':[0,0.15],'cut_mix_prob':[0,0.05,0.1]}
 
 keys=list(hparams.keys())
@@ -32,7 +32,7 @@ def job(input_tuple):
     cmd_string='python3 tools/main.py'
 
     if is_local:
-        cmd_string+=' --gpus='+str(get_gpu_available())
+        pass #cmd_string+=' --gpus='+str(get_gpu_available())
 
     for k,v in zip(keys,args_list):
         cmd_string+=' --'+k+'='+str(v)
@@ -41,7 +41,7 @@ def job(input_tuple):
     os.system(cmd_string)
 
 if is_local:
-    num_procs=2
+    num_procs=1
     pool=mp.Pool(num_procs)
     map_fn=pool.imap_unordered
 else:
