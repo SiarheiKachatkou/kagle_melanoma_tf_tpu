@@ -148,6 +148,7 @@ if __name__=="__main__":
     from dataset.dataset_utils import get_validation_dataset
     from config.config import CONFIG
     from config.runtime import get_scope
+    from dataset.dataset_utils import remove_str
     import timeit
 
     model=load_model('/mnt/850G/GIT/kagle_melanoma_tf_tpu/artifacts/trained_models_0/model0_6.h5')

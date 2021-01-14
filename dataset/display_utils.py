@@ -6,6 +6,7 @@ from config.consts import CLASSES
 import cv2
 import os
 from dataset.dict_list import DictList
+from dataset.dataset_utils import remove_str
 from tqdm import tqdm
 from augmentations.augmentations import cut_mix
 
@@ -63,7 +64,8 @@ def get_high_low_loss_images(model, dataset, N, max_batches):
     losses_list = []
 
 
-    preds=model.predict(dataset)
+    preds=model.predict(remove_str(dataset))
+
     def loss_fn(outputs, labels):
         losses = model.loss([labels],[outputs])
         losses = losses.numpy().astype(np.float32)
