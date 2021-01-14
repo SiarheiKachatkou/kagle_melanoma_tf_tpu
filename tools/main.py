@@ -110,7 +110,7 @@ for fold in range(CONFIG.nfolds):
 
         model_file_paths = save_callback_best_n.get_filepaths()
         model=load_model(model_file_paths[0])
-        '''
+
         print(f'reload models ... ru={ru()} Mb')
         models = []
         for filepath in model_file_paths:
@@ -135,7 +135,7 @@ for fold in range(CONFIG.nfolds):
 
         submission.calc_and_save_submissions(CONFIG, models, f'test_le_{fold}', test_dataset,
                                              test_dataset_tta, CONFIG.ttas)
-        '''
+
     print(f'save interpretations ... ru={ru()} Mb')
     test_val_dataset = get_validation_dataset(test_val_filenames, CONFIG, is_augment=False)
     save_interpretations(model, test_val_dataset, os.path.join(CONFIG.work_dir, f'interpretation_{fold}'), CONFIG)
