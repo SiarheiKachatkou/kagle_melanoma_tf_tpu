@@ -64,7 +64,7 @@ def get_high_low_loss_images(model, dataset, N, max_batches):
     losses_list = []
 
 
-    preds=model.predict(remove_str(dataset))
+    preds=model.predict(remove_str(dataset)).numpy().astype(np.float32)
 
     def loss_fn(outputs, labels):
         losses = model.loss([labels],[outputs])
