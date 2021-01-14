@@ -108,12 +108,10 @@ def _save_occlusion_show(N, high_loss_triplet, low_loss_triplet, config, model, 
     saliency_maps = [calc_occlusion_map_multisace(output_fn, model, batch, config, average_samples=average_samples,
                                                   steps_list=steps_list) for batch in batches]
 
-    red = True
+
     for i, batch in enumerate(batches):
 
         title = str(labels[i]) + ' ' + str(round(losses[i], 3))
-        if i >= N:
-            red = False
 
         saliency_map = normalize(saliency_maps[i])
         plt.subplot(*subplot)
@@ -121,7 +119,7 @@ def _save_occlusion_show(N, high_loss_triplet, low_loss_triplet, config, model, 
         image = batch['image']
         plt.imshow(normalize(image, to_gray=True))
         plt.imshow(saliency_map, cmap='jet', alpha=0.2)
-        plt.title(title, fontsize=16, color='red' if red else 'black')
+        plt.title(title, fontsize=16, color='black')
         subplot[2] += 1
 
     plt.subplots_adjust(wspace=0.1, hspace=0.1)
@@ -133,15 +131,10 @@ def save_interpretations(model,test_dataset,dst_dir, config, average_samples=10,
         os.makedirs(dst_dir)
 
 
-    def loss_fn(images, labels):
-        outputs = model(images)
-        losses = [model.loss([l],[o]) for o, l in zip(outputs, labels)]
-        losses = tf.stack(losses, axis=0).numpy().astype(np.float32)
-        return losses
 
     start=datetime.now()
     print(f'start get_high_low_loss_images')
-    high_loss_triplet,low_loss_triplet,zero_label_triplet,one_label_triplet = get_high_low_loss_images(test_dataset, N, loss_fn, max_batches=None)
+    high_loss_triplet,low_loss_triplet,zero_label_triplet,one_label_triplet = get_high_low_loss_images(model, test_dataset, N, max_batches=None)
     finish=datetime.now()
     print(f'finished get_high_low_loss_images {finish-start}')
 
@@ -157,8 +150,8 @@ if __name__=="__main__":
     from config.runtime import get_scope
     import timeit
 
-    model=load_model('/mnt/850G/GIT/kagle_melanoma_tf_tpu/artifacts/trained_models/model0_0.h5')
-    validation_dataset_tta = get_validation_dataset(['/mnt/850G/GIT/kagle_melanoma_tf_tpu/data/256x256_triple/train00-2182.tfrec','/mnt/850G/GIT/kagle_melanoma_tf_tpu/data/256x256_triple/train01-2185.tfrec'], CONFIG, is_augment=False)
+    model=load_model('/mnt/850G/GIT/kagle_melanoma_tf_tpu/artifacts/trained_models_0/model0_6.h5')
+    validation_dataset_tta = get_validation_dataset(['/mnt/850G/GIT/kagle_melanoma_tf_tpu/data/384x384_triple_stratified/train00-2182.tfrec','/mnt/850G/GIT/kagle_melanoma_tf_tpu/data/384x384_triple_stratified/train01-2185.tfrec'], CONFIG, is_augment=False)
 
     def stm():
         save_interpretations(model, validation_dataset_tta, CONFIG.work_dir, CONFIG)#, average_samples=1, steps_list=(10,),N=1)

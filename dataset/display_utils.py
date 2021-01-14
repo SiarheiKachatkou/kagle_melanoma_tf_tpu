@@ -1,3 +1,4 @@
+import tensorflow as tf
 from functools import partial
 import matplotlib.pyplot as plt
 import numpy as np
@@ -56,25 +57,25 @@ def display_one_image(image, title, subplot, red=False):
         return [subplot[0],subplot[1],subplot[2]+1]
 
 
-def get_high_low_loss_images(dataset, N, loss_fn, max_batches):
+def get_high_low_loss_images(model, dataset, N, max_batches):
 
-    batches_list = DictList()
     labels_list = []
     losses_list = []
-    batch_count=0
-    #TODO use model.predict(dataset) is is much faster
-    for batch, labels in tqdm(dataset):
 
-        losses_numpy=loss_fn(batch,labels)
 
-        batches_list.extend(batch)
-        labels_list.extend(labels.numpy())
-        losses_list.extend(losses_numpy)
+    preds=model.predict(dataset)
+    def loss_fn(outputs, labels):
+        losses = model.loss([labels],[outputs])
+        losses = losses.numpy().astype(np.float32)
+        return losses
 
-        batch_count+=1
-        if max_batches is not None:
-            if batch_count>max_batches:
-                break
+    unbatched_dataset=dataset.unbatch()
+    for pred, (_, labels) in tqdm(zip(preds,unbatched_dataset)):
+
+        losses_numpy=loss_fn(pred,labels)
+        losses_list.append(losses_numpy)
+        labels_list.append(labels.numpy().astype(np.float32))
+
     args = np.argsort(losses_list)
 
     zero_labels_inds=np.where(np.equal(labels_list,0))[0][:N]
@@ -83,8 +84,16 @@ def get_high_low_loss_images(dataset, N, loss_fn, max_batches):
     args = args[::-1]
     high_loss_inds=args[:N]
 
+    batches_dict={}
+    all_inds=set(list(zero_labels_inds)+list(one_labels_inds)+list(low_loss_inds)+list(high_loss_inds))
+    for i, (batch, _) in tqdm(enumerate(unbatched_dataset)):
+        if i in all_inds:
+            batches_dict[i]=batch
+
     def _inds_to_triplet(inds):
-        batches = [batches_list[i] for i in inds]
+        batches = [batches_dict[i] for i in inds]
+        for b in batches:
+            b['image']=b['image'].numpy().astype(np.float32)
         labels = [labels_list[i] for i in inds]
         losses = [losses_list[i] for i in inds]
         return (batches,labels,losses)
