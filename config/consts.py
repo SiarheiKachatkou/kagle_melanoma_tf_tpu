@@ -37,7 +37,7 @@ if is_local:
                 256: {'new': root/'data/256x256_triple/train*.tfrec', 'old': ''},
                 #128: {'new': 'data/128/train*.tfrec', 'old': ''},
                 #384: {'new': 'data/isic2020-384-colornormed-tfrecord/train*.tfrec', 'old': ''},
-                384: {'new': 'data/384_triple_2020_with_labels/train*.tfrec', 'old': ''},
+                384: {'new': 'data/384x384_triple_stratified/train*.tfrec', 'old': 'data/384x384_old/train*.tfrec'},
                 768: {'new': 'data/dataset_768/train*.tfrec', 'old': ''}
     }
 
