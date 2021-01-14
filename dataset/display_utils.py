@@ -95,7 +95,8 @@ def get_high_low_loss_images(model, dataset, N, max_batches):
     def _inds_to_triplet(inds):
         batches = [batches_dict[i] for i in inds]
         for b in batches:
-            b['image']=b['image'].numpy().astype(np.float32)
+            if not isinstance(b['image'],np.ndarray):
+                b['image']=b['image'].numpy().astype(np.float32)
         labels = [labels_list[i] for i in inds]
         losses = [losses_list[i] for i in inds]
         return (batches,labels,losses)
