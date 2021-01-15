@@ -92,3 +92,50 @@ b0:
   - path: metrics/metrics_b0.txt
     md5: 3d9a54533a74c5fdee3f7c2e3df06469
     size: 123
+resnet50:
+  cmd: export LD_LIBRARY_PATH=/usr/local/cuda-10.2/lib64 && export PYTHONPATH=$PWD
+    && python3 tools/main.py --work_dir=artifacts/resnet50 --backbone=ResNet50 --dropout_rate=0.1
+    --lr_max=1 --lr_exp_decay=0.7 --focal_loss_gamma=4 --focal_loss_alpha=0.8 --hair_prob=0.1
+    --microscope_prob=0.01 --lr_warm_up_epochs=5 --image_height=384 --batch_size=128
+    --stage=resnet50 --save_best_n=3 --epochs_full=20
+  deps:
+  - path: augmentations
+    md5: b67c6dcabdb2a030ca8c1a8213cc67cb.dir
+    size: 25670
+    nfiles: 9
+  - path: config
+    md5: a87405f27ae5ebd355a1c591a21d91a2.dir
+    size: 17166
+    nfiles: 8
+  - path: data
+    md5: 6ffbaaad7b4ac6e1afabed19a80b2560.dir
+    size: 0
+    nfiles: 1
+  - path: dataset
+    md5: 7cf44fb1bbf0366380b49599aa51a38a.dir
+    size: 40597
+    nfiles: 10
+  - path: debug_tools
+    md5: 494b0ac1493c8e072fadf968d7b0ae33.dir
+    size: 21757
+    nfiles: 14
+  - path: model
+    md5: d3e0c7c372fc3bb1b94dc3025178c95b.dir
+    size: 26235
+    nfiles: 14
+  - path: submission
+    md5: 238cd89752c25ab1f30744a1ea5455c2.dir
+    size: 15555
+    nfiles: 6
+  - path: tools
+    md5: 96a1f024bd9b01c64aaf66ee85b8998c.dir
+    size: 13903
+    nfiles: 8
+  outs:
+  - path: artifacts/resnet50
+    md5: 74369d5ddc9445476cfd72f6e80b692f.dir
+    size: 25650853
+    nfiles: 66
+  - path: metrics/metrics_resnet50.txt
+    md5: f28da6ae085534a41b6b0e92365f1188
+    size: 123
