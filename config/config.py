@@ -27,7 +27,7 @@ parser.add_argument('--oversample_mult',type=int,default=1)
 parser.add_argument('--cut_out_prob',type=float,default=0.2)
 parser.add_argument('--cut_mix_prob',type=float,default=0.2)
 parser.add_argument('--val_ttas',type=int,default=1)
-parser.add_argument('--use_meta',type=bool,default=False)
+parser.add_argument('--use_meta',type=int,default=0)
 
 args=parser.parse_args()
 
