@@ -55,7 +55,7 @@ stages:
       - submission
       - tools
     outs:
-      - artifacts/resnet101
+      - artifacts/resnet50
     metrics:
-      - metrics/metrics_resnet101.txt:
+      - metrics/metrics_resnet50.txt:
           cache: false
