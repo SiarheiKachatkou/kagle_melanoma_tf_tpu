@@ -10,8 +10,8 @@ yaml_ignore_keys={'gs_work_dir','work_dir','lr_fn'}
 target_key='test_avg_tta_auc'
 
 
-features = [('cut_out_prob','cut_mix_prob'),('cut_out_prob','model_fn_str'),('cut_mix_prob','model_fn_str'),'model_fn_str','hair_prob','microscope_prob',
-            'dropout_rate','cut_out_prob','cut_mix_prob','image_height']
+features = [('cut_out_prob','cut_mix_prob'),('cut_out_prob','model_fn_str'),('cut_mix_prob','model_fn_str'),'model_fn_str',
+            'cut_out_prob','cut_mix_prob','use_meta']
 
 df=parse_logs('metrics/metrics_*.txt','artifacts',yaml_ignore_keys,yaml_parsers_fns)
 

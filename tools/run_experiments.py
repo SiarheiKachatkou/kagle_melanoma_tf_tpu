@@ -6,17 +6,18 @@ from itertools import product
 import subprocess
 from config.consts import is_local
 
-hparams={'backbone':['B2'], 'dropout_rate':[0], 'lr_max':[5],
-         'lr_exp_decay':[0.8],'hair_prob':[0,0.05],
+hparams={'backbone':['B0','B2'], 'dropout_rate':[0], 'lr_max':[5],
+         'lr_exp_decay':[0.8],'hair_prob':[0.05],
          'microscope_prob':[0],
          'lr_warm_up_epochs':[5],
-         'image_height':[256], 'batch_size':[64], 'save_best_n':[1],
-         'cut_out_prob':[0,0.15],'cut_mix_prob':[0,0.05,0.1]}
+         'image_height':[128], 'batch_size':[64], 'save_best_n':[1],
+         'cut_out_prob':[0,0.15],'cut_mix_prob':[0,0.05,0.1],'use_meta':[1,0]}
 
 keys=list(hparams.keys())
 val_list=[hparams[k] for k in keys]
 args=list(product(*val_list))
-args=args[:1]
+random.shuffle(args)
+#args=args[:1]
 
 def get_gpu_available():
     worker_id=mp.current_process().name
@@ -32,7 +33,7 @@ def job(input_tuple):
     cmd_string='python3 tools/main.py'
 
     if is_local:
-        pass #cmd_string+=' --gpus='+str(get_gpu_available())
+        cmd_string+=' --gpus='+str(get_gpu_available())
 
     for k,v in zip(keys,args_list):
         cmd_string+=' --'+k+'='+str(v)
@@ -41,7 +42,7 @@ def job(input_tuple):
     os.system(cmd_string)
 
 if is_local:
-    num_procs=1
+    num_procs=2
     pool=mp.Pool(num_procs)
     map_fn=pool.imap_unordered
 else:

@@ -27,6 +27,7 @@ parser.add_argument('--oversample_mult',type=int,default=1)
 parser.add_argument('--cut_out_prob',type=float,default=0.2)
 parser.add_argument('--cut_mix_prob',type=float,default=0.2)
 parser.add_argument('--val_ttas',type=int,default=1)
+parser.add_argument('--use_meta',type=int,default=0)
 
 args=parser.parse_args()
 
@@ -39,7 +40,7 @@ if is_local:
 
 
 epochs_fine_tune = 0
-epochs_full = 1 if is_debug else epochs_fine_tune+1#12
+epochs_full = 1 if is_debug else epochs_fine_tune+12
 epochs_total = epochs_full + 0
 
 BATCH_SIZE = 36 if is_debug else args.batch_size
@@ -95,7 +96,7 @@ CONFIG=config(lr_max=args.lr_max*1e-4, lr_start=1e-6, stepsize=3,lr_fine_tune=3e
               image_height=image_height,
               epochs_full=epochs_full,epochs_fine_tune=epochs_fine_tune, fine_tune_last=-1, epochs_total=epochs_total,
               stage=args.stage,
-              use_meta=False
+              use_meta=args.use_meta
               )
 
 root=Path(os.path.split(__file__)[0])/'..'

@@ -7,7 +7,7 @@ from pathlib import Path
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 
-use_tpu_2 = False
+use_tpu_2 = True
 is_local = True
 is_kaggle = False
 is_debug = False
@@ -29,7 +29,7 @@ if is_local:
 
 root=Path(os.path.split(__file__)[0])/'..'
 
-test_files_num=1
+test_files_num=2
 
 if is_local:
     DATASETS = {
