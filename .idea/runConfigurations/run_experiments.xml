@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="run_experiments" type="PythonConfigurationType" factoryName="Python">
+  <configuration default="false" name="run_experiments" type="PythonConfigurationType" factoryName="Python" singleton="false">
     <module name="kaggle_melanoma_tf_tpu_" />
     <option name="INTERPRETER_OPTIONS" value="" />
     <option name="PARENT_ENVS" value="true" />
