@@ -27,6 +27,7 @@ parser.add_argument('--oversample_mult',type=int,default=1)
 parser.add_argument('--cut_out_prob',type=float,default=0.2)
 parser.add_argument('--cut_mix_prob',type=float,default=0.2)
 parser.add_argument('--val_ttas',type=int,default=1)
+parser.add_argument('--epochs_full',type=int,default=12)
 
 args=parser.parse_args()
 
@@ -39,7 +40,7 @@ if is_local:
 
 
 epochs_fine_tune = 0
-epochs_full = 1 if is_debug else epochs_fine_tune+12
+epochs_full = 1 if is_debug else epochs_fine_tune+args.epochs_full
 epochs_total = epochs_full + 0
 
 BATCH_SIZE = 36 if is_debug else args.batch_size

@@ -42,9 +42,9 @@ stages:
   resnet50:
     cmd: export LD_LIBRARY_PATH=/usr/local/cuda-10.2/lib64 && export PYTHONPATH=$PWD
       && python3 tools/main.py --work_dir=artifacts/resnet101
-      --backbone=ResNet50 --dropout_rate=0.1 --lr_max=1 --lr_exp_decay=0.5 --focal_loss_gamma=4
+      --backbone=ResNet50 --dropout_rate=0.1 --lr_max=1 --lr_exp_decay=0.7 --focal_loss_gamma=4
       --focal_loss_alpha=0.8 --hair_prob=0.1 --microscope_prob=0.01 --lr_warm_up_epochs=5
-      --image_height=384 --batch_size=128 --stage=resnet50 --save_best_n=3
+      --image_height=384 --batch_size=128 --stage=resnet50 --save_best_n=3 --epochs_full=20
     deps:
       - augmentations
       - config
