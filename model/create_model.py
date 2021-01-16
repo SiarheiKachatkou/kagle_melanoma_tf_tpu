@@ -91,14 +91,17 @@ def create_model(cfg,  metrics, optimizer, fine_tune_last=None, backbone_trainab
 
     pretrained_model.trainable = False
 
+
+
     image=tf.keras.Input(shape=(cfg.image_height,cfg.image_height,3),name='image')
     sex=tf.keras.Input(shape=(2,),name='sex')
     age = tf.keras.Input(shape=(1,), name='age')
     anatom=tf.keras.Input(shape=(10,), name='anatom_site')
     meta_feature=tf.concat([sex,age,anatom],axis=1)
 
-    training=cfg.epochs_fine_tune==0
-    features=pretrained_model(image,training=training)
+    if cfg.epochs_fine_tune!=0:
+        raise NotImplementedError("not tested functional: test is backbone changes on fine tune stage")
+    features=pretrained_model(image)
 
     head=tf.keras.Sequential([
         tf.keras.layers.GlobalAveragePooling2D(),
@@ -125,6 +128,7 @@ def create_model(cfg,  metrics, optimizer, fine_tune_last=None, backbone_trainab
     if cfg.l2_penalty != 0:
         regularizer = tf.keras.regularizers.l2(cfg.l2_penalty)
         model=add_regularization(model, regularizer)
+
 
     return set_backbone_trainable(model, metrics, optimizer, backbone_trainable, cfg, fine_tune_last=fine_tune_last)
 
