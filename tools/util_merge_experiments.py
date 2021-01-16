@@ -3,11 +3,11 @@ from glob import glob
 import os
 import shutil
 
-dst_root='.'
+dst_root='/mnt/850G/GIT/kaggle_melanoma_experiments/experiments_use_meta_e997306'
 dst_metrics_root=os.path.join(dst_root,'metrics')
 dst_artifacts_root=os.path.join(dst_root,'artifacts')
 
-src_root='tpu3'
+src_root='/mnt/850G/GIT/kaggle_melanoma_experiments/experiments_use_meta_2'
 
 def get_metrics_paths(root):
     paths=glob(os.path.join(root, 'metrics','metrics_*.txt'))

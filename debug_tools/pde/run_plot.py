@@ -10,11 +10,14 @@ yaml_ignore_keys={'gs_work_dir','work_dir','lr_fn'}
 target_key='test_avg_tta_auc'
 
 
-features = [('cut_out_prob','cut_mix_prob'),('cut_out_prob','model_fn_str'),('cut_mix_prob','model_fn_str'),'model_fn_str',
-            'cut_out_prob','cut_mix_prob','use_meta']
+features = ['model_fn_str',
+            'use_meta','cut_mix_prob','cut_out_prob']
 
-df=parse_logs('metrics/metrics_*.txt','artifacts',yaml_ignore_keys,yaml_parsers_fns)
+experiments_root='/mnt/850G/GIT/kaggle_melanoma_experiments/experiments_use_meta_e997306/'
 
+df=parse_logs(experiments_root+'metrics/metrics_*.txt',experiments_root+'artifacts',yaml_ignore_keys,yaml_parsers_fns)
+
+#df=df[df['model_fn_str']==2]
 
 rows=int(np.sqrt(len(features)))
 cols=len(features)//rows+1
