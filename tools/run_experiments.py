@@ -10,8 +10,8 @@ hparams={'backbone':['B0','B2'], 'dropout_rate':[0], 'lr_max':[5],
          'lr_exp_decay':[0.8],'hair_prob':[0.05],
          'microscope_prob':[0],
          'lr_warm_up_epochs':[5],
-         'image_height':[128], 'batch_size':[64], 'save_best_n':[1],
-         'cut_out_prob':[0,0.15],'cut_mix_prob':[0,0.05,0.1],'use_meta':[0]}
+         'image_height':[128], 'batch_size':[64], 'save_best_n':[3,5],
+         'cut_out_prob':[0.15],'cut_mix_prob':[0],'use_meta':[0,1]}
 
 keys=list(hparams.keys())
 val_list=[hparams[k] for k in keys]
