@@ -1,3 +1,4 @@
+import os
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
@@ -10,12 +11,13 @@ yaml_ignore_keys={'gs_work_dir','work_dir','lr_fn'}
 target_key='test_avg_tta_auc'
 
 
-features = ['model_fn_str',
-            'use_meta','cut_mix_prob','cut_out_prob']
+features = ['image_height','save_best_n',
+         'cut_out_prob','cut_mix_prob']
 
-experiments_root='/mnt/850G/GIT/kaggle_melanoma_experiments/experiments_use_meta_e997306/'
 
-df=parse_logs(experiments_root+'metrics/metrics_*.txt',experiments_root+'artifacts',yaml_ignore_keys,yaml_parsers_fns)
+experiments_root='/mnt/850G/GIT/kaggle_melanoma_experiments/experiments_b6'
+
+df=parse_logs(os.path.join(experiments_root,'metrics/metrics_*.txt'),os.path.join(experiments_root,'artifacts'),yaml_ignore_keys,yaml_parsers_fns)
 
 #df=df[df['model_fn_str']==2]
 
