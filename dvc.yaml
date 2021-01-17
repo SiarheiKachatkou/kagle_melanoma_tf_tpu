@@ -59,3 +59,23 @@ stages:
     metrics:
       - metrics/metrics_resnet50.txt:
           cache: false
+  b5:
+    cmd: export LD_LIBRARY_PATH=/usr/local/cuda-10.2/lib64 && export PYTHONPATH=$PWD
+      && python3 tools/main.py --work_dir=artifacts/b5
+      --backbone=B5 --dropout_rate=0.1 --lr_max=1 --lr_exp_decay=0.5 --focal_loss_gamma=4
+      --focal_loss_alpha=0.8 --hair_prob=0.1 --microscope_prob=0.01 --lr_warm_up_epochs=5
+      --image_height=512 --batch_size=128 --stage=b5 --save_best_n=3
+    deps:
+    - augmentations
+    - config
+    - data
+    - dataset
+    - debug_tools
+    - model
+    - submission
+    - tools
+    outs:
+    - artifacts/b5
+    metrics:
+    - metrics/metrics_b5.txt:
+        cache: false

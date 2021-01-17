@@ -1,4 +1,4 @@
-#pip3 install tensorflow-gpu==2.2.1
+#pip3 install tensorflow-gpu==2.2.0
 sudo apt-get install htop
 pip3 install -q -U albumentations
 pip3 install -U efficientnet
