@@ -97,8 +97,8 @@ b5:
     && python3 tools/main.py --work_dir=artifacts/b5 --backbone=B5 --dropout_rate=0
     --lr_max=5 --lr_exp_decay=0.8 --focal_loss_gamma=4 --focal_loss_alpha=0.8 --hair_prob=0
     --microscope_prob=0 --lr_warm_up_epochs=5 --image_height=512 --batch_size=128
-    --stage=b5 --save_best_n=3 --cut_mix_prob=0.05 --cut_out_prob=0 --epochs_full=12
-    --use_meta=0 --val_ttas=1
+    --stage=b5 --save_best_n=3 --cut_mix_prob=0.05 --cut_out_prob=0.15 --epochs_full=12
+    --use_meta=1 --val_ttas=1
   deps:
   - path: augmentations
     md5: 4cf43d259ab2d5c60e64b7b32d59c45c.dir
@@ -134,9 +134,9 @@ b5:
     nfiles: 8
   outs:
   - path: artifacts/b5
-    md5: 3977a218dbb210ddc514930eaacc7d0e.dir
-    size: 25484161
+    md5: e58a02859ce115f34d80912bfbd46c2d.dir
+    size: 25669528
     nfiles: 66
   - path: metrics/metrics_b5.txt
-    md5: ba5475a9a23d6d424b84295825f54601
-    size: 123
+    md5: 9b853720d586721dfdc8ec03f3c50c31
+    size: 122
