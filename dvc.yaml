@@ -64,8 +64,8 @@ stages:
       && python3 tools/main.py --work_dir=artifacts/b5
       --backbone=B5 --dropout_rate=0 --lr_max=5 --lr_exp_decay=0.8 --focal_loss_gamma=4
       --focal_loss_alpha=0.8 --hair_prob=0 --microscope_prob=0 --lr_warm_up_epochs=5
-      --image_height=512 --batch_size=128 --stage=b5 --save_best_n=3 --cut_mix_prob=0.05 --cut_out_prob=0
-      --epochs_full=12 --use_meta=0 --val_ttas=1
+      --image_height=512 --batch_size=128 --stage=b5 --save_best_n=3 --cut_mix_prob=0.05 --cut_out_prob=0.15
+      --epochs_full=12 --use_meta=1 --val_ttas=1
     deps:
     - augmentations
     - config
