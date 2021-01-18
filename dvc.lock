@@ -94,17 +94,18 @@ b0:
     size: 123
 b5:
   cmd: export LD_LIBRARY_PATH=/usr/local/cuda-10.2/lib64 && export PYTHONPATH=$PWD
-    && python3 tools/main.py --work_dir=artifacts/b5 --backbone=B5 --dropout_rate=0.1
-    --lr_max=1 --lr_exp_decay=0.5 --focal_loss_gamma=4 --focal_loss_alpha=0.8 --hair_prob=0.1
-    --microscope_prob=0.01 --lr_warm_up_epochs=5 --image_height=512 --batch_size=128
-    --stage=b5 --save_best_n=3
+    && python3 tools/main.py --work_dir=artifacts/b5 --backbone=B5 --dropout_rate=0
+    --lr_max=5 --lr_exp_decay=0.8 --focal_loss_gamma=4 --focal_loss_alpha=0.8 --hair_prob=0
+    --microscope_prob=0 --lr_warm_up_epochs=5 --image_height=512 --batch_size=128
+    --stage=b5 --save_best_n=3 --cut_mix_prob=0.05 --cut_out_prob=0 --epochs_full=12
+    --use_meta=0 --val_ttas=1
   deps:
   - path: augmentations
-    md5: 4442ab2481efa1ee13afd9a04e36eaba.dir
+    md5: 4cf43d259ab2d5c60e64b7b32d59c45c.dir
     size: 25670
     nfiles: 9
   - path: config
-    md5: 3e593eea40de6796587b3595d7631584.dir
+    md5: 134681eeafa2b55d73ef4e14cd89e80c.dir
     size: 17264
     nfiles: 8
   - path: data
@@ -112,30 +113,30 @@ b5:
     size: 0
     nfiles: 1
   - path: dataset
-    md5: 79de62c0449a2cf1b53c513955d06b54.dir
+    md5: cf1b5a35d118d3eeece55e5832cc80af.dir
     size: 40597
     nfiles: 10
   - path: debug_tools
-    md5: fe1abfae4fc3c96b7f3049a0d4040c52.dir
+    md5: dcfacb33011615482a4a40ce2638d931.dir
     size: 21792
     nfiles: 14
   - path: model
-    md5: 3c93c45f702bdbff31eabaac8f994045.dir
+    md5: 20934e461461c960603e48285ceda1db.dir
     size: 26397
     nfiles: 14
   - path: submission
-    md5: df57a81eaf3200b8c04606d4b8deeaea.dir
+    md5: 976175cdf78525e1b3ebd9b286b3d124.dir
     size: 15555
     nfiles: 6
   - path: tools
-    md5: c9b353bc4e4b725fa2340379e481d9fe.dir
-    size: 14962
-    nfiles: 9
+    md5: 677916a39801747f3298391c5dfbb3d8.dir
+    size: 13925
+    nfiles: 8
   outs:
   - path: artifacts/b5
-    md5: 421111f5f563a55bd8fa083b2ac125d7.dir
-    size: 24669590
+    md5: 3977a218dbb210ddc514930eaacc7d0e.dir
+    size: 25484161
     nfiles: 66
   - path: metrics/metrics_b5.txt
-    md5: 25ca1877be171be0f63ed53c7774a638
-    size: 121
+    md5: ba5475a9a23d6d424b84295825f54601
+    size: 123
