@@ -15,10 +15,10 @@ ctpu up --project=${PROJECT_ID} \
 
 exit 0
 
-git clone -b hotfix-release-config https://github.com/SiarheiKachatkou/kagle_melanoma_tf_tpu.git &&
+git clone -b feature_b5_512 https://github.com/SiarheiKachatkou/kagle_melanoma_tf_tpu.git &&
 cd kagle_melanoma_tf_tpu &&
 tools/install.sh &&
-dvc repro resnet50
+dvc repro b5
 
 export PYTHONPATH=$PWD &&
 python3 tools/run_experiments.py
